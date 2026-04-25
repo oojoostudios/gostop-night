@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
-import { ChevronLeft, ChevronRight, Layers } from "lucide-react";
+import { ChevronLeft, ChevronRight, Layers, Lock } from "lucide-react";
 import { Button } from "@heroui/react";
 import { useLocale } from "@/contexts/locale-context";
 import { HWATU_DECK, type HwatuCard as HwatuCardData } from "@/lib/hwatu";
@@ -14,20 +14,23 @@ const cardById = (id: string): HwatuCardData => {
   return c;
 };
 
-type Zone = "hand" | "floor" | "taken";
-
 type StageState = {
   hand: string[];
   floor: string[];
   taken: string[];
-  /** Top deck card, only present when face-up mid-turn. */
+  /** Top deck card mid-turn (visually face-up next to deck). */
   flipped?: string;
   deckCount: number;
-  highlight?: { hand?: string; floor?: string; taken?: string[] };
+  highlight?: {
+    hand?: string;
+    floor?: string[];
+    taken?: string[];
+    /** Floor cards that are locked (뻑) — rendered with rose styling. */
+    locked?: string[];
+  };
+  /** "+N pi from each opponent" badge (쪽/따닥/폭탄). */
+  bonusPi?: number;
 };
-
-const HAND = ["01-gwang", "03-tti", "07-pi-1", "09-kkeut"];
-const FLOOR = ["01-pi-1", "04-pi-1", "08-gwang", "11-pi-3"];
 
 type Step = {
   id: string;
@@ -38,7 +41,23 @@ type Step = {
   state: StageState;
 };
 
-const STEPS: ReadonlyArray<Step> = [
+type Scenario = {
+  id: string;
+  label: string;
+  labelKo: string;
+  blurb: string;
+  blurbKo: string;
+  steps: ReadonlyArray<Step>;
+};
+
+/* -------------------------------------------------------------------------- */
+/* Scenarios                                                                   */
+/* -------------------------------------------------------------------------- */
+
+const HAND = ["01-gwang", "03-tti", "07-pi-1", "09-kkeut"];
+const FLOOR_NORMAL = ["01-pi-1", "04-pi-1", "08-gwang", "11-pi-3"];
+
+const NORMAL_STEPS: Step[] = [
   {
     id: "setup",
     title: "Deal the cards",
@@ -47,27 +66,22 @@ const STEPS: ReadonlyArray<Step> = [
       "In a 3-player game, each player gets 7 cards in hand. 8 cards lie face-up on the floor (바닥). The remaining 19 form the deck.",
     descKo:
       "3인 고스톱 기준 — 각자 7장씩 손패를 받고, 바닥(공유 영역)에는 8장이 펼쳐져요. 남은 19장은 더미.",
-    state: {
-      hand: HAND,
-      floor: FLOOR,
-      taken: [],
-      deckCount: 19,
-    },
+    state: { hand: HAND, floor: FLOOR_NORMAL, taken: [], deckCount: 19 },
   },
   {
     id: "pick",
     title: "Pick a card from your hand",
     titleKo: "손패에서 카드를 골라요",
     desc:
-      "Look for a hand card whose month matches one on the floor. Here, the 1월 광 (Pine bright) in hand pairs with the 1월 피 on the floor.",
+      "Look for a hand card whose month matches one on the floor. The 1월 광 in hand pairs with the 1월 피 on the floor.",
     descKo:
-      "내 손패와 바닥에서 같은 월(月)의 카드를 찾아요. 손에 있는 1월 광(송학)이 바닥의 1월 피와 짝이 맞네요.",
+      "내 손패와 바닥에서 같은 월(月)의 카드를 찾아요. 1월 광(송학)이 바닥의 1월 피와 짝이 맞네요.",
     state: {
       hand: HAND,
-      floor: FLOOR,
+      floor: FLOOR_NORMAL,
       taken: [],
       deckCount: 19,
-      highlight: { hand: "01-gwang", floor: "01-pi-1" },
+      highlight: { hand: "01-gwang", floor: ["01-pi-1"] },
     },
   },
   {
@@ -119,13 +133,252 @@ const STEPS: ReadonlyArray<Step> = [
   },
 ];
 
+const JJOK_HAND_INIT = ["01-gwang", "03-tti", "07-pi-1", "09-kkeut"];
+const JJOK_FLOOR_INIT = ["04-pi-1", "08-gwang", "11-pi-3"]; // no 1월
+const JJOK_HAND_AFTER = ["03-tti", "07-pi-1", "09-kkeut"];
+
+const JJOK_STEPS: Step[] = [
+  {
+    id: "setup",
+    title: "1월 광 in hand, no 1월 on floor",
+    titleKo: "내 손엔 1월 광, 바닥엔 1월 없음",
+    desc:
+      "You hold the 1월 bright. Looking at the floor, there's no 1월 card to match against — so when you play it, it'll just join the floor.",
+    descKo:
+      "1월 광을 손에 들고 있어요. 바닥엔 1월이 하나도 없으니 그냥 광을 내면 바닥으로 가버리겠죠.",
+    state: {
+      hand: JJOK_HAND_INIT,
+      floor: JJOK_FLOOR_INIT,
+      taken: [],
+      deckCount: 19,
+      highlight: { hand: "01-gwang" },
+    },
+  },
+  {
+    id: "no-match",
+    title: "Played — joins the floor",
+    titleKo: "내고 보니 바닥행",
+    desc:
+      "You play the 1월 광. Without a partner on the floor, it sits face-up on the floor.",
+    descKo:
+      "1월 광을 냈지만 짝이 없어서 그대로 바닥에 놓여요.",
+    state: {
+      hand: JJOK_HAND_AFTER,
+      floor: [...JJOK_FLOOR_INIT, "01-gwang"],
+      taken: [],
+      deckCount: 19,
+      highlight: { floor: ["01-gwang"] },
+    },
+  },
+  {
+    id: "flip-match",
+    title: "Flip — same month!",
+    titleKo: "더미를 뒤집었더니… 같은 월!",
+    desc:
+      "Now you flip the top deck card. It's 1월 — same month as the card you just placed. That's 쪽 (jjok).",
+    descKo:
+      "더미를 뒤집었더니 1월! 방금 내가 낸 1월 광과 같은 월이에요. 이게 바로 쪽이에요.",
+    state: {
+      hand: JJOK_HAND_AFTER,
+      floor: [...JJOK_FLOOR_INIT, "01-gwang"],
+      taken: [],
+      deckCount: 18,
+      flipped: "01-pi-1",
+      highlight: { floor: ["01-gwang"] },
+    },
+  },
+  {
+    id: "take-bonus",
+    title: "Take both + bonus pi",
+    titleKo: "둘 다 가져가고 보너스 피",
+    desc:
+      "Both 1월 cards go to your taken pile. Plus, every other player gives you one pi each — bonus reward for the lucky flip.",
+    descKo:
+      "두 카드 모두 내 먹은 패로. 추가로 상대방 한 명당 피 한 장씩 — 운 좋은 짝 만남에 대한 보너스예요.",
+    state: {
+      hand: JJOK_HAND_AFTER,
+      floor: JJOK_FLOOR_INIT,
+      taken: ["01-gwang", "01-pi-1"],
+      deckCount: 18,
+      highlight: { taken: ["01-gwang", "01-pi-1"] },
+      bonusPi: 2,
+    },
+  },
+];
+
+const TTADAK_HAND_INIT = ["01-gwang", "03-tti", "07-pi-1", "09-kkeut"];
+const TTADAK_FLOOR_INIT = ["01-pi-1", "01-pi-2", "04-pi-1", "08-gwang"]; // 2x 1월
+const TTADAK_HAND_AFTER = ["03-tti", "07-pi-1", "09-kkeut"];
+
+const TTADAK_STEPS: Step[] = [
+  {
+    id: "setup",
+    title: "Two 1월 already on the floor",
+    titleKo: "바닥에 1월이 벌써 2장",
+    desc:
+      "The floor already shows two 1월 pi cards (left over from earlier turns). You happen to be holding the 1월 bright.",
+    descKo:
+      "이전 차례들의 결과로 바닥엔 1월 피 2장이 있어요. 마침 내 손엔 1월 광이 들려있고요.",
+    state: {
+      hand: TTADAK_HAND_INIT,
+      floor: TTADAK_FLOOR_INIT,
+      taken: [],
+      deckCount: 19,
+      highlight: { hand: "01-gwang", floor: ["01-pi-1", "01-pi-2"] },
+    },
+  },
+  {
+    id: "match-three",
+    title: "Match grabs all three",
+    titleKo: "한 번에 3장",
+    desc:
+      "When you play your 1월 bright, it matches both floor cards. All three go into your taken pile.",
+    descKo:
+      "1월 광을 내면 바닥의 1월 두 장과 한꺼번에 매치돼요. 세 장 모두 내 먹은 패로.",
+    state: {
+      hand: TTADAK_HAND_AFTER,
+      floor: ["04-pi-1", "08-gwang"],
+      taken: ["01-gwang", "01-pi-1", "01-pi-2"],
+      deckCount: 19,
+      highlight: { taken: ["01-gwang", "01-pi-1", "01-pi-2"] },
+      bonusPi: 2,
+    },
+  },
+  {
+    id: "flip-after",
+    title: "Flip — no extra match",
+    titleKo: "더미 뒤집기 — 추가 매치는 없음",
+    desc:
+      "You still flip the deck card afterwards. 5월 피 doesn't match anything on the floor — it just sits down. But the 따닥 already earned you bonus pi from each opponent.",
+    descKo:
+      "그리고 나서도 더미를 뒤집어요. 5월 피는 바닥과 안 맞아서 그대로 놓여요. 하지만 따닥으로 이미 상대 한 명당 피 1장씩 받았어요.",
+    state: {
+      hand: TTADAK_HAND_AFTER,
+      floor: ["04-pi-1", "08-gwang", "05-pi-1"],
+      taken: ["01-gwang", "01-pi-1", "01-pi-2"],
+      deckCount: 18,
+      bonusPi: 2,
+    },
+  },
+];
+
+const PPEOK_HAND_INIT = ["01-gwang", "03-tti", "07-pi-1", "09-kkeut"];
+const PPEOK_FLOOR_INIT = ["01-pi-1", "04-pi-1", "08-gwang"]; // 1x 1월
+const PPEOK_HAND_AFTER = ["03-tti", "07-pi-1", "09-kkeut"];
+
+const PPEOK_STEPS: Step[] = [
+  {
+    id: "setup",
+    title: "Hand match looks easy",
+    titleKo: "손패 매치는 평범해 보여요",
+    desc:
+      "You hold the 1월 bright, and the floor has a 1월 pi. A normal pair-take, right?",
+    descKo:
+      "1월 광을 내려고 해요. 바닥에 1월 피가 한 장 있으니 평범한 쌍 매치 같죠?",
+    state: {
+      hand: PPEOK_HAND_INIT,
+      floor: PPEOK_FLOOR_INIT,
+      taken: [],
+      deckCount: 19,
+      highlight: { hand: "01-gwang", floor: ["01-pi-1"] },
+    },
+  },
+  {
+    id: "flip-third",
+    title: "But the flip is also 1월!",
+    titleKo: "근데 더미도 1월이네요?!",
+    desc:
+      "You flip the deck card right after. It's another 1월. That makes three 1월 cards on the floor at once — the situation locks.",
+    descKo:
+      "곧바로 더미를 뒤집었는데 그것도 1월. 바닥에 1월 카드가 한꺼번에 3장이 모이면 상황이 잠겨버려요.",
+    state: {
+      hand: PPEOK_HAND_AFTER,
+      floor: [...PPEOK_FLOOR_INIT, "01-gwang"],
+      taken: [],
+      deckCount: 18,
+      flipped: "01-pi-2",
+      highlight: { floor: ["01-pi-1", "01-gwang"] },
+    },
+  },
+  {
+    id: "locked",
+    title: "Three 1월 stuck on the floor",
+    titleKo: "1월 3장이 바닥에 묶여요",
+    desc:
+      "All three 1월 cards now stay on the floor — nobody takes them. The next player who plays a 1월 card will sweep all four (the locked three plus their own).",
+    descKo:
+      "1월 3장이 그대로 바닥에 묶여요. 누구도 못 가져가요. 다음에 1월을 내는 사람이 (자기 카드까지 더해서) 4장 모두 가져갑니다.",
+    state: {
+      hand: PPEOK_HAND_AFTER,
+      floor: ["04-pi-1", "08-gwang", "01-pi-1", "01-gwang", "01-pi-2"],
+      taken: [],
+      deckCount: 18,
+      highlight: { locked: ["01-pi-1", "01-gwang", "01-pi-2"] },
+    },
+  },
+];
+
+const SCENARIOS: ReadonlyArray<Scenario> = [
+  {
+    id: "normal",
+    label: "Normal turn",
+    labelKo: "기본 흐름",
+    blurb: "A vanilla turn with a single match.",
+    blurbKo: "한 번 매치되는 평범한 차례.",
+    steps: NORMAL_STEPS,
+  },
+  {
+    id: "jjok",
+    label: "쪽 (Jjok)",
+    labelKo: "쪽",
+    blurb:
+      "Played hand card had no match — but the deck flip happens to be the same month. Take both, plus pi from each opponent.",
+    blurbKo:
+      "낸 손패는 짝이 없었는데 더미에서 뒤집은 게 같은 월. 두 장 모두 가져가고 상대 피 한 장씩.",
+    steps: JJOK_STEPS,
+  },
+  {
+    id: "ttadak",
+    label: "따닥 (Ttadak)",
+    labelKo: "따닥",
+    blurb:
+      "Two of the same month already on the floor — your matching play takes all three. Plus bonus pi.",
+    blurbKo:
+      "바닥에 같은 월 카드가 2장 있을 때 손에서 매치되는 카드를 내면 3장 모두 내 것. 보너스 피까지.",
+    steps: TTADAK_STEPS,
+  },
+  {
+    id: "ppeok",
+    label: "뻑 (Ppeok)",
+    labelKo: "뻑",
+    blurb:
+      "Hand-match plus a same-month flip = three-of-a-month on floor. Locked. The next player to play that month wins all four.",
+    blurbKo:
+      "손패 매치 + 더미도 같은 월 = 3장이 바닥에 묶여요. 다음에 그 월을 내는 사람이 다 쓸어가요.",
+    steps: PPEOK_STEPS,
+  },
+];
+
+/* -------------------------------------------------------------------------- */
+/* Main section                                                                */
+/* -------------------------------------------------------------------------- */
+
 export function SectionFlow() {
   const { locale } = useLocale();
-  const [stepIndex, setStepIndex] = useState(0);
-  const step = STEPS[stepIndex];
+  const [scenarioId, setScenarioId] = useState<string>("normal");
+  const [stepIndex, setStepIndex] = useState<number>(0);
 
+  const scenario =
+    SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS[0];
+  const step = scenario.steps[stepIndex];
+
+  const switchScenario = (id: string) => {
+    setScenarioId(id);
+    setStepIndex(0);
+  };
   const goPrev = () => setStepIndex((i) => Math.max(0, i - 1));
-  const goNext = () => setStepIndex((i) => Math.min(STEPS.length - 1, i + 1));
+  const goNext = () =>
+    setStepIndex((i) => Math.min(scenario.steps.length - 1, i + 1));
 
   return (
     <section
@@ -138,18 +391,49 @@ export function SectionFlow() {
       <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mb-6">
         {locale === "ko" ? "한 판은 이렇게" : "How a round works"}
       </h2>
-      <p className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-12">
+      <p className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-8">
         {locale === "ko"
-          ? "한 턴의 흐름을 따라가 봐요. 패를 받고, 같은 월의 카드를 매치하고, 더미를 뒤집고, 다음 사람으로 넘어가요."
-          : "Follow one turn from start to finish. Deal, match by month, flip from the deck, and pass to the next player."}
+          ? "한 턴의 흐름을 따라가 봐요. 기본 흐름부터 보고, 그 다음에 쪽·따닥·뻑 같은 변주들을 차례대로 클릭해보세요."
+          : "Follow one turn from start to finish. Start with the normal flow, then explore the variations — jjok, ttadak, and ppeok."}
       </p>
+
+      {/* Scenario selector */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {SCENARIOS.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            onClick={() => switchScenario(s.id)}
+            className={`px-3.5 py-1.5 rounded-full text-sm transition-colors ${
+              scenario.id === s.id
+                ? "bg-foreground text-background font-medium"
+                : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
+            }`}
+          >
+            {locale === "ko" ? s.labelKo : s.label}
+          </button>
+        ))}
+      </div>
+
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={scenario.id}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.18 }}
+          className="text-sm text-foreground/55 mb-8 max-w-2xl leading-relaxed"
+        >
+          {locale === "ko" ? scenario.blurbKo : scenario.blurb}
+        </motion.p>
+      </AnimatePresence>
 
       <Stage state={step.state} />
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start">
         <AnimatePresence mode="wait">
           <motion.div
-            key={step.id}
+            key={`${scenario.id}-${step.id}`}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
@@ -178,7 +462,7 @@ export function SectionFlow() {
             variant="primary"
             size="sm"
             onPress={goNext}
-            isDisabled={stepIndex === STEPS.length - 1}
+            isDisabled={stepIndex === scenario.steps.length - 1}
           >
             {locale === "ko" ? "다음" : "Next"}
             <ChevronRight className="size-4" />
@@ -187,7 +471,7 @@ export function SectionFlow() {
       </div>
 
       <div className="mt-6 flex items-center gap-2">
-        {STEPS.map((s, i) => (
+        {scenario.steps.map((s, i) => (
           <button
             key={s.id}
             type="button"
@@ -203,12 +487,16 @@ export function SectionFlow() {
           />
         ))}
         <span className="ml-3 text-xs tabular-nums text-foreground/50">
-          {stepIndex + 1} / {STEPS.length}
+          {stepIndex + 1} / {scenario.steps.length}
         </span>
       </div>
     </section>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Stage                                                                       */
+/* -------------------------------------------------------------------------- */
 
 function Stage({ state }: { state: StageState }) {
   const { locale } = useLocale();
@@ -220,10 +508,11 @@ function Stage({ state }: { state: StageState }) {
         helpKo="공유되는 카드. 매치 대상이에요."
         helpEn="Shared face-up cards — match candidates."
         cardIds={state.floor}
-        highlightedId={state.highlight?.floor}
+        highlightedIds={state.highlight?.floor}
+        lockedIds={state.highlight?.locked}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-6 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] gap-6 items-start">
         <DeckPile count={state.deckCount} flipped={state.flipped} />
         <Zone
           labelKo="먹은 패"
@@ -233,11 +522,10 @@ function Stage({ state }: { state: StageState }) {
           cardIds={state.taken}
           highlightedIds={state.highlight?.taken}
           empty={
-            locale === "ko"
-              ? "아직 먹은 패가 없어요"
-              : "No cards taken yet"
+            locale === "ko" ? "아직 먹은 패가 없어요" : "No cards taken yet"
           }
         />
+        <BonusPiBadge count={state.bonusPi} />
       </div>
 
       <Zone
@@ -246,7 +534,7 @@ function Stage({ state }: { state: StageState }) {
         helpKo="다른 플레이어에겐 안 보여요."
         helpEn="Hidden from other players."
         cardIds={state.hand}
-        highlightedId={state.highlight?.hand}
+        highlightedIds={state.highlight?.hand ? [state.highlight.hand] : undefined}
       />
     </div>
   );
@@ -258,8 +546,8 @@ function Zone({
   helpKo,
   helpEn,
   cardIds,
-  highlightedId,
   highlightedIds,
+  lockedIds,
   empty,
 }: {
   labelKo: string;
@@ -267,13 +555,13 @@ function Zone({
   helpKo: string;
   helpEn: string;
   cardIds: string[];
-  highlightedId?: string;
   highlightedIds?: string[];
+  lockedIds?: string[];
   empty?: string;
 }) {
   const { locale } = useLocale();
-  const isHighlighted = (id: string) =>
-    id === highlightedId || (highlightedIds?.includes(id) ?? false);
+  const isHighlighted = (id: string) => highlightedIds?.includes(id) ?? false;
+  const isLocked = (id: string) => lockedIds?.includes(id) ?? false;
 
   return (
     <div>
@@ -297,6 +585,7 @@ function Zone({
                 key={id}
                 id={id}
                 highlighted={isHighlighted(id)}
+                locked={isLocked(id)}
               />
             ))}
           </AnimatePresence>
@@ -309,9 +598,11 @@ function Zone({
 function MiniCard({
   id,
   highlighted,
+  locked,
 }: {
   id: string;
   highlighted?: boolean;
+  locked?: boolean;
 }) {
   const card = cardById(id);
   return (
@@ -319,16 +610,29 @@ function MiniCard({
       layout
       layoutId={`flow-${id}`}
       initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ opacity: locked ? 0.6 : 1, y: 0 }}
       exit={{ opacity: 0, y: -6 }}
       transition={{ type: "spring", stiffness: 320, damping: 30 }}
-      className={`relative aspect-[2/3] w-14 sm:w-16 rounded-md overflow-hidden ring-1 ring-black/10 bg-white ${
-        highlighted
-          ? "outline outline-2 outline-offset-2 outline-amber-500"
-          : ""
+      className={`relative aspect-[2/3] w-14 sm:w-16 rounded-md overflow-hidden ring-1 bg-white ${
+        locked
+          ? "ring-rose-400 outline outline-2 outline-offset-2 outline-rose-500"
+          : highlighted
+            ? "ring-black/10 outline outline-2 outline-offset-2 outline-amber-500"
+            : "ring-black/10"
       }`}
     >
-      <Image src={card.image} alt={card.nameKo} fill sizes="80px" className="object-cover" />
+      <Image
+        src={card.image}
+        alt={card.nameKo}
+        fill
+        sizes="80px"
+        className="object-cover"
+      />
+      {locked && (
+        <div className="absolute top-0.5 right-0.5 bg-rose-500 text-white rounded-full p-0.5">
+          <Lock className="size-2.5" />
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -380,5 +684,31 @@ function DeckPile({
         </AnimatePresence>
       </div>
     </div>
+  );
+}
+
+function BonusPiBadge({ count }: { count?: number }) {
+  const { locale } = useLocale();
+  return (
+    <AnimatePresence>
+      {count && count > 0 ? (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: -6 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 360, damping: 22 }}
+          className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400 self-center"
+        >
+          <div className="font-semibold">
+            +{count} {locale === "ko" ? "피 (보너스)" : "pi (bonus)"}
+          </div>
+          <div className="text-[10px] opacity-80 mt-0.5">
+            {locale === "ko"
+              ? "상대 한 명당 한 장씩"
+              : "from each opponent"}
+          </div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }

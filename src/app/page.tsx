@@ -11,7 +11,7 @@ export default function Home() {
       <MobileTopbar />
       <Sidebar />
       <main className="lg:ml-72 min-h-screen">
-        <div className="max-w-3xl mx-auto px-8 lg:px-16">
+        <div className="max-w-5xl mx-auto px-8 lg:px-16">
           <Hero />
           <SectionCards />
           {SECTIONS.filter((s) => s.id !== "section-cards").map((section) => (

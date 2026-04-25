@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { useLocale } from "@/contexts/locale-context";
 import { ScoreCalculator } from "@/components/score-calculator";
+import { WinningPatterns } from "@/components/winning-patterns";
 import {
   HWATU_DECK,
   HWATU_TYPES,
@@ -50,6 +51,10 @@ export function SectionScoring() {
         <TtiBlock />
         <KkeutBlock />
         <PiBlock />
+      </div>
+
+      <div className="border-t border-foreground/10 pt-14 mt-16">
+        <WinningPatterns />
       </div>
 
       <ScoreCalculator />

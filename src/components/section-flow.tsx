@@ -318,6 +318,62 @@ const PPEOK_STEPS: Step[] = [
   },
 ];
 
+const SWEEP_HAND_INIT = ["01-gwang", "07-pi-1", "09-kkeut"];
+const SWEEP_HAND_AFTER = ["07-pi-1", "09-kkeut"];
+const SWEEP_TAKEN_PRE = ["02-kkeut", "03-gwang", "04-pi-1"];
+
+const SWEEP_STEPS: Step[] = [
+  {
+    id: "setup",
+    title: "Late round, only one card on the floor",
+    titleKo: "라운드 막바지, 바닥엔 1장뿐",
+    desc:
+      "Several turns in. Most floor cards have been taken throughout the round. Just a single 1월 피 remains — and you're holding the 1월 광.",
+    descKo:
+      "여러 턴이 지나 대부분의 카드가 정리됐어요. 바닥엔 1월 피 한 장만 남아있고, 마침 내 손엔 1월 광이 있어요.",
+    state: {
+      hand: SWEEP_HAND_INIT,
+      floor: ["01-pi-1"],
+      taken: SWEEP_TAKEN_PRE,
+      deckCount: 6,
+      highlight: { hand: "01-gwang", floor: ["01-pi-1"] },
+    },
+  },
+  {
+    id: "sweep",
+    title: "Match clears the floor — 싹쓸이!",
+    titleKo: "매치하면 바닥이 텅 비어요 — 싹쓸이!",
+    desc:
+      "Your 1월 광 takes the lone 1월 피. The floor is now empty — that's 싹쓸이 (sweep). Every opponent gives you one pi.",
+    descKo:
+      "1월 광이 마지막 1월 피와 매치되면서 바닥이 텅 비어요. 이게 싹쓸이! 상대 한 명당 피 1장씩 받아요.",
+    state: {
+      hand: SWEEP_HAND_AFTER,
+      floor: [],
+      taken: [...SWEEP_TAKEN_PRE, "01-gwang", "01-pi-1"],
+      deckCount: 6,
+      highlight: { taken: ["01-gwang", "01-pi-1"] },
+      bonusPi: 2,
+    },
+  },
+  {
+    id: "flip",
+    title: "Flip lands on empty floor",
+    titleKo: "더미 뒤집기는 빈 바닥으로",
+    desc:
+      "After the sweep you still flip from the deck. 5월 피 has nothing to match — it sits down on the (briefly empty) floor.",
+    descKo:
+      "싹쓸이 후에도 더미는 뒤집어요. 5월 피는 짝이 없어서 (잠깐 비었던) 바닥에 그대로 놓여요.",
+    state: {
+      hand: SWEEP_HAND_AFTER,
+      floor: ["05-pi-1"],
+      taken: [...SWEEP_TAKEN_PRE, "01-gwang", "01-pi-1"],
+      deckCount: 5,
+      bonusPi: 2,
+    },
+  },
+];
+
 const SCENARIOS: ReadonlyArray<Scenario> = [
   {
     id: "normal",
@@ -356,6 +412,16 @@ const SCENARIOS: ReadonlyArray<Scenario> = [
     blurbKo:
       "손패 매치 + 더미도 같은 월 = 3장이 바닥에 묶여요. 다음에 그 월을 내는 사람이 다 쓸어가요.",
     steps: PPEOK_STEPS,
+  },
+  {
+    id: "sweep",
+    label: "싹쓸이 (Sweep)",
+    labelKo: "싹쓸이",
+    blurb:
+      "Your match takes the last card on the floor — bonus pi from each opponent for clearing the table.",
+    blurbKo:
+      "내 매치가 바닥의 마지막 카드를 가져가서 텅 비게 돼요. 바닥을 청소한 상으로 상대 피 한 장씩.",
+    steps: SWEEP_STEPS,
   },
 ];
 

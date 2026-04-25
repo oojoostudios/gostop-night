@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@heroui/react";
-import { SECTIONS } from "@/lib/sections";
+import { SECTIONS_BY_GAME } from "@/lib/sections";
+import { getActiveGame } from "@/lib/games";
+import { GameTabs } from "@/components/game-tabs";
 import { useLocale } from "@/contexts/locale-context";
 import { useVariant, VARIANTS } from "@/contexts/variant-context";
 import { useTheme } from "@/contexts/theme-context";
@@ -12,7 +15,15 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   const { locale, setLocale } = useLocale();
   const { variant, setVariant } = useVariant();
   const { theme, toggleTheme } = useTheme();
-  const [active, setActive] = useState<string>(SECTIONS[0].id);
+  const pathname = usePathname();
+  const game = getActiveGame(pathname);
+  const sections = SECTIONS_BY_GAME[game];
+  const [active, setActive] = useState<string>(sections[0].id);
+
+  // Reset active section when switching games.
+  useEffect(() => {
+    setActive(sections[0].id);
+  }, [game, sections]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -23,12 +34,18 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
       },
       { rootMargin: "-35% 0px -55% 0px" },
     );
-    for (const section of SECTIONS) {
-      const el = document.getElementById(section.id);
-      if (el) observer.observe(el);
-    }
-    return () => observer.disconnect();
-  }, []);
+    // Defer to ensure the new page's sections are mounted.
+    const raf = requestAnimationFrame(() => {
+      for (const section of sections) {
+        const el = document.getElementById(section.id);
+        if (el) observer.observe(el);
+      }
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+    };
+  }, [sections]);
 
   const scrollTo = (id: string) => {
     document
@@ -39,13 +56,10 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <>
-      <div className="flex items-baseline gap-2 text-lg font-semibold tracking-tight">
-        <span>Go-Stop</span>
-        <span className="text-foreground/50 font-normal text-base">고스톱</span>
-      </div>
+      <GameTabs />
 
       <nav className="flex flex-col gap-0.5">
-        {SECTIONS.map((section) => {
+        {sections.map((section) => {
           const isActive = active === section.id;
           return (
             <a
@@ -70,29 +84,31 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      <div className="flex flex-col gap-2 mt-auto">
-        <div className="text-[10px] uppercase tracking-[0.18em] text-foreground/50">
-          {locale === "ko" ? "룰셋" : "Ruleset"}
+      {game === "gostop" && (
+        <div className="flex flex-col gap-2 mt-auto">
+          <div className="text-[10px] uppercase tracking-[0.18em] text-foreground/50">
+            {locale === "ko" ? "룰셋" : "Ruleset"}
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {VARIANTS.map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => setVariant(v.id)}
+                className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
+                  variant === v.id
+                    ? "bg-foreground text-background border-foreground"
+                    : "border-foreground/20 text-foreground/60 hover:text-foreground hover:bg-foreground/5"
+                }`}
+              >
+                {locale === "ko" ? v.labelKo : v.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-wrap gap-1">
-          {VARIANTS.map((v) => (
-            <button
-              key={v.id}
-              type="button"
-              onClick={() => setVariant(v.id)}
-              className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
-                variant === v.id
-                  ? "bg-foreground text-background border-foreground"
-                  : "border-foreground/20 text-foreground/60 hover:text-foreground hover:bg-foreground/5"
-              }`}
-            >
-              {locale === "ko" ? v.labelKo : v.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
 
-      <div className="flex flex-col gap-2">
+      <div className={`flex flex-col gap-2 ${game === "gostop" ? "" : "mt-auto"}`}>
         <div className="text-[10px] uppercase tracking-[0.18em] text-foreground/50">
           {locale === "ko" ? "언어" : "Language"}
         </div>

@@ -3,10 +3,15 @@ import { MobileTopbar } from "@/components/mobile-topbar";
 import { SectionCards } from "@/components/section-cards";
 import { SectionFlow } from "@/components/section-flow";
 import { SectionPlaceholder } from "@/components/section-placeholder";
+import { SectionScoring } from "@/components/section-scoring";
 import { Sidebar } from "@/components/sidebar";
 import { SECTIONS } from "@/lib/sections";
 
-const IMPLEMENTED = new Set(["section-cards", "section-flow"]);
+const IMPLEMENTED = new Set([
+  "section-cards",
+  "section-flow",
+  "section-scoring",
+]);
 
 export default function Home() {
   return (
@@ -18,6 +23,7 @@ export default function Home() {
           <Hero />
           <SectionCards />
           <SectionFlow />
+          <SectionScoring />
           {SECTIONS.filter((s) => !IMPLEMENTED.has(s.id)).map((section) => (
             <SectionPlaceholder key={section.id} section={section} />
           ))}

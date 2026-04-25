@@ -1,8 +1,10 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type Locale = "en" | "ko";
+
+const STORAGE_KEY = "gostop:locale";
 
 type LocaleContextValue = {
   locale: Locale;
@@ -10,6 +12,10 @@ type LocaleContextValue = {
 };
 
 const LocaleContext = createContext<LocaleContextValue | undefined>(undefined);
+
+function isLocale(value: unknown): value is Locale {
+  return value === "en" || value === "ko";
+}
 
 export function LocaleProvider({
   children,
@@ -19,6 +25,27 @@ export function LocaleProvider({
   defaultLocale?: Locale;
 }) {
   const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (isLocale(stored)) setLocale(stored);
+    } catch {
+      // localStorage unavailable; keep default
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, locale);
+    } catch {
+      // ignore quota/availability errors
+    }
+  }, [locale, hydrated]);
+
   return (
     <LocaleContext.Provider value={{ locale, setLocale }}>
       {children}

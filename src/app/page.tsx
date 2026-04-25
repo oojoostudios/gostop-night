@@ -4,6 +4,7 @@ import { SectionCards } from "@/components/section-cards";
 import { SectionFlow } from "@/components/section-flow";
 import { SectionPlaceholder } from "@/components/section-placeholder";
 import { SectionScoring } from "@/components/section-scoring";
+import { SectionSpecial } from "@/components/section-special";
 import { Sidebar } from "@/components/sidebar";
 import { SECTIONS } from "@/lib/sections";
 
@@ -11,6 +12,7 @@ const IMPLEMENTED = new Set([
   "section-cards",
   "section-flow",
   "section-scoring",
+  "section-special",
 ]);
 
 export default function Home() {
@@ -24,6 +26,7 @@ export default function Home() {
           <SectionCards />
           <SectionFlow />
           <SectionScoring />
+          <SectionSpecial />
           {SECTIONS.filter((s) => !IMPLEMENTED.has(s.id)).map((section) => (
             <SectionPlaceholder key={section.id} section={section} />
           ))}

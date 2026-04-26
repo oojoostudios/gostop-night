@@ -188,27 +188,46 @@ export function WinningPatterns() {
           const isActive = p.id === activeId;
           const ac = ACCENT[p.accent];
           return (
-            <button
+            <motion.button
               key={p.id}
               type="button"
               role="tab"
               aria-selected={isActive}
               onClick={() => setActiveId(p.id)}
-              className={`text-sm px-3 py-1.5 rounded-md border transition-colors ${
+              whileTap={{ scale: 0.94 }}
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 30,
+                mass: 0.6,
+              }}
+              className={`relative text-sm px-3 py-1.5 rounded-md border transition-colors ${
                 isActive
                   ? ac.tab
                   : "border-transparent text-foreground/55 hover:text-foreground hover:bg-foreground/5"
               }`}
             >
-              <span className="font-medium">
+              {isActive && (
+                <motion.span
+                  layoutId="winning-pattern-tab"
+                  className="absolute inset-0 rounded-md bg-foreground/[0.04] border border-foreground/15"
+                  transition={{
+                    type: "spring",
+                    stiffness: 460,
+                    damping: 30,
+                    mass: 0.7,
+                  }}
+                />
+              )}
+              <span className="relative z-10 font-medium">
                 {locale === "ko" ? p.labelKo : p.label}
               </span>
-              <span className="mx-1.5 text-foreground/30">·</span>
-              <span className="tabular-nums text-xs">
+              <span className="relative z-10 mx-1.5 text-foreground/30">·</span>
+              <span className="relative z-10 tabular-nums text-xs">
                 {p.points}
                 {locale === "ko" ? "점" : " pts"}
               </span>
-            </button>
+            </motion.button>
           );
         })}
       </div>

@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { ChevronLeft, ChevronRight, Layers, Lock } from "lucide-react";
 import { Button } from "@heroui/react";
 import { useLocale } from "@/contexts/locale-context";
+import { FadeInOnView } from "@/components/fade-in-on-view";
 import { HWATU_DECK, type HwatuCard as HwatuCardData } from "@/lib/hwatu";
 
 const cardById = (id: string): HwatuCardData => {
@@ -451,34 +452,66 @@ export function SectionFlow() {
       id="section-flow"
       className="py-24 border-t border-foreground/10"
     >
-      <div className="text-xs tabular-nums text-foreground/50 mb-4">
+      <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
         SECTION 02
-      </div>
-      <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+      </FadeInOnView>
+      <FadeInOnView
+        as="h2"
+        delay={0.05}
+        className="text-4xl md:text-5xl font-semibold tracking-tight mb-6"
+      >
         {locale === "ko" ? "한 판은 이렇게" : "How a round works"}
-      </h2>
-      <p className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-8">
+      </FadeInOnView>
+      <FadeInOnView
+        as="p"
+        delay={0.12}
+        className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-8"
+      >
         {locale === "ko"
           ? "한 턴의 흐름을 따라가 봐요. 기본 흐름부터 보고, 그 다음에 쪽·따닥·뻑 같은 변주들을 차례대로 클릭해보세요."
           : "Follow one turn from start to finish. Start with the normal flow, then explore the variations — jjok, ttadak, and ppeok."}
-      </p>
+      </FadeInOnView>
 
       {/* Scenario selector */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {SCENARIOS.map((s) => (
-          <button
-            key={s.id}
-            type="button"
-            onClick={() => switchScenario(s.id)}
-            className={`px-3.5 py-1.5 rounded-full text-sm transition-colors ${
-              scenario.id === s.id
-                ? "bg-foreground text-background font-medium"
-                : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
-            }`}
-          >
-            {locale === "ko" ? s.labelKo : s.label}
-          </button>
-        ))}
+        {SCENARIOS.map((s) => {
+          const isActive = scenario.id === s.id;
+          return (
+            <motion.button
+              key={s.id}
+              type="button"
+              onClick={() => switchScenario(s.id)}
+              whileTap={{ scale: 0.94 }}
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 30,
+                mass: 0.6,
+              }}
+              className={`relative px-3.5 py-1.5 rounded-full text-sm transition-colors ${
+                isActive
+                  ? "text-background font-medium"
+                  : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
+              }`}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="flow-scenario-pill"
+                  className="absolute inset-0 rounded-full bg-foreground"
+                  transition={{
+                    type: "spring",
+                    stiffness: 480,
+                    damping: 28,
+                    mass: 0.7,
+                  }}
+                />
+              )}
+              <span className="relative z-10">
+                {locale === "ko" ? s.labelKo : s.label}
+              </span>
+            </motion.button>
+          );
+        })}
       </div>
 
       <AnimatePresence mode="wait">
@@ -538,10 +571,11 @@ export function SectionFlow() {
 
       <div className="mt-6 flex items-center gap-2">
         {scenario.steps.map((s, i) => (
-          <button
+          <motion.button
             key={s.id}
             type="button"
             onClick={() => setStepIndex(i)}
+            whileTap={{ scale: 0.85 }}
             aria-label={`Go to step ${i + 1}`}
             className={`h-1.5 rounded-full transition-all ${
               i === stepIndex

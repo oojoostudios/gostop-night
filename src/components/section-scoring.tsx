@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useLocale } from "@/contexts/locale-context";
 import { ScoreCalculator } from "@/components/score-calculator";
 import { WinningPatterns } from "@/components/winning-patterns";
+import { FadeInOnView } from "@/components/fade-in-on-view";
 import {
   HWATU_DECK,
   HWATU_TYPES,
@@ -34,17 +35,25 @@ export function SectionScoring() {
       id="section-scoring"
       className="py-24 border-t border-foreground/10"
     >
-      <div className="text-xs tabular-nums text-foreground/50 mb-4">
+      <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
         SECTION 03
-      </div>
-      <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+      </FadeInOnView>
+      <FadeInOnView
+        as="h2"
+        delay={0.05}
+        className="text-4xl md:text-5xl font-semibold tracking-tight mb-6"
+      >
         {locale === "ko" ? "점수 계산" : "Scoring"}
-      </h2>
-      <p className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-14">
+      </FadeInOnView>
+      <FadeInOnView
+        as="p"
+        delay={0.12}
+        className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-14"
+      >
         {locale === "ko"
           ? "광·띠·끗·피 — 카드 종류마다 점수 계산이 달라요. 같은 색 띠 3장 같은 콤보가 추가 점수를 만들어요."
           : "Brights, ribbons, animals, pips — each type scores differently. Special combos (three-of-a-color, three songbirds) earn bonus points."}
-      </p>
+      </FadeInOnView>
 
       <div className="space-y-16">
         <GwangBlock />

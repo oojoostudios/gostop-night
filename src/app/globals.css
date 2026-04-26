@@ -69,3 +69,86 @@
     @apply font-sans;
   }
 }
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* Animation utilities (track-policy 패턴 차용)                                */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+/* highlight-sweep: 핵심 키워드 강조 — 스크롤 진입 시 좌→우 배경 스캔 */
+@keyframes highlight-sweep {
+  from { background-size: 0% 100%; }
+  to   { background-size: 100% 100%; }
+}
+
+.sweep-mark {
+  background-image: linear-gradient(
+    120deg,
+    transparent 0%,
+    var(--sweep-color, oklch(0.85 0.18 80 / 0.55)) 25%,
+    var(--sweep-color, oklch(0.85 0.18 80 / 0.55)) 75%,
+    transparent 100%
+  );
+  background-size: 0% 100%;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  padding: 0 0.15em;
+  margin: 0 -0.05em;
+  border-radius: 2px;
+  animation: highlight-sweep 700ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  animation-delay: var(--sweep-delay, 200ms);
+}
+
+.sweep-mark-rose  { --sweep-color: oklch(0.78 0.18 18 / 0.4); }
+.sweep-mark-violet{ --sweep-color: oklch(0.78 0.18 295 / 0.4); }
+.sweep-mark-emerald{ --sweep-color: oklch(0.82 0.16 155 / 0.4); }
+
+/* live-dot breath: 게임 진행 인디케이터 — 점이 천천히 호흡 */
+@keyframes live-dot-breath {
+  0%   { transform: scale(1);   opacity: 0.55; }
+  70%  { transform: scale(2.4); opacity: 0; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+.live-dot {
+  position: relative;
+  display: inline-block;
+}
+.live-dot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: live-dot-breath 2s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+}
+
+/* drill-in: 카드 상세 패널 진입 — 살짝 축소 → 정사이즈 */
+@keyframes drill-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-drill-in {
+  animation: drill-in 380ms cubic-bezier(0.32, 0.72, 0, 1);
+  transform-origin: center top;
+}
+
+/* card-fade-in: 화투 카드 그리드 mount stagger
+ * SSR-safe — initial state는 opacity 1로, animation이 0 → 1 trip을 처리.
+ * (motion.div의 initial=opacity:0이 hydration 실패 시 카드를 영구 invisible로 만드는 문제를 회피) */
+@keyframes card-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card-fade-in {
+  animation: card-fade-in 320ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/* 감소 모션 사용자 존중 */
+@media (prefers-reduced-motion: reduce) {
+  .sweep-mark,
+  .live-dot::before,
+  .animate-drill-in {
+    animation: none !important;
+  }
+  .sweep-mark { background-size: 100% 100%; }
+}

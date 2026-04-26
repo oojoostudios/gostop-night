@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { motion } from "motion/react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@heroui/react";
 import { SECTIONS_BY_GAME } from "@/lib/sections";
@@ -69,14 +70,28 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                 event.preventDefault();
                 scrollTo(section.id);
               }}
-              className={`flex items-baseline gap-3 py-2 px-3 -mx-3 rounded-md transition-colors ${
+              className={`relative flex items-baseline gap-3 py-2 px-3 -mx-3 rounded-md transition-colors ${
                 isActive
-                  ? "bg-foreground/10 text-foreground"
+                  ? "text-foreground"
                   : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
               }`}
             >
-              <span className="text-xs tabular-nums opacity-70">{section.num}</span>
-              <span className="text-sm leading-snug">
+              {isActive && (
+                <motion.span
+                  layoutId={`sidebar-active-${game}`}
+                  className="absolute inset-0 rounded-md bg-foreground/10"
+                  transition={{
+                    type: "spring",
+                    stiffness: 480,
+                    damping: 32,
+                    mass: 0.7,
+                  }}
+                />
+              )}
+              <span className="relative z-10 text-xs tabular-nums opacity-70">
+                {section.num}
+              </span>
+              <span className="relative z-10 text-sm leading-snug">
                 {locale === "ko" ? section.labelKo : section.label}
               </span>
             </a>
@@ -91,10 +106,17 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
           </div>
           <div className="flex flex-wrap gap-1">
             {VARIANTS.map((v) => (
-              <button
+              <motion.button
                 key={v.id}
                 type="button"
                 onClick={() => setVariant(v.id)}
+                whileTap={{ scale: 0.93 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 30,
+                  mass: 0.6,
+                }}
                 className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
                   variant === v.id
                     ? "bg-foreground text-background border-foreground"
@@ -102,7 +124,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                 }`}
               >
                 {locale === "ko" ? v.labelKo : v.label}
-              </button>
+              </motion.button>
             ))}
           </div>
         </div>
@@ -114,10 +136,17 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
         </div>
         <div className="flex gap-1">
           {(["en", "ko"] as const).map((l) => (
-            <button
+            <motion.button
               key={l}
               type="button"
               onClick={() => setLocale(l)}
+              whileTap={{ scale: 0.93 }}
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 30,
+                mass: 0.6,
+              }}
               className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
                 locale === l
                   ? "bg-foreground text-background border-foreground"
@@ -125,7 +154,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
               }`}
             >
               {l === "en" ? "English" : "한국어"}
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>

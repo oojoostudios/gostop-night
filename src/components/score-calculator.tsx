@@ -194,15 +194,25 @@ function ScorePanel({
       </div>
 
       <div className="flex items-baseline gap-2 mb-3">
-        <motion.div
-          key={score.total}
-          initial={{ scale: 0.94, opacity: 0.8 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 360, damping: 24 }}
-          className="text-5xl font-semibold tabular-nums tracking-tight"
-        >
-          {score.total}
-        </motion.div>
+        <div className="relative h-[1em] text-5xl font-semibold tabular-nums tracking-tight overflow-hidden">
+          {/* invisible spacer to reserve width — keeps layout stable */}
+          <span aria-hidden className="invisible">
+            {score.total}
+          </span>
+          <AnimatePresence mode="sync" initial={false}>
+            <motion.span
+              key={score.total}
+              initial={{ y: "70%", opacity: 0 }}
+              animate={{ y: "0%", opacity: 1 }}
+              exit={{ y: "-70%", opacity: 0 }}
+              transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
+              className="absolute inset-0 flex items-baseline"
+              aria-live="polite"
+            >
+              {score.total}
+            </motion.span>
+          </AnimatePresence>
+        </div>
         <div className="text-foreground/50 text-sm">
           {locale === "ko" ? "점" : "pts"}
         </div>
@@ -211,15 +221,21 @@ function ScorePanel({
       <AnimatePresence>
         {canStop && (
           <motion.div
+            key="canstop"
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 mb-4"
           >
             <Trophy className="size-3.5" />
-            {locale === "ko"
-              ? "고/스톱 결정 가능 (7점)"
-              : "Go/Stop available (7+)"}
+            <span
+              className="sweep-mark"
+              style={{ ["--sweep-delay" as string]: "120ms" }}
+            >
+              {locale === "ko"
+                ? "고/스톱 결정 가능 (7점)"
+                : "Go/Stop available (7+)"}
+            </span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -258,11 +274,22 @@ function ScorePanel({
                 </span>
               </div>
               <span
-                className={`tabular-nums font-semibold ${
+                className={`relative tabular-nums font-semibold inline-block min-w-[1.5ch] text-right overflow-hidden ${
                   points > 0 ? "text-foreground" : "text-foreground/30"
                 }`}
               >
-                {points}
+                <AnimatePresence mode="sync" initial={false}>
+                  <motion.span
+                    key={points}
+                    initial={{ y: "60%", opacity: 0 }}
+                    animate={{ y: "0%", opacity: 1 }}
+                    exit={{ y: "-60%", opacity: 0 }}
+                    transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+                    className="inline-block"
+                  >
+                    {points}
+                  </motion.span>
+                </AnimatePresence>
               </span>
             </div>
           );

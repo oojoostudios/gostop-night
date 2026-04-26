@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useLocale } from "@/contexts/locale-context";
 import { HwatuCard } from "@/components/hwatu-card";
+import { FadeInOnView } from "@/components/fade-in-on-view";
 import {
   HWATU_DECK,
   HWATU_TYPES,
@@ -45,17 +46,25 @@ export function SectionCards() {
       id="section-cards"
       className="py-24 border-t border-foreground/10"
     >
-      <div className="text-xs tabular-nums text-foreground/50 mb-4">
+      <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
         SECTION 01
-      </div>
-      <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+      </FadeInOnView>
+      <FadeInOnView
+        as="h2"
+        delay={0.05}
+        className="text-4xl md:text-5xl font-semibold tracking-tight mb-6"
+      >
         {locale === "ko" ? "화투 카드란?" : "What are hwatu cards?"}
-      </h2>
-      <p className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-10">
+      </FadeInOnView>
+      <FadeInOnView
+        as="p"
+        delay={0.12}
+        className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-10"
+      >
         {locale === "ko"
           ? "12달 × 4장 = 48장. 각 카드는 4가지 종류 중 하나에 속해요. 필터로 종류를 골라보고, 카드를 클릭하면 자세한 정보가 옆에 떠요."
           : "12 months × 4 cards = 48 in total. Each card belongs to one of four types. Filter by type, then click any card to see details appear on the right."}
-      </p>
+      </FadeInOnView>
 
       {/* Filter chips */}
       <div className="flex flex-wrap gap-2 mb-10">
@@ -80,7 +89,7 @@ export function SectionCards() {
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-10 lg:gap-12 items-start">
         {/* Cards by month */}
         <div className="space-y-7">
-          {MONTHS.map((month) => {
+          {MONTHS.map((month, monthIdx) => {
             const monthCards = visibleDeck.filter((c) => c.month === month.num);
             if (monthCards.length === 0) return null;
             return (
@@ -94,15 +103,27 @@ export function SectionCards() {
                   </span>
                 </div>
                 <div className="grid grid-cols-4 gap-2.5">
-                  {monthCards.map((card) => (
-                    <HwatuCard
+                  {monthCards.map((card, cardIdx) => (
+                    <div
                       key={card.id}
-                      card={card}
-                      isActive={selected?.id === card.id}
-                      onSelect={(c) =>
-                        setSelected((prev) => (prev?.id === c.id ? null : c))
-                      }
-                    />
+                      className="card-fade-in"
+                      style={{
+                        animationDelay: `${Math.min(
+                          (monthIdx * 4 + cardIdx) * 15,
+                          400,
+                        )}ms`,
+                      }}
+                    >
+                      <HwatuCard
+                        card={card}
+                        isActive={selected?.id === card.id}
+                        onSelect={(c) =>
+                          setSelected((prev) =>
+                            prev?.id === c.id ? null : c,
+                          )
+                        }
+                      />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -133,30 +154,46 @@ function FilterChip({
   badgeClassName?: string;
 }) {
   return (
-    <button
+    <motion.button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm transition-colors ${
+      whileTap={{ scale: 0.94 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.6 }}
+      className={`relative flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm transition-colors ${
         active
-          ? "bg-foreground text-background"
-          : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
+          ? "text-background"
+          : "text-foreground/70 hover:bg-foreground/10 hover:text-foreground bg-foreground/5"
       }`}
     >
-      {badgeClassName && (
-        <span
-          className={`size-1.5 rounded-full ${badgeClassName.split(" ")[0]}`}
-          aria-hidden
+      {active && (
+        <motion.span
+          layoutId="cards-filter-pill"
+          className="absolute inset-0 rounded-full bg-foreground"
+          transition={{
+            type: "spring",
+            stiffness: 480,
+            damping: 28,
+            mass: 0.7,
+          }}
         />
       )}
-      <span className="font-medium">{label}</span>
-      <span
-        className={`text-xs tabular-nums ${
-          active ? "text-background/60" : "text-foreground/40"
-        }`}
-      >
-        {count}
+      <span className="relative flex items-center gap-2 z-10">
+        {badgeClassName && (
+          <span
+            className={`size-1.5 rounded-full ${badgeClassName.split(" ")[0]}`}
+            aria-hidden
+          />
+        )}
+        <span className="font-medium">{label}</span>
+        <span
+          className={`text-xs tabular-nums ${
+            active ? "text-background/60" : "text-foreground/40"
+          }`}
+        >
+          {count}
+        </span>
       </span>
-    </button>
+    </motion.button>
   );
 }
 
@@ -188,21 +225,23 @@ function DetailPanel({
     <AnimatePresence mode="wait">
       <motion.div
         key={card.id}
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -6 }}
-        transition={{ duration: 0.18 }}
+        initial={{ opacity: 0, scale: 0.94, y: 6 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: -6 }}
+        transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
+        style={{ transformOrigin: "center top" }}
         className="rounded-lg border border-foreground/15 bg-foreground/[0.02] overflow-hidden"
       >
         <div className="p-5 pb-0 flex justify-end">
-          <button
+          <motion.button
             type="button"
             onClick={onClear}
+            whileTap={{ scale: 0.88 }}
             aria-label="Close detail"
             className="text-foreground/40 hover:text-foreground/80 text-sm leading-none p-1 -m-1"
           >
             ✕
-          </button>
+          </motion.button>
         </div>
 
         <div className="px-5">

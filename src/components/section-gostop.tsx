@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, RotateCcw, ShieldCheck, Zap } from "lucide-react";
 import { Button } from "@heroui/react";
 import { useLocale } from "@/contexts/locale-context";
+import { FadeInOnView } from "@/components/fade-in-on-view";
 
 type Choice = "stop" | "go";
 type ScenarioState = { picked?: Choice };
@@ -106,17 +107,25 @@ export function SectionGoStop() {
       id="section-gostop"
       className="py-24 border-t border-foreground/10"
     >
-      <div className="text-xs tabular-nums text-foreground/50 mb-4">
+      <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
         SECTION 05
-      </div>
-      <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+      </FadeInOnView>
+      <FadeInOnView
+        as="h2"
+        delay={0.05}
+        className="text-4xl md:text-5xl font-semibold tracking-tight mb-6"
+      >
         {locale === "ko" ? "고냐 스톱이냐" : "Go or Stop?"}
-      </h2>
-      <p className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-12">
+      </FadeInOnView>
+      <FadeInOnView
+        as="p"
+        delay={0.12}
+        className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-12"
+      >
         {locale === "ko"
           ? "게임 이름에 들어간 그 결정. 7점에 도달하는 순간, 멈출지 더 갈지를 직접 골라야 해요. 욕심과 리스크 사이의 줄타기."
           : "The decision baked into the game's name. The moment you hit 7 points, you choose: end the round or risk doubling — for both reward and punishment."}
-      </p>
+      </FadeInOnView>
 
       <DecisionMoment />
 

@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { motion } from "motion/react";
 import { Sparkles, AlertTriangle, Zap, X } from "lucide-react";
 import { useLocale } from "@/contexts/locale-context";
+import { FadeInOnView } from "@/components/fade-in-on-view";
 import { HWATU_DECK } from "@/lib/hwatu";
 
 const cardById = (id: string) => HWATU_DECK.find((c) => c.id === id);
@@ -16,17 +18,25 @@ export function SectionSpecial() {
       id="section-special"
       className="py-24 border-t border-foreground/10"
     >
-      <div className="text-xs tabular-nums text-foreground/50 mb-4">
+      <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
         SECTION 04
-      </div>
-      <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+      </FadeInOnView>
+      <FadeInOnView
+        as="h2"
+        delay={0.05}
+        className="text-4xl md:text-5xl font-semibold tracking-tight mb-6"
+      >
         {locale === "ko" ? "특수 룰" : "Special rules"}
-      </h2>
-      <p className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-12">
+      </FadeInOnView>
+      <FadeInOnView
+        as="p"
+        delay={0.12}
+        className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-12"
+      >
         {locale === "ko"
           ? "고스톱이 단순히 카드 매칭이 아닌 이유. 보너스 피를 부르는 콤보, 카드를 묶어버리는 함정, 점수를 두 배로 만드는 배수까지."
           : "Why go-stop isn't just card matching: bonus moves that earn pi from opponents, stuck-card traps, and multipliers that double the round."}
-      </p>
+      </FadeInOnView>
 
       <SubsectionHeader
         icon={<Sparkles className="size-4" />}
@@ -91,12 +101,18 @@ function SubsectionHeader({
   accent: keyof typeof ACCENT;
 }) {
   return (
-    <div className={`flex items-center gap-2 mb-5 ${ACCENT[accent].text}`}>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className={`flex items-center gap-2 mb-5 ${ACCENT[accent].text}`}
+    >
       {icon}
       <h3 className="text-sm uppercase tracking-[0.18em] font-semibold">
         {title}
       </h3>
-    </div>
+    </motion.div>
   );
 }
 
@@ -158,7 +174,13 @@ function RuleBlock({
   const { locale } = useLocale();
   const a = ACCENT[accent];
   return (
-    <div className={`rounded-lg border ${a.border} ${a.bg} p-5`}>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      className={`rounded-lg border ${a.border} ${a.bg} p-5`}
+    >
       <div className="flex items-baseline gap-3 mb-3 flex-wrap">
         <h4 className="text-xl font-semibold tracking-tight">
           {locale === "ko" ? titleKo : titleEn}
@@ -169,7 +191,7 @@ function RuleBlock({
         {badge}
       </div>
       {children}
-    </div>
+    </motion.div>
   );
 }
 
@@ -424,9 +446,17 @@ function BakBlock() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-      {items.map((item) => (
-        <div
+      {items.map((item, i) => (
+        <motion.div
           key={item.titleKo}
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{
+            duration: 0.4,
+            ease: [0.16, 1, 0.3, 1],
+            delay: i * 0.08,
+          }}
           className={`rounded-lg border ${ACCENT.orange.border} ${ACCENT.orange.bg} p-4`}
         >
           <div className={`text-xs font-semibold mb-1 ${ACCENT.orange.text}`}>
@@ -438,7 +468,7 @@ function BakBlock() {
           <p className="text-sm text-foreground/70 leading-relaxed">
             {locale === "ko" ? item.descKo : item.descEn}
           </p>
-        </div>
+        </motion.div>
       ))}
     </div>
   );

@@ -6,7 +6,7 @@
 
 A visual guide to Korean go-stop (고스톱), for first-time players.
 
-[Live demo →](#) <!-- TODO: replace once deployed -->
+[Live demo → gostopguide.com](https://gostopguide.com)
 
 </div>
 
@@ -65,14 +65,15 @@ Issues and PRs welcome. Easiest places to help:
 
 ## Credits
 
-- Inspired by [themahjong.guide](https://themahjong.guide).
-- Hwatu card images derive from a master SVG slice (see `/public/cards`). Source attribution and licensing are being clarified — see [open issues](../../issues) before reusing the images.
+- Inspired by [themahjong.guide](https://themahjong.guide) — the structure, paper-and-mat tone, and tile-by-tile teaching approach all came from there.
+- **Hwatu card illustrations** are PNG slices of a Wikimedia Commons SVG by **huzinger827** and **pk0001** (2021, updated 2023-12-02), distributed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Source: [File:Hwatu012.svg on Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hwatu012.svg). Full attribution in [`NOTICE.md`](./NOTICE.md).
 
 ## License
 
-Code: [MIT](./LICENSE).
+This project uses two licenses:
 
-Illustrations follow their original source license (see Credits).
+- **Source code:** [MIT](./LICENSE) — fork and reuse freely.
+- **Card images** in `public/cards/`: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) inherited from the upstream Wikimedia source. If you redistribute the images, you must preserve attribution and license derivatives under the same terms — see [`NOTICE.md`](./NOTICE.md).
 
 ---
 

@@ -4,8 +4,64 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans:
+    var(--font-geist-sans),
+    "Apple SD Gothic Neo",
+    "Pretendard Variable",
+    Pretendard,
+    "Noto Sans KR",
+    system-ui,
+    sans-serif;
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* K-culture theme overrides on top of HeroUI's default tokens.               */
+/* The primary accent moves from a generic blue to a warm hwatu red, with     */
+/* slightly softer corners and a faint cream tint on light backgrounds.       */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+@layer base {
+  :root,
+  .light,
+  .default,
+  [data-theme="light"],
+  [data-theme="default"] {
+    /* Warm hwatu red accent */
+    --accent: oklch(0.6 0.2 28);
+    --accent-foreground: oklch(0.985 0.005 80);
+    --focus: var(--accent);
+
+    /* Friendlier rounded corners */
+    --radius: 0.625rem;
+
+    /* Hint of warmth on the page background — like 한지 paper */
+    --background: oklch(0.984 0.007 75);
+
+    /* Slightly warmer surfaces (cards, panels) */
+    --surface: oklch(0.998 0.002 80);
+    --surface-secondary: oklch(0.962 0.006 75);
+    --surface-tertiary: oklch(0.945 0.008 75);
+
+    /* Borders pick up the warmth */
+    --border: oklch(0.91 0.008 75);
+    --separator: oklch(0.93 0.006 75);
+  }
+
+  .dark,
+  [data-theme="dark"] {
+    /* Lifted warm red for contrast on dark bg */
+    --accent: oklch(0.7 0.18 30);
+    --accent-foreground: oklch(0.16 0.01 30);
+    --focus: var(--accent);
+
+    /* Subtle amber undertone in the dark — like aged wood */
+    --background: oklch(0.13 0.008 30);
+    --surface: oklch(0.18 0.01 30);
+    --surface-secondary: oklch(0.21 0.012 30);
+    --surface-tertiary: oklch(0.24 0.013 30);
+  }
 }
 
 @layer base {

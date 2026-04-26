@@ -766,11 +766,17 @@ function DeckPile({
           {flippedCard && (
             <motion.div
               key={flippedCard.id}
-              initial={{ opacity: 0, x: 0, rotateY: 180 }}
-              animate={{ opacity: 1, x: 80, rotateY: 0 }}
-              exit={{ opacity: 0, x: 80 }}
-              transition={{ type: "spring", stiffness: 240, damping: 22 }}
-              className="absolute inset-0 rounded-md overflow-hidden ring-1 ring-amber-500 ring-offset-2 bg-white"
+              layoutId={`flow-${flippedCard.id}`}
+              initial={{ opacity: 0, x: 0, rotateY: 180, scale: 0.9 }}
+              animate={{ opacity: 1, x: 80, rotateY: 0, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                type: "spring",
+                stiffness: 240,
+                damping: 22,
+              }}
+              style={{ zIndex: 50 }}
+              className="absolute inset-0 rounded-md overflow-hidden ring-2 ring-amber-500 ring-offset-2 bg-white shadow-lg"
             >
               <Image
                 src={flippedCard.image}

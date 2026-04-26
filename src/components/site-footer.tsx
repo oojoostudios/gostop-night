@@ -33,12 +33,12 @@ export function SiteFooter() {
             </a>
             <span className="mx-1.5 text-foreground/25">·</span>
             <a
-              href="https://github.com/jaehafe"
+              href="https://github.com/k-culture-play/gostop-guide"
               target="_blank"
               rel="noopener noreferrer"
               className="text-foreground/60 hover:text-foreground underline-offset-2 hover:underline"
             >
-              GitHub
+              {locale === 'ko' ? '소스' : 'Source'}
             </a>
             <span className="mx-1.5 text-foreground/25">·</span>
             <a

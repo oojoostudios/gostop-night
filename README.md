@@ -6,7 +6,7 @@
 
 A visual guide to Korean go-stop (고스톱), for first-time players.
 
-[Live demo → gostopguide.com](https://gostopguide.com)
+[Live demo → gostopguide.com](https://gostopguide.com)  ·  [Source on GitHub](https://github.com/k-culture-play/gostop-guide)
 
 </div>
 

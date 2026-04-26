@@ -27,6 +27,12 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 const SITE_NAME = 'Go-Stop: A Visual Guide';
 const SITE_DESCRIPTION =
   'Learn how to play 고스톱 (Go-Stop), the Korean card game, in five minutes — a visual guide for first-time players.';
+const OG_IMAGE = {
+  url: '/opengraph-image.png',
+  width: 1200,
+  height: 630,
+  alt: SITE_NAME,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -47,12 +53,14 @@ export const metadata: Metadata = {
     url: SITE_URL,
     locale: 'en_US',
     alternateLocale: 'ko_KR',
+    images: [OG_IMAGE],
   },
   twitter: {
     card: 'summary_large_image',
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
     creator: '@miniapp223',
+    images: [OG_IMAGE.url],
   },
 };
 

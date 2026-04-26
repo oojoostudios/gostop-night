@@ -12,8 +12,10 @@ export function SectionYutSticks() {
   return (
     <section
       id="yut-sticks"
-      className="min-h-screen flex flex-col justify-center py-24"
+      className="relative min-h-screen flex flex-col justify-center py-24"
     >
+      <div className="lg:ml-72">
+        <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
       <div className="text-xs tabular-nums text-foreground/50 mb-4">
         SECTION 01
       </div>
@@ -29,6 +31,8 @@ export function SectionYutSticks() {
       <Anatomy />
       <ThrowsCatalog />
       <YutThrowSimulator />
+        </div>
+      </div>
     </section>
   );
 }

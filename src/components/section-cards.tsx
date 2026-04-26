@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
+import { Drawer } from "@heroui/react";
 import { useLocale } from "@/contexts/locale-context";
+import { useIsMobile } from "@/lib/use-media-query";
 import { HwatuCard } from "@/components/hwatu-card";
 import { FadeInOnView } from "@/components/fade-in-on-view";
 import {
@@ -21,6 +23,75 @@ const TYPE_BADGE: Record<HwatuType, string> = {
   tti: "bg-rose-500 text-white",
   kkeut: "bg-emerald-600 text-white",
   pi: "bg-zinc-600 text-white",
+};
+
+// Mahjong-style overview: each type gets a hanja sigil + romanization + count
+const TYPE_OVERVIEW: Record<
+  HwatuType,
+  {
+    hanja: string;
+    roman: string;
+    perMonth: number;
+    formula: string;
+    accent: string;
+    sample: ReadonlyArray<string>; // representative card ids
+  }
+> = {
+  gwang: {
+    hanja: "光",
+    roman: "Gwang",
+    perMonth: 1,
+    formula: "5 × 1 = 5",
+    accent:
+      "border-amber-500/40 bg-amber-500/[0.06] dark:bg-amber-500/[0.08]",
+    sample: ["01-gwang", "03-gwang", "08-gwang", "11-gwang", "12-gwang"],
+  },
+  tti: {
+    hanja: "短",
+    roman: "Tti",
+    perMonth: 1,
+    formula: "10 × 1 = 10",
+    accent:
+      "border-rose-500/40 bg-rose-500/[0.06] dark:bg-rose-500/[0.08]",
+    sample: ["01-tti", "02-tti", "06-tti", "10-tti", "12-tti"],
+  },
+  kkeut: {
+    hanja: "種",
+    roman: "Kkeut",
+    perMonth: 1,
+    formula: "9 × 1 = 9",
+    accent:
+      "border-emerald-500/40 bg-emerald-500/[0.06] dark:bg-emerald-500/[0.08]",
+    sample: ["02-kkeut", "04-kkeut", "08-kkeut", "09-kkeut", "10-kkeut"],
+  },
+  pi: {
+    hanja: "皮",
+    roman: "Pi",
+    perMonth: 2,
+    formula: "Mostly 2 each = 24",
+    accent:
+      "border-zinc-500/40 bg-zinc-500/[0.06] dark:bg-zinc-500/[0.08]",
+    sample: ["01-pi-1", "04-pi-1", "07-pi-1", "11-pi-1", "12-pi"],
+  },
+};
+
+const TYPE_BLURB_DETAIL: Record<HwatuType, { ko: string; en: string }> = {
+  gwang: {
+    ko: "다섯 달(1·3·8·11·12월)에 각각 한 장씩. 가장 귀한 카드 — 3장부터 점수가 들어와요.",
+    en: "One per month for five months (Jan, Mar, Aug, Nov, Dec). Most prestigious — 3+ start scoring.",
+  },
+  tti: {
+    ko: "10개 달에 각 1장씩. 빨강·파랑·초록 색상 띠 — 같은 색 3장이면 콤보 (홍단·청단·초단).",
+    en: "One per month, in 10 months. Red, blue, or grass-colored — three of a color = combo (홍단·청단·초단).",
+  },
+  kkeut: {
+    ko: "9개 달에 각 1장씩 — 동물·새·풍경. 새 3종 (매조·두견·기러기)을 모으면 고도리.",
+    en: "One per month, in 9 months — animals, birds, scenery. Three songbirds = godori combo.",
+  },
+  pi: {
+    ko: "대부분 달에 2장씩 (가장 흔함). 11월·12월의 쌍피는 ×2 효과 — 보너스피도 ×2.",
+    en: "Two per month for most (most common type). 11월·12월 'double pi' count as ×2 — bonus pi too.",
+  },
 };
 
 type Filter = "all" | HwatuType;
@@ -44,8 +115,10 @@ export function SectionCards() {
   return (
     <section
       id="section-cards"
-      className="py-24 border-t border-foreground/10"
+      className="relative py-24 border-t border-foreground/10 section-cards-bg"
     >
+      <div className="lg:ml-72">
+        <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
       <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
         SECTION 01
       </FadeInOnView>
@@ -65,6 +138,9 @@ export function SectionCards() {
           ? "12달 × 4장 = 48장. 각 카드는 4가지 종류 중 하나에 속해요. 필터로 종류를 골라보고, 카드를 클릭하면 자세한 정보가 옆에 떠요."
           : "12 months × 4 cards = 48 in total. Each card belongs to one of four types. Filter by type, then click any card to see details appear on the right."}
       </FadeInOnView>
+
+      {/* Type overview blocks (광 · 띠 · 끗 · 피) */}
+      <TypeOverview typeCounts={typeCounts} />
 
       {/* Filter chips */}
       <div className="flex flex-wrap gap-2 mb-10">
@@ -131,12 +207,168 @@ export function SectionCards() {
           })}
         </div>
 
-        {/* Detail panel */}
-        <div className="lg:sticky lg:top-12 lg:self-start">
+        {/* Detail panel — desktop sticky on the right (hidden on mobile) */}
+        <div className="hidden lg:block lg:sticky lg:top-12 lg:self-start">
           <DetailPanel card={selected} onClear={() => setSelected(null)} />
         </div>
       </div>
+        </div>
+      </div>
+
+      {/* Mobile bottom sheet — same content, drawer presentation on small screens */}
+      <MobileCardSheet card={selected} onClose={() => setSelected(null)} />
     </section>
+  );
+}
+
+/**
+ * Mobile-only bottom drawer for the card detail panel.
+ *
+ * Uses HeroUI v3 `Drawer` with `placement="bottom"`. (HeroUI's `Sheet` with
+ * snap-points exists in their staging docs but isn't shipped in 3.0.3 yet —
+ * Drawer covers our needs: drag handle, swipe-to-dismiss, blurred backdrop,
+ * focus trap, body scroll lock.)
+ *
+ * The desktop sticky panel takes over on lg+ via `lg:hidden` on the dialog,
+ * so this drawer only ever shows on mobile.
+ */
+function MobileCardSheet({
+  card,
+  onClose,
+}: {
+  card: HwatuCardData | null;
+  onClose: () => void;
+}) {
+  const isMobile = useIsMobile();
+  // Only mount the drawer at all when mobile — prevents desktop from showing
+  // the backdrop / locking body scroll / trapping focus on the lg+ breakpoint.
+  if (!isMobile) return null;
+
+  return (
+    <Drawer
+      isOpen={!!card}
+      onOpenChange={(open: boolean) => {
+        if (!open) onClose();
+      }}
+    >
+      {/* Backdrop — warm dark overlay (not generic black) so it reads as
+       * "the room dimmed around the card" rather than a modal wash. */}
+      <Drawer.Backdrop
+        variant="blur"
+        className="bg-[oklch(0.18_0.02_60_/_0.45)]"
+      >
+        <Drawer.Content placement="bottom">
+          {/* Dialog — paper surface with warm hairline border + soft shadow.
+           * Larger top radius so it visually "lifts" from the floor edge. */}
+          <Drawer.Dialog className="max-h-[90vh] !rounded-t-2xl border-t border-x border-[var(--line)] bg-[var(--card)] shadow-[0_-12px_40px_-8px_rgba(75,54,24,0.18)]">
+            <Drawer.Handle className="[&_*]:bg-[var(--ink)]/25" />
+            <Drawer.CloseTrigger className="text-[var(--muted-ink)] hover:text-[var(--ink)]" />
+            <Drawer.Body className="pb-8">
+              {card && (
+                <DetailPanel card={card} onClear={onClose} framed={false} />
+              )}
+            </Drawer.Body>
+          </Drawer.Dialog>
+        </Drawer.Content>
+      </Drawer.Backdrop>
+    </Drawer>
+  );
+}
+
+function TypeOverview({
+  typeCounts,
+}: {
+  typeCounts: Record<HwatuType, number>;
+}) {
+  const { locale } = useLocale();
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-12">
+      {TYPE_ORDER.map((t, i) => {
+        const meta = HWATU_TYPES[t];
+        const ov = TYPE_OVERVIEW[t];
+        const count = typeCounts[t];
+        return (
+          <motion.div
+            key={t}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{
+              duration: 0.45,
+              ease: [0.16, 1, 0.3, 1],
+              delay: i * 0.06,
+            }}
+            className={`relative rounded-lg border ${ov.accent} p-5`}
+          >
+            <div className="flex items-start gap-4 mb-3">
+              <div className="flex flex-col items-center min-w-[3rem]">
+                <span
+                  className="text-4xl leading-none font-normal text-foreground/85"
+                  style={{ fontFamily: "var(--font-accent)" }}
+                  aria-hidden
+                >
+                  {ov.hanja}
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.18em] text-foreground/50 mt-1 tabular-nums">
+                  {ov.roman}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <h3 className="text-2xl font-semibold tracking-tight">
+                    {locale === "ko" ? meta.labelKo : meta.label}
+                  </h3>
+                  <span className="text-xs text-foreground/50">
+                    {locale === "ko" ? meta.label : meta.labelKo}
+                  </span>
+                </div>
+                <div className="text-[11px] uppercase tracking-wider text-foreground/55 tabular-nums mt-0.5">
+                  {ov.formula}{" "}
+                  <span className="text-foreground/35 mx-1">·</span>{" "}
+                  {count} {locale === "ko" ? "장" : "tiles"}
+                </div>
+              </div>
+            </div>
+
+            <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+              {locale === "ko"
+                ? TYPE_BLURB_DETAIL[t].ko
+                : TYPE_BLURB_DETAIL[t].en}
+            </p>
+
+            <div className="flex flex-wrap gap-1.5">
+              {ov.sample.map((id, idx) => {
+                const card = HWATU_DECK.find((c) => c.id === id);
+                if (!card) return null;
+                return (
+                  <motion.div
+                    key={id}
+                    initial={{ opacity: 0, y: 6 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{
+                      duration: 0.32,
+                      ease: [0.16, 1, 0.3, 1],
+                      delay: 0.15 + idx * 0.04,
+                    }}
+                    whileHover={{ y: -3 }}
+                    className="relative aspect-[2/3] w-12 sm:w-14 rounded-md overflow-hidden ring-1 ring-black/10 bg-white shrink-0"
+                  >
+                    <Image
+                      src={card.image}
+                      alt={card.nameKo}
+                      fill
+                      sizes="60px"
+                      className="object-cover"
+                    />
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -200,9 +432,13 @@ function FilterChip({
 function DetailPanel({
   card,
   onClear,
+  framed = true,
 }: {
   card: HwatuCardData | null;
   onClear: () => void;
+  /** Wrap the content in a border+bg frame. Off when shown inside a Drawer
+   *  (the Drawer surface itself acts as the frame — double frames look bad). */
+  framed?: boolean;
 }) {
   const { locale } = useLocale();
 
@@ -230,9 +466,16 @@ function DetailPanel({
         exit={{ opacity: 0, scale: 0.98, y: -4 }}
         transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
         style={{ transformOrigin: "center top" }}
-        className="rounded-lg border border-foreground/15 bg-foreground/[0.02] overflow-hidden"
+        className={`overflow-hidden ${
+          framed
+            ? "rounded-lg border border-foreground/15 bg-foreground/[0.02]"
+            : ""
+        }`}
       >
-        <div className="p-5 pb-0 flex justify-end">
+        {/* Inline close — desktop sticky panel only.
+         * On mobile we render inside a Drawer which has its own CloseTrigger,
+         * so showing this would create duplicate ✕ buttons. */}
+        <div className="hidden lg:flex p-5 pb-0 justify-end">
           <motion.button
             type="button"
             onClick={onClear}

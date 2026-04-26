@@ -16,10 +16,12 @@ export function SectionSpecial() {
   return (
     <section
       id="section-special"
-      className="py-24 border-t border-foreground/10"
+      className="relative py-24 border-t border-foreground/10 section-special-bg"
     >
+      <div className="lg:ml-72">
+        <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
       <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
-        SECTION 04
+        SECTION 05
       </FadeInOnView>
       <FadeInOnView
         as="h2"
@@ -77,6 +79,8 @@ export function SectionSpecial() {
       />
 
       <BakBlock />
+        </div>
+      </div>
     </section>
   );
 }

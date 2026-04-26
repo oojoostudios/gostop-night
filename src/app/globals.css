@@ -14,12 +14,22 @@
     sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
+  --font-accent:
+    var(--font-serif-accent),
+    "Instrument Serif",
+    Georgia,
+    "Times New Roman",
+    serif;
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
-/* K-culture theme overrides on top of HeroUI's default tokens.               */
-/* The primary accent moves from a generic blue to a warm hwatu red, with     */
-/* slightly softer corners and a faint cream tint on light backgrounds.       */
+/* K-culture theme — 한지 (paper) base + 화투 매트 액센트 (matgo red/felt green)*/
+/*                                                                            */
+/* 마장 가이드의 paper philosophy를 기본으로 차용 (#f2ecdc 톤),                 */
+/* 그 위에 한국 고스톱의 시각적 정체성을 추가:                                  */
+/*  - 빨간 화투 매트 (--mat)        : 명절에 깔던 그 빨간 비닐 매트              */
+/*  - 펠트 그린 (--felt)            : 점수/도박판 분위기                        */
+/*  - 따뜻한 한지 (--paper)         : 베이스, 한옥/온돌 느낌                     */
 /* ────────────────────────────────────────────────────────────────────────── */
 
 @layer base {
@@ -28,39 +38,67 @@
   .default,
   [data-theme="light"],
   [data-theme="default"] {
-    /* Warm hwatu red accent */
-    --accent: oklch(0.6 0.2 28);
-    --accent-foreground: oklch(0.985 0.005 80);
-    --focus: var(--accent);
+    /* 핵심 팔레트 토큰 (마장 가이드와 호환되는 hex) */
+    --paper: #f2ecdc;        /* 한지 — 사이트 기본 배경 */
+    --paper-deep: #e9dfc8;   /* 진한 한지 — 섹션 액센트 */
+    --card: #fffdf5;         /* 카드/패널 배경 — 거의 흰색이지만 미세하게 따뜻 */
+    --ink: #25211a;          /* 본문 텍스트 — 따뜻한 검정 */
+    --muted-ink: #777064;    /* 부 텍스트 */
+    --line: rgba(75, 65, 47, 0.14); /* 구분선 */
 
-    /* Friendlier rounded corners */
+    /* 한국 고스톱 시그니처 액센트 */
+    --mat: #a9362c;          /* 화투 매트 빨강 */
+    --mat-deep: #7a2018;     /* 짙은 매트 */
+    --mat-soft: #efe0d5;     /* 매트 분위기의 부드러운 배경 */
+
+    --felt: #167737;         /* 펠트 그린 */
+    --felt-deep: #07542a;    /* 짙은 펠트 */
+    --felt-soft: #dfe9d9;    /* 펠트 분위기의 부드러운 배경 */
+
+    /* HeroUI / Tailwind v4 시스템 토큰을 위 팔레트로 매핑 */
+    --accent: var(--mat);
+    --accent-foreground: var(--paper);
+    --focus: var(--accent);
     --radius: 0.625rem;
 
-    /* Hint of warmth on the page background — like 한지 paper */
-    --background: oklch(0.984 0.007 75);
+    --background: var(--paper);
+    --surface: var(--card);
+    --surface-secondary: var(--paper-deep);
+    --surface-tertiary: oklch(0.9 0.018 80);
 
-    /* Slightly warmer surfaces (cards, panels) */
-    --surface: oklch(0.998 0.002 80);
-    --surface-secondary: oklch(0.962 0.006 75);
-    --surface-tertiary: oklch(0.945 0.008 75);
-
-    /* Borders pick up the warmth */
-    --border: oklch(0.91 0.008 75);
-    --separator: oklch(0.93 0.006 75);
+    --border: var(--line);
+    --separator: var(--line);
   }
 
   .dark,
   [data-theme="dark"] {
-    /* Lifted warm red for contrast on dark bg */
-    --accent: oklch(0.7 0.18 30);
-    --accent-foreground: oklch(0.16 0.01 30);
+    /* 어둠 모드 — 어두운 나무판 + 따뜻한 호롱 */
+    --paper: #1d1a14;
+    --paper-deep: #15120d;
+    --card: #28241c;
+    --ink: #f2ecdc;
+    --muted-ink: #aea696;
+    --line: rgba(220, 200, 160, 0.12);
+
+    --mat: #c25040;
+    --mat-deep: #8b3025;
+    --mat-soft: #2a1916;
+
+    --felt: #2a9656;
+    --felt-deep: #15673a;
+    --felt-soft: #1a261d;
+
+    --accent: var(--mat);
+    --accent-foreground: var(--paper);
     --focus: var(--accent);
 
-    /* Subtle amber undertone in the dark — like aged wood */
-    --background: oklch(0.13 0.008 30);
-    --surface: oklch(0.18 0.01 30);
-    --surface-secondary: oklch(0.21 0.012 30);
-    --surface-tertiary: oklch(0.24 0.013 30);
+    --background: var(--paper);
+    --surface: var(--card);
+    --surface-secondary: var(--paper-deep);
+    --surface-tertiary: #34302a;
+
+    --border: var(--line);
+    --separator: var(--line);
   }
 }
 
@@ -142,6 +180,114 @@
 .card-fade-in {
   animation: card-fade-in 320ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* 섹션별 배경 톤 — Mahjong 가이드 처럼 분위기 차등화                            */
+/* 한지 베이지 → 따뜻한 크림 → 세이지 → 짙은 녹색 매트 → 따뜻한 갈색 → 적색 톤   */
+/* ────────────────────────────────────────────────────────────────────────── */
+/* IMPORTANT: layout.tsx에서 max-w 래퍼를 제거했기 때문에 section 자체가         */
+/* viewport full-width. bg는 section에 직접 적용. content는 section 내부에서   */
+/* `lg:ml-72` + `max-w-5xl mx-auto`로 제약. 사이드바는 fixed라 그 위를 덮음.    */
+
+.section-cards-bg,
+.section-flow-bg,
+.section-scoring-bg,
+.section-special-bg,
+.section-gostop-bg {
+  position: relative;
+  background: var(--section-bg);
+}
+
+/* 섹션 01 화투 카드 — 따뜻한 한지 톤 */
+.section-cards-bg {
+  --section-bg: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    var(--paper-deep) 0%,
+    transparent 70%
+  );
+}
+
+/* 섹션 02 분배 + 03 흐름 — 부드러운 펠트 (게임판 느낌) */
+.section-flow-bg {
+  --section-bg: radial-gradient(
+    ellipse 70% 50% at 50% 30%,
+    var(--felt-soft) 0%,
+    transparent 75%
+  );
+}
+.dark .section-flow-bg {
+  --section-bg: radial-gradient(
+    ellipse 70% 50% at 50% 30%,
+    var(--felt-soft) 0%,
+    transparent 75%
+  );
+}
+
+/* 섹션 04 점수 — 짙은 펠트 그린 (도박판 / 매트) */
+.section-scoring-bg {
+  --section-bg: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in oklch, var(--felt) 12%, transparent) 8%,
+    color-mix(in oklch, var(--felt) 16%, transparent) 50%,
+    color-mix(in oklch, var(--felt) 12%, transparent) 92%,
+    transparent 100%
+  );
+}
+.dark .section-scoring-bg {
+  --section-bg: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in oklch, var(--felt-deep) 55%, transparent) 8%,
+    color-mix(in oklch, var(--felt-deep) 65%, transparent) 50%,
+    color-mix(in oklch, var(--felt-deep) 55%, transparent) 92%,
+    transparent 100%
+  );
+}
+
+/* 섹션 05 특수 룰 — 따뜻한 매트 분위기 (살짝 적빛) */
+.section-special-bg {
+  --section-bg: radial-gradient(
+    ellipse 70% 50% at 30% 30%,
+    var(--mat-soft) 0%,
+    transparent 75%
+  );
+}
+
+/* 섹션 06 고/스톱 — 강렬한 화투 매트 빨강 (결정의 순간) */
+.section-gostop-bg {
+  --section-bg: radial-gradient(
+    ellipse 80% 55% at 50% 40%,
+    color-mix(in oklch, var(--mat) 18%, var(--paper)) 0%,
+    transparent 80%
+  );
+}
+.dark .section-gostop-bg {
+  --section-bg: radial-gradient(
+    ellipse 80% 55% at 50% 40%,
+    color-mix(in oklch, var(--mat-deep) 60%, transparent) 0%,
+    transparent 80%
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* 한지 텍스처 — body에 SVG noise를 옅게 깔아 종이의 "결" 표현                  */
+/* 인라인 data-URI라 별도 자산 없음. 한 번 다운로드 후 모든 섹션에 통용.        */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+body {
+  /* SVG turbulence(0.85) — 종이 섬유처럼 보이는 미세 노이즈, 7% 불투명도. */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.16  0 0 0 0 0.10  0 0 0 0.07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-attachment: fixed;
+  background-size: 220px 220px;
+  background-color: var(--background);
+}
+
+.dark body {
+  /* 어둠 모드는 더 옅게 — 노이즈가 어두운 배경에서 도드라지면 거슬림 */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.92  0 0 0 0 0.85  0 0 0 0.04 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
 
 /* score-cell-emphasis: 5광 / 최고 점수 셀의 펄싱 글로우 */
 @keyframes score-cell-glow {

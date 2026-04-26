@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GAMES, getActiveGame } from "@/lib/games";
+import { VISIBLE_GAMES, getActiveGame } from "@/lib/games";
 import { useLocale } from "@/contexts/locale-context";
 
 export function GameTabs() {
@@ -16,7 +16,7 @@ export function GameTabs() {
       aria-label={locale === "ko" ? "게임 선택" : "Pick a game"}
       className="grid grid-cols-2 rounded-md border border-foreground/10 p-0.5 bg-foreground/[0.04]"
     >
-      {GAMES.map((game) => {
+      {VISIBLE_GAMES.map((game) => {
         const isActive = active === game.id;
         return (
           <Link

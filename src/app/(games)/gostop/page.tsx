@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/hero";
 import { SectionCards } from "@/components/section-cards";
+import { SectionDeal } from "@/components/section-deal";
 import { SectionFlow } from "@/components/section-flow";
 import { SectionGoStop } from "@/components/section-gostop";
 import { SectionScoring } from "@/components/section-scoring";
 import { SectionSpecial } from "@/components/section-special";
+import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
   title: "Go-Stop · A Visual Guide to Korean Games",
@@ -22,10 +24,12 @@ export default function GoStopPage() {
         blurbEn="The Korean card game families gather around during holidays. Learn the rules in five minutes."
       />
       <SectionCards />
+      <SectionDeal />
       <SectionFlow />
       <SectionScoring />
       <SectionSpecial />
       <SectionGoStop />
+      <SiteFooter />
     </>
   );
 }

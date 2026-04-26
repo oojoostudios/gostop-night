@@ -237,8 +237,10 @@ export function SectionYutFlow() {
   return (
     <section
       id="yut-flow"
-      className="py-24 border-t border-foreground/10"
+      className="relative py-24 border-t border-foreground/10"
     >
+      <div className="lg:ml-72">
+        <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
       <div className="text-xs tabular-nums text-foreground/50 mb-4">
         SECTION 03
       </div>
@@ -351,6 +353,8 @@ export function SectionYutFlow() {
         <span className="ml-3 text-xs tabular-nums text-foreground/50">
           {stepIndex + 1} / {scenario.steps.length}
         </span>
+      </div>
+        </div>
       </div>
     </section>
   );

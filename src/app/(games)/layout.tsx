@@ -7,9 +7,11 @@ export default function GamesLayout({ children }: { children: ReactNode }) {
     <>
       <MobileTopbar />
       <Sidebar />
-      <main className="lg:ml-72 min-h-screen">
-        <div className="max-w-5xl mx-auto px-8 lg:px-16">{children}</div>
-      </main>
+      {/* main is full-viewport-width — sections handle their own bg + content offset.
+       * The sidebar is fixed (w-72) and visually occupies the left 288px on lg+ screens,
+       * but doesn't take any layout space. Section content uses `lg:ml-72` internally
+       * to clear it. */}
+      <main className="min-h-screen">{children}</main>
     </>
   );
 }

@@ -759,10 +759,12 @@ export function SectionFlow() {
   return (
     <section
       id="section-flow"
-      className="py-24 border-t border-foreground/10"
+      className="relative py-24 border-t border-foreground/10 section-flow-bg"
     >
+      <div className="lg:ml-72">
+        <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
       <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
-        SECTION 02
+        SECTION 03
       </FadeInOnView>
       <FadeInOnView
         as="h2"
@@ -898,6 +900,8 @@ export function SectionFlow() {
         <span className="ml-3 text-xs tabular-nums text-foreground/50">
           {stepIndex + 1} / {scenario.steps.length}
         </span>
+      </div>
+        </div>
       </div>
     </section>
   );

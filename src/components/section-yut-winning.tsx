@@ -131,8 +131,10 @@ export function SectionYutWinning() {
   return (
     <section
       id="yut-winning"
-      className="py-24 border-t border-foreground/10"
+      className="relative py-24 border-t border-foreground/10"
     >
+      <div className="lg:ml-72">
+        <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
       <div className="text-xs tabular-nums text-foreground/50 mb-4">
         SECTION 05
       </div>
@@ -215,6 +217,8 @@ export function SectionYutWinning() {
         <span className="ml-3 text-xs tabular-nums text-foreground/50">
           {stepIndex + 1} / {STEPS.length}
         </span>
+      </div>
+        </div>
       </div>
     </section>
   );

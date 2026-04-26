@@ -6,6 +6,7 @@ import { SectionYutFlow } from "@/components/section-yut-flow";
 import { SectionYutSticks } from "@/components/section-yut-sticks";
 import { SectionYutStrategy } from "@/components/section-yut-strategy";
 import { SectionYutWinning } from "@/components/section-yut-winning";
+import { SiteFooter } from "@/components/site-footer";
 import { SECTIONS_BY_GAME } from "@/lib/sections";
 
 export const metadata: Metadata = {
@@ -42,6 +43,7 @@ export default function YutnoriPage() {
         .map((section) => (
           <SectionPlaceholder key={section.id} section={section} />
         ))}
+      <SiteFooter />
     </>
   );
 }

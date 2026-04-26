@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@heroui/react";
 import { SECTIONS_BY_GAME } from "@/lib/sections";
 import { getActiveGame } from "@/lib/games";
-import { GameTabs } from "@/components/game-tabs";
 import { useLocale } from "@/contexts/locale-context";
 import { useVariant, VARIANTS } from "@/contexts/variant-context";
 import { useTheme } from "@/contexts/theme-context";
@@ -57,7 +57,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <>
-      <GameTabs />
+      <BrandBlock locale={locale} />
 
       <nav className="flex flex-col gap-0.5">
         {sections.map((section) => {
@@ -100,7 +100,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       {game === "gostop" && (
-        <div className="flex flex-col gap-2 mt-auto">
+        <div className="flex flex-col gap-2">
           <div className="text-[10px] uppercase tracking-[0.18em] text-foreground/50">
             {locale === "ko" ? "룰셋" : "Ruleset"}
           </div>
@@ -130,7 +130,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
         </div>
       )}
 
-      <div className={`flex flex-col gap-2 ${game === "gostop" ? "" : "mt-auto"}`}>
+      <div className="flex flex-col gap-2">
         <div className="text-[10px] uppercase tracking-[0.18em] text-foreground/50">
           {locale === "ko" ? "언어" : "Language"}
         </div>
@@ -179,5 +179,25 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
             : "Dark"}
       </Button>
     </>
+  );
+}
+
+/**
+ * Brand block — replaces the previous 2-column GameTabs since yutnori is
+ * still WIP. A simple Mahjong-guide-style stacked title (Korean + hanja).
+ */
+function BrandBlock({ locale }: { locale: "ko" | "en" }) {
+  return (
+    <Link href="/gostop" className="group block">
+      <div className="text-xl font-semibold tracking-tight leading-tight text-foreground group-hover:text-foreground transition-colors">
+        {locale === "ko" ? "고스톱" : "Go-Stop"}
+      </div>
+      <div
+        className="text-base text-foreground/55 leading-tight mt-0.5"
+        style={{ fontFamily: "var(--font-accent)" }}
+      >
+        화 鬪
+      </div>
+    </Link>
   );
 }

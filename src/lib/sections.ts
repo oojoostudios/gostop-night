@@ -21,18 +21,28 @@ const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
       "12달 48장의 카드. 각 달마다 꽃, 동물, 계절 풍경이 그려져 있어요.",
   },
   {
-    id: "section-flow",
+    id: "section-deal",
     num: "02",
+    label: "How a round begins",
+    labelKo: "한 판이 시작될 때",
+    blurb:
+      "Shuffle, deal 8 to the floor, then 7 to each player. The remaining 19 form the deck.",
+    blurbKo:
+      "셔플 → 바닥에 8장 → 각자 7장씩. 남은 19장이 더미.",
+  },
+  {
+    id: "section-flow",
+    num: "03",
     label: "How a round works",
     labelKo: "한 판은 이렇게",
     blurb:
-      "Deal, take turns, match cards by month, and stack what you've won.",
+      "Take turns, match cards by month, and stack what you've won.",
     blurbKo:
-      "패를 분배하고, 차례대로 같은 월의 카드를 매칭하면서 먹어가요.",
+      "차례대로 같은 월의 카드를 매칭하면서 먹어가요.",
   },
   {
     id: "section-scoring",
-    num: "03",
+    num: "04",
     label: "Scoring",
     labelKo: "점수 계산",
     blurb:
@@ -42,7 +52,7 @@ const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
   },
   {
     id: "section-special",
-    num: "04",
+    num: "05",
     label: "Special rules",
     labelKo: "특수 룰",
     blurb:
@@ -52,7 +62,7 @@ const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
   },
   {
     id: "section-gostop",
-    num: "05",
+    num: "06",
     label: "Go or Stop?",
     labelKo: "고냐 스톱이냐",
     blurb:

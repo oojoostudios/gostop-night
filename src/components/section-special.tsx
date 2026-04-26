@@ -152,9 +152,10 @@ function MiniCard({
 }
 
 function PiBadge({ count }: { count: number }) {
+  const { locale } = useLocale();
   return (
     <span className="inline-flex items-center gap-1 text-xs font-semibold tabular-nums px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
-      +{count} 피
+      +{count} {locale === "ko" ? "피" : "pi"}
     </span>
   );
 }
@@ -262,7 +263,9 @@ function Ttadak() {
             <MiniCard id="01-pi-2" highlighted />
           </div>
           <span className="text-[10px] text-foreground/50">
-            {locale === "ko" ? "바닥에 이미 2장" : "On floor (2 of 1월)"}
+            {locale === "ko"
+              ? "바닥에 이미 2장"
+              : "On floor (2 of January)"}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">+</span>
@@ -303,14 +306,14 @@ function Pokdan() {
             <MiniCard id="01-pi-1" highlighted />
           </div>
           <span className="text-[10px] text-foreground/50">
-            {locale === "ko" ? "내 손패 (1월 3장)" : "Hand (3× 1월)"}
+            {locale === "ko" ? "내 손패 (1월 3장)" : "Hand (3× January)"}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">+</span>
         <div className="flex flex-col items-start gap-1.5">
           <MiniCard id="01-pi-2" highlighted />
           <span className="text-[10px] text-foreground/50">
-            {locale === "ko" ? "바닥의 마지막 1월" : "Floor's 4th"}
+            {locale === "ko" ? "바닥의 마지막 1월" : "Floor's 4th January"}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">=</span>
@@ -347,14 +350,16 @@ function Ppeok() {
             <MiniCard id="01-pi-1" />
           </div>
           <span className="text-[10px] text-rose-700 dark:text-rose-400 font-semibold">
-            {locale === "ko" ? "1월 3장이 바닥에 묶임" : "3× 1월 stuck on floor"}
+            {locale === "ko"
+              ? "1월 3장이 바닥에 묶임"
+              : "3 January cards stuck on floor"}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">→</span>
         <span className="text-xs text-foreground/60">
           {locale === "ko"
             ? "다음에 1월 내는 사람이 4장 한꺼번에 가져감"
-            : "Next 1월 played sweeps all 4"}
+            : "Next player to play a January card sweeps all 4"}
         </span>
       </div>
       <p className="text-xs text-foreground/50 mt-3 italic">
@@ -396,7 +401,9 @@ function Heunduki() {
             <MiniCard id="01-pi-1" highlighted ringColor="outline-violet-500" />
           </div>
           <span className="text-[10px] text-foreground/50">
-            {locale === "ko" ? "내 손에 1월 3장" : "Three 1월 in starting hand"}
+            {locale === "ko"
+              ? "내 손에 1월 3장"
+              : "Three January cards in starting hand"}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">→</span>

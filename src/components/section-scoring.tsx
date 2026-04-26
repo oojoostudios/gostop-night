@@ -240,17 +240,17 @@ function GwangBlock() {
       <p className="text-sm text-foreground/65 max-w-2xl leading-relaxed mb-5">
         {locale === "ko"
           ? "광은 다섯 장. 3장부터 점수가 들어와요. 하지만 12월 비광은 차감 효과가 있어서 비광 포함 3광은 2점."
-          : "There are five brights. Three or more begin to score — but the 12월 Rain bright (비광) discounts the score by one when it's part of the count."}
+          : "There are five brights. Three or more begin to score — but the December Rain bright (비광 · Bigwang) discounts the score by one when it's part of the count."}
       </p>
 
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-w-xl mb-6">
         <ScoreCell
-          label={locale === "ko" ? "3광 (비광 X)" : "3 brights"}
+          label={locale === "ko" ? "3광 (비광 X)" : "3 brights (no rain)"}
           score={locale === "ko" ? "3점" : "3 pts"}
           delay={0}
         />
         <ScoreCell
-          label={locale === "ko" ? "3광 (비광 O)" : "3 with 비광"}
+          label={locale === "ko" ? "3광 (비광 O)" : "3 brights (w/ rain)"}
           score={locale === "ko" ? "2점" : "2 pts"}
           detail={locale === "ko" ? "비광 차감" : "rain penalty"}
           delay={0.06}
@@ -314,36 +314,36 @@ function TtiBlock() {
 
       <div className="space-y-3">
         <ComboCallout
-          title={locale === "ko" ? "홍단 (1·2·3월)" : "Hongdan (Red)"}
+          title={locale === "ko" ? "홍단 (1·2·3월)" : "Hongdan · Red ribbons"}
           score={locale === "ko" ? "+3점" : "+3 pts"}
           desc={
             locale === "ko"
               ? "1월·2월·3월의 빨간 띠 (시문이 적힌 홍색 띠)"
-              : "Red ribbons of 1월, 2월, 3월 — poetry-inscribed red ribbons."
+              : "Red ribbons of January, February, March — poetry-inscribed."
           }
           cardIds={HONGDAN}
           ringColor="outline-rose-500"
           borderClass="border-rose-300 bg-rose-500/5"
         />
         <ComboCallout
-          title={locale === "ko" ? "청단 (6·9·10월)" : "Cheongdan (Blue)"}
+          title={locale === "ko" ? "청단 (6·9·10월)" : "Cheongdan · Blue ribbons"}
           score={locale === "ko" ? "+3점" : "+3 pts"}
           desc={
             locale === "ko"
               ? "6월·9월·10월의 파란 띠"
-              : "Blue ribbons of 6월, 9월, 10월."
+              : "Blue ribbons of June, September, October."
           }
           cardIds={CHEONGDAN}
           ringColor="outline-blue-500"
           borderClass="border-blue-300 bg-blue-500/5"
         />
         <ComboCallout
-          title={locale === "ko" ? "초단 (4·5·7월)" : "Chodan (Grass)"}
+          title={locale === "ko" ? "초단 (4·5·7월)" : "Chodan · Grass ribbons"}
           score={locale === "ko" ? "+3점" : "+3 pts"}
           desc={
             locale === "ko"
               ? "4월·5월·7월의 초록 띠"
-              : "Grass-colored ribbons of 4월, 5월, 7월."
+              : "Grass-colored ribbons of April, May, July."
           }
           cardIds={CHODAN}
           ringColor="outline-green-600"
@@ -354,7 +354,7 @@ function TtiBlock() {
       <p className="text-xs text-foreground/50 mt-4 italic">
         {locale === "ko"
           ? "* 12월 띠는 콤보에 들어가지 않아요. 띠 카운트엔 포함."
-          : "* The 12월 ribbon doesn't count toward any combo, but does add to total ribbon count."}
+          : "* The December ribbon doesn't count toward any combo, but does add to total ribbon count."}
       </p>
     </div>
   );
@@ -374,12 +374,12 @@ function KkeutBlock() {
       </p>
 
       <ComboCallout
-        title={locale === "ko" ? "고도리" : "Godori"}
+        title={locale === "ko" ? "고도리" : "Godori · Songbird trio"}
         score={locale === "ko" ? "+5점" : "+5 pts"}
         desc={
           locale === "ko"
             ? "새가 그려진 끗 3장 — 매조(2월) + 두견(4월) + 기러기(8월)"
-            : "Three bird animals — warbler (2월), cuckoo (4월), and geese (8월)."
+            : "Three bird animals — warbler (February), cuckoo (April), geese (August)."
         }
         cardIds={GODORI}
         ringColor="outline-emerald-500"

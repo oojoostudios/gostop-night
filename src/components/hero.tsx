@@ -10,7 +10,7 @@ const EASE = [0.32, 0.72, 0, 1] as const;
 const STATS = [
   { num: "48", labelKo: "장의 화투 카드", labelEn: "cards in a deck" },
   { num: "12", labelKo: "달 × 4장", labelEn: "months × 4 cards" },
-  { num: "4", labelKo: "종류 (광·띠·끗·피)", labelEn: "types (광·띠·끗·피)" },
+  { num: "4", labelKo: "종류 (광·띠·끗·피)", labelEn: "types (brights · ribbons · animals · pips)" },
   { num: "7", labelKo: "점에서 고/스톱", labelEn: "points to call go/stop" },
 ] as const;
 
@@ -42,13 +42,22 @@ export function Hero({
   const animKey = `${locale}`;
 
   // Title parts (kept short — Mahjong style: "Learn *mahjong* / A visual guide")
+  // 화투 = the cards (assets), 고스톱 = the rules (game). Eyebrow names the
+  // RULES because that's what this site teaches.
   const eyebrowMain =
-    locale === "ko" ? "한국식 화투 게임" : "Korean hwatu rules";
+    locale === "ko" ? "한국식 고스톱 규칙" : "Korean go-stop rules";
   const eyebrowAccent = "고스톱 · 화투";
   const learn = locale === "ko" ? "고스톱을 배워봐요" : "Learn";
   const accentWord = locale === "ko" ? "" : "go-stop";
   const subhead = locale === "ko" ? "비주얼 가이드" : "A visual guide";
-  const sigil = "화 투";
+  // Tagline that EXPLICITLY names the relationship: go-stop is the GAME,
+  // played with hwatu (花鬪) cards. Mahjong-guide can show "麻將" alone
+  // because mahjong = the tile set itself, but for us the two are distinct,
+  // so we spell out the connection on its own line.
+  const deckLine =
+    locale === "ko"
+      ? "화투(花鬪)로 치는 게임"
+      : "the card game played with 花鬪 (hwatu)";
   void titleKo;
   void titleEn;
 
@@ -113,7 +122,7 @@ export function Hero({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.55, ease: EASE }}
-            className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-[1.05] text-foreground/45 mb-7"
+            className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-[1.05] text-foreground/45 mb-3"
           >
             <span
               className="italic font-normal"
@@ -121,9 +130,18 @@ export function Hero({
             >
               {subhead}
             </span>
-            <span className="ml-3 text-foreground/55 not-italic text-2xl sm:text-3xl md:text-4xl tracking-tight">
-              {sigil}
-            </span>
+          </motion.div>
+
+          {/* Explicit deck-relationship tagline — clarifies that go-stop
+           * is the GAME played with the 화투 (花鬪) deck, not synonymous. */}
+          <motion.div
+            key={`deck-${animKey}`}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.28, duration: 0.55, ease: EASE }}
+            className="text-base sm:text-lg text-foreground/55 mb-7"
+          >
+            {deckLine}
           </motion.div>
 
           <motion.p

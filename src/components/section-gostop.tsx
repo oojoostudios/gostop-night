@@ -54,7 +54,7 @@ const SCENARIOS: ReadonlyArray<Scenario> = [
     title: "Tempting go",
     titleKo: "고고고",
     setup:
-      "You hit 7 with two 광 already, and you can see the third 광 is on the floor — easily reachable. Plenty of deck left.",
+      "You hit 7 with two brights (광) already, and you can see the third bright is on the floor — easily reachable. Plenty of deck left.",
     setupKo:
       "광 2장으로 7점 달성. 바닥에 또 다른 광이 보이고, 더미도 충분히 남아있어요.",
     facts: [
@@ -65,11 +65,11 @@ const SCENARIOS: ReadonlyArray<Scenario> = [
     ],
     best: "go",
     reasoningStop:
-      "Stopping at 7 leaves a lot on the table. With three 광 reachable and 12 cards left, going is mathematically the better call.",
+      "Stopping at 7 leaves a lot on the table. With three brights reachable and 12 cards left, going is mathematically the better call.",
     reasoningStopKo:
       "7점에서 멈추면 너무 보수적. 3광 (3점)이 보이고 더미도 12장 남아있으니, 기댓값상 고가 더 좋은 선택.",
     reasoningGo:
-      "Going makes sense. If you grab the third 광 you're at 8+; that lets you call 1고 and possibly aim for 4광 = 4 points.",
+      "Going makes sense. If you grab the third bright you're at 8+; that lets you call '1-go' and possibly aim for four brights = 4 points.",
     reasoningGoKo:
       "고는 합리적이에요. 바닥의 광을 먹으면 3광(3점)이 되고, 1고 → 4광 노릴 수도 있어요.",
   },

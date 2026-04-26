@@ -33,7 +33,7 @@ const PATTERNS: ReadonlyArray<Pattern> = [
     points: 15,
     accent: "amber",
     desc:
-      "All five 광 cards. The highest single combo in standard go-stop — collect the entire bright set and you score 15 in one go.",
+      "All five bright (광) cards. The highest single combo in standard go-stop — collect the entire bright set and you score 15 in one go.",
     descKo:
       "광 5장 모두. 고스톱 기본 룰에서 단일 콤보 최고 점수. 5광을 노린다면 12월 비광까지 다 모아야 해요.",
     cardIds: ["01-gwang", "03-gwang", "08-gwang", "11-gwang", "12-gwang"],
@@ -46,11 +46,11 @@ const PATTERNS: ReadonlyArray<Pattern> = [
     points: 4,
     accent: "amber",
     desc:
-      "Any four 광 cards. Unlike at the 3광 threshold, 비광 doesn't penalize at 4광 — four brights is always 4 points.",
+      "Any four bright (광) cards. Unlike at the three-bright threshold, the Rain bright (비광) doesn't penalize at four brights — it's always 4 points.",
     descKo:
       "광 4장. 3광에서는 비광이 차감되지만, 4광에서는 비광이 들어가도 그대로 4점.",
     cardIds: ["01-gwang", "03-gwang", "08-gwang", "11-gwang"],
-    note: "비광 included is still 4 points.",
+    note: "Rain bright (비광) included is still 4 points.",
     noteKo: "비광 포함 4광도 4점.",
   },
   {
@@ -61,11 +61,11 @@ const PATTERNS: ReadonlyArray<Pattern> = [
     points: 3,
     accent: "amber",
     desc:
-      "Any three 광 cards. Without 비광 it's 3 points. With 비광 the score drops to 2 — a quirk that makes 비광 a tricky card to chase.",
+      "Any three bright (광) cards. Without the Rain bright it's 3 points. With it, the score drops to 2 — a quirk that makes 비광 a tricky card to chase.",
     descKo:
       "광 3장. 비광 없이는 3점, 비광이 끼면 2점으로 내려가요. 비광은 그래서 양날의 검.",
     cardIds: ["01-gwang", "03-gwang", "08-gwang"],
-    note: "Including 비광 (12월) reduces it to 2.",
+    note: "Including the Rain bright (비광 · 12月) reduces it to 2.",
     noteKo: "비광이 포함되면 2점으로 내려가요.",
   },
   {
@@ -76,7 +76,7 @@ const PATTERNS: ReadonlyArray<Pattern> = [
     points: 5,
     accent: "emerald",
     desc:
-      "Three songbirds — warbler (2월), cuckoo (4월), and geese (8월). The most famous combo in go-stop, named after 'go' (5) and 'tori' (birds).",
+      "Three songbirds — warbler (February), cuckoo (April), and geese (August). The most famous combo in go-stop, named after 'go' (五, five) and 'tori' (鳥, birds).",
     descKo:
       "새 3마리 — 매조(2월), 두견(4월), 기러기(8월). 고스톱에서 가장 유명한 콤보. 이름은 '고(5)' + '도리(새)'.",
     cardIds: ["02-kkeut", "04-kkeut", "08-kkeut"],
@@ -89,7 +89,7 @@ const PATTERNS: ReadonlyArray<Pattern> = [
     points: 3,
     accent: "rose",
     desc:
-      "Three red ribbons inscribed with poetry — 1월, 2월, and 3월. The earliest combo of the year, fittingly named after the bright red color of 홍.",
+      "Three red ribbons inscribed with poetry — January, February, March. The earliest combo of the year, fittingly named after 홍 (紅, red).",
     descKo:
       "1·2·3월의 빨간 띠 (시문이 적힌 홍색 띠). 이름 그대로 '붉다(홍)'는 색에서 따왔어요.",
     cardIds: ["01-tti", "02-tti", "03-tti"],
@@ -102,7 +102,7 @@ const PATTERNS: ReadonlyArray<Pattern> = [
     points: 3,
     accent: "blue",
     desc:
-      "Three blue ribbons — 6월, 9월, 10월. 'Cheong' means blue. Spread out across mid-summer to autumn.",
+      "Three blue ribbons — June, September, October. 'Cheong' (청 · 青) means blue. Spread out across mid-summer to autumn.",
     descKo:
       "6·9·10월의 파란 띠. '청'은 파랑을 뜻해요. 한여름부터 가을 사이에 흩어져 있어요.",
     cardIds: ["06-tti", "09-tti", "10-tti"],
@@ -115,7 +115,7 @@ const PATTERNS: ReadonlyArray<Pattern> = [
     points: 3,
     accent: "green",
     desc:
-      "Three grass-colored ribbons — 4월, 5월, 7월. 'Cho' means grass. The plant-themed ribbons of spring through midsummer.",
+      "Three grass-colored ribbons — April, May, July. 'Cho' (초 · 草) means grass. The plant-themed ribbons of spring through midsummer.",
     descKo:
       "4·5·7월의 초록 띠. '초'는 풀을 뜻해요. 봄부터 한여름의 식물 모티프 띠들.",
     cardIds: ["04-tti", "05-tti", "07-tti"],

@@ -192,11 +192,12 @@ function BrandBlock({ locale }: { locale: "ko" | "en" }) {
       <div className="text-xl font-semibold tracking-tight leading-tight text-foreground group-hover:text-foreground transition-colors">
         {locale === "ko" ? "고스톱" : "Go-Stop"}
       </div>
+      {/* Hanja for hwatu cards — Mahjong-guide style (their subtitle is "麻將"). */}
       <div
         className="text-base text-foreground/55 leading-tight mt-0.5"
         style={{ fontFamily: "var(--font-accent)" }}
       >
-        화 鬪
+        花鬪
       </div>
     </Link>
   );

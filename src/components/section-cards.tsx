@@ -25,12 +25,18 @@ const TYPE_BADGE: Record<HwatuType, string> = {
   pi: "bg-zinc-600 text-white",
 };
 
-// Mahjong-style overview: each type gets a hanja sigil + romanization + count
+// Mahjong-guide-style overview: each type gets a hanja sigil + romanization +
+// English meaning. The hanja column matches the Korean term's actual etymology
+// where one exists (광=光, 피=皮); kkeut has no standard hanja, so we leave a
+// placeholder (—). This trio (Korean / Hanja / Romanization / English) lets
+// non-Korean readers anchor on the English while still showing cultural roots.
 const TYPE_OVERVIEW: Record<
   HwatuType,
   {
     hanja: string;
     roman: string;
+    /** English meaning shown in EN locale and as KO subtitle */
+    english: string;
     perMonth: number;
     formula: string;
     accent: string;
@@ -40,6 +46,7 @@ const TYPE_OVERVIEW: Record<
   gwang: {
     hanja: "光",
     roman: "Gwang",
+    english: "Brights",
     perMonth: 1,
     formula: "5 × 1 = 5",
     accent:
@@ -47,8 +54,12 @@ const TYPE_OVERVIEW: Record<
     sample: ["01-gwang", "03-gwang", "08-gwang", "11-gwang", "12-gwang"],
   },
   tti: {
+    // 短 — short for 短冊 (tanzaku, the strip of paper). The compound combos
+    // 紅短 (홍단), 青短 (청단), 草短 (초단) are all "<color>-short", literally
+    // "<color> tanzaku". So 短 (not 帶) is the etymologically correct hanja.
     hanja: "短",
     roman: "Tti",
+    english: "Ribbons",
     perMonth: 1,
     formula: "10 × 1 = 10",
     accent:
@@ -56,8 +67,10 @@ const TYPE_OVERVIEW: Record<
     sample: ["01-tti", "02-tti", "06-tti", "10-tti", "12-tti"],
   },
   kkeut: {
-    hanja: "種",
+    // No standard hanja — "끗" is a native Korean counter-word for points.
+    hanja: "—",
     roman: "Kkeut",
+    english: "Animals",
     perMonth: 1,
     formula: "9 × 1 = 9",
     accent:
@@ -67,6 +80,7 @@ const TYPE_OVERVIEW: Record<
   pi: {
     hanja: "皮",
     roman: "Pi",
+    english: "Pips",
     perMonth: 2,
     formula: "Mostly 2 each = 24",
     accent:
@@ -82,15 +96,15 @@ const TYPE_BLURB_DETAIL: Record<HwatuType, { ko: string; en: string }> = {
   },
   tti: {
     ko: "10개 달에 각 1장씩. 빨강·파랑·초록 색상 띠 — 같은 색 3장이면 콤보 (홍단·청단·초단).",
-    en: "One per month, in 10 months. Red, blue, or grass-colored — three of a color = combo (홍단·청단·초단).",
+    en: "One per month, in 10 months. Red, blue, or grass-colored — three of a color = combo (Hongdan / Cheongdan / Chodan).",
   },
   kkeut: {
     ko: "9개 달에 각 1장씩 — 동물·새·풍경. 새 3종 (매조·두견·기러기)을 모으면 고도리.",
-    en: "One per month, in 9 months — animals, birds, scenery. Three songbirds = godori combo.",
+    en: "One per month, in 9 months — animals, birds, scenery. Three songbirds (warbler, cuckoo, geese) = godori combo.",
   },
   pi: {
     ko: "대부분 달에 2장씩 (가장 흔함). 11월·12월의 쌍피는 ×2 효과 — 보너스피도 ×2.",
-    en: "Two per month for most (most common type). 11월·12월 'double pi' count as ×2 — bonus pi too.",
+    en: "Two per month for most (most common type). November and December 'double pi' count as ×2 — bonus pi too.",
   },
 };
 
@@ -315,17 +329,22 @@ function TypeOverview({
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-2 flex-wrap">
+                  {/* Mahjong-guide-style trio: native term first, with the
+                   * "other side" + romanization as a small subtitle so EN
+                   * readers always see what 광/띠/끗/피 mean. */}
                   <h3 className="text-2xl font-semibold tracking-tight">
-                    {locale === "ko" ? meta.labelKo : meta.label}
+                    {locale === "ko" ? meta.labelKo : ov.english}
                   </h3>
                   <span className="text-xs text-foreground/50">
-                    {locale === "ko" ? meta.label : meta.labelKo}
+                    {locale === "ko"
+                      ? `${ov.english} · ${ov.roman}`
+                      : `${meta.labelKo} · ${ov.roman}`}
                   </span>
                 </div>
                 <div className="text-[11px] uppercase tracking-wider text-foreground/55 tabular-nums mt-0.5">
                   {ov.formula}{" "}
                   <span className="text-foreground/35 mx-1">·</span>{" "}
-                  {count} {locale === "ko" ? "장" : "tiles"}
+                  {count} {locale === "ko" ? "장" : "cards"}
                 </div>
               </div>
             </div>

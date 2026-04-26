@@ -23,12 +23,16 @@ export type Month = {
   motifKo: string;
 };
 
+// English motifs use the BOTANICALLY accurate name; Korean names use the
+// common nickname. 4월 (등나무 / Wisteria) is colloquially called 흑싸리,
+// and 5월 (제비붓꽃 / Iris) is colloquially called 난초 — both Korean
+// names persist as game shorthand even though they don't match the plant.
 export const MONTHS: ReadonlyArray<Month> = [
   { num: 1,  motif: "Pine & crane",       motifKo: "송학" },
   { num: 2,  motif: "Plum & warbler",     motifKo: "매조" },
   { num: 3,  motif: "Cherry blossom",     motifKo: "벚꽃" },
-  { num: 4,  motif: "Black bush clover",  motifKo: "흑싸리" },
-  { num: 5,  motif: "Orchid",             motifKo: "난초" },
+  { num: 4,  motif: "Wisteria",           motifKo: "흑싸리" },
+  { num: 5,  motif: "Iris",               motifKo: "난초" },
   { num: 6,  motif: "Peony",              motifKo: "모란" },
   { num: 7,  motif: "Red bush clover",    motifKo: "홍싸리" },
   { num: 8,  motif: "Pampas & moon",      motifKo: "공산명월" },
@@ -168,7 +172,9 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
   { id: "12-gwang", month: 12, type: "gwang", name: "Rain bright (Ono no Michikaze)", nameKo: "비광", tag: "비광", tagKo: "비광", image: "/cards/cell-r5-c4.png",
     lore: "Ono no Michikaze, a Heian-era calligrapher, sheltering under an umbrella. Watching a frog repeatedly leap at a willow branch taught him persistence — the moral of the picture.",
     loreKo: "헤이안 시대 서예가 오노노 미치카제(小野道風)가 우산을 쓴 모습. 버드나무에 자꾸 뛰어오르는 개구리를 보고 끈기를 배웠다는 일화가 그림에 담겼어요." },
-  { id: "12-tti",   month: 12, type: "tti",   name: "Red ribbon", nameKo: "홍단", tag: "홍단", tagKo: "홍단", image: "/cards/cell-r5-c5.png" },
+  // 12월 띠 — 표준 고스톱 룰에선 어떤 단(홍/청/초) 콤보에도 속하지 않음.
+  // (일부 변형 룰에서 초단으로 분류) → tag 미부여로 콤보 카운트에서 제외.
+  { id: "12-tti",   month: 12, type: "tti",   name: "Plain ribbon", nameKo: "12월 띠", image: "/cards/cell-r5-c5.png" },
   { id: "12-kkeut", month: 12, type: "kkeut", name: "Swallow",    nameKo: "제비", image: "/cards/cell-r5-c6.png",
     lore: "A swallow against rain — the rain card's animal, traveling through storms. Often a bonus card in 고도리 sets.",
     loreKo: "빗속을 가르는 제비 — 비 카드의 동물. 고도리 짝의 일부로 점수가 되는 카드예요." },

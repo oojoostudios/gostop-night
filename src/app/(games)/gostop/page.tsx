@@ -20,7 +20,7 @@ export default function GoStopPage() {
       <Hero
         titleKo="고스톱"
         titleEn="Go-Stop"
-        blurbKo="한국 사람들이 명절마다 둘러앉아 치는 화투 게임. 5분만에 룰을 익혀보세요."
+        blurbKo="한국 사람들이 명절마다 화투로 치는 고스톱. 5분만에 룰을 익혀보세요."
         blurbEn="The Korean card game families gather around during holidays. Learn the rules in five minutes."
       />
       <SectionCards />

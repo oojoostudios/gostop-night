@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
-import { motion } from "motion/react";
-import { Sparkles, AlertTriangle, Zap, X } from "lucide-react";
-import { useLocale } from "@/contexts/locale-context";
-import { FadeInOnView } from "@/components/fade-in-on-view";
-import { HwatuCardImage } from "@/components/hwatu-card-image";
-import { HWATU_DECK } from "@/lib/hwatu";
+import type { ReactNode } from 'react';
+import { motion } from 'motion/react';
+import { Sparkles, AlertTriangle, Zap, X } from 'lucide-react';
+import { useLocale } from '@/contexts/locale-context';
+import { FadeInOnView } from '@/components/fade-in-on-view';
+import { HwatuCardImage } from '@/components/hwatu-card-image';
+import { HWATU_DECK } from '@/lib/hwatu';
 
 const cardById = (id: string) => HWATU_DECK.find((c) => c.id === id);
 
@@ -20,79 +20,104 @@ export function SectionSpecial() {
     >
       <div className="lg:ml-72">
         <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
-      <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
-        SECTION 05
-      </FadeInOnView>
-      <FadeInOnView
-        as="h2"
-        delay={0.05}
-        className="text-4xl md:text-5xl font-semibold tracking-tight mb-6"
-      >
-        {locale === "ko" ? "특수 룰" : "Special rules"}
-      </FadeInOnView>
-      <FadeInOnView
-        as="p"
-        delay={0.12}
-        className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-12"
-      >
-        {locale === "ko"
-          ? "고스톱이 단순히 카드 매칭이 아닌 이유. 보너스 피를 부르는 콤보, 카드를 묶어버리는 함정, 점수를 두 배로 만드는 배수까지."
-          : "Why go-stop isn't just card matching: bonus moves that earn pi from opponents, stuck-card traps, and multipliers that double the round."}
-      </FadeInOnView>
+          <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
+            SECTION 05
+          </FadeInOnView>
+          <FadeInOnView
+            as="h2"
+            delay={0.05}
+            className="text-4xl md:text-5xl font-semibold tracking-tight mb-6"
+          >
+            {locale === 'ko' ? '특수 룰' : 'Special rules'}
+          </FadeInOnView>
+          <FadeInOnView
+            as="p"
+            delay={0.12}
+            className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-12"
+          >
+            {locale === 'ko'
+              ? '고스톱이 단순히 카드 매칭이 아닌 이유. 보너스 피를 부르는 콤보, 카드를 묶어버리는 함정, 점수를 두 배로 만드는 배수까지.'
+              : "Why go-stop isn't just card matching: bonus moves that earn pi from opponents, stuck-card traps, and multipliers that double the round."}
+          </FadeInOnView>
 
-      <SubsectionHeader
-        icon={<Sparkles className="size-4" />}
-        title={locale === "ko" ? "보너스 — 상대 피 한 장씩" : "Bonus moves — gain pi from each opponent"}
-        accent="amber"
-      />
+          <SubsectionHeader
+            icon={<Sparkles className="size-4" />}
+            title={
+              locale === 'ko'
+                ? '보너스 — 상대 피 한 장씩'
+                : 'Bonus moves — gain pi from each opponent'
+            }
+            accent="amber"
+          />
 
-      <div className="space-y-6 mb-16">
-        <Jjok />
-        <Ttadak />
-        <Pokdan />
-      </div>
+          <div className="space-y-6 mb-16">
+            <Jjok />
+            <Ttadak />
+            <Pokdan />
+          </div>
 
-      <SubsectionHeader
-        icon={<X className="size-4" />}
-        title={locale === "ko" ? "꼬임 — 카드가 묶여요" : "Stuck — cards get tied up"}
-        accent="rose"
-      />
+          <SubsectionHeader
+            icon={<X className="size-4" />}
+            title={locale === 'ko' ? '꼬임 — 카드가 묶여요' : 'Stuck — cards get tied up'}
+            accent="rose"
+          />
 
-      <div className="space-y-6 mb-16">
-        <Ppeok />
-      </div>
+          <div className="space-y-6 mb-16">
+            <Ppeok />
+          </div>
 
-      <SubsectionHeader
-        icon={<Zap className="size-4" />}
-        title={locale === "ko" ? "배수 — 점수가 두 배로" : "Multipliers — score doubles"}
-        accent="violet"
-      />
+          <SubsectionHeader
+            icon={<Zap className="size-4" />}
+            title={locale === 'ko' ? '배수 — 점수가 두 배로' : 'Multipliers — score doubles'}
+            accent="violet"
+          />
 
-      <div className="space-y-6 mb-16">
-        <Heunduki />
-      </div>
+          <div className="space-y-6 mb-16">
+            <Heunduki />
+          </div>
 
-      <SubsectionHeader
-        icon={<AlertTriangle className="size-4" />}
-        title={locale === "ko" ? "박 시스템 — 패자에게 추가 부담" : "Bak system — penalties for the loser"}
-        accent="orange"
-      />
+          <SubsectionHeader
+            icon={<AlertTriangle className="size-4" />}
+            title={
+              locale === 'ko'
+                ? '박 시스템 — 패자에게 추가 부담'
+                : 'Bak system — penalties for the loser'
+            }
+            accent="orange"
+          />
 
-      <BakBlock />
+          <BakBlock />
         </div>
       </div>
     </section>
   );
 }
 
-const ACCENT: Record<
-  string,
-  { text: string; ring: string; bg: string; border: string }
-> = {
-  amber:  { text: "text-amber-700 dark:text-amber-400",  ring: "ring-amber-500/30",  bg: "bg-amber-500/5",  border: "border-amber-500/40" },
-  rose:   { text: "text-rose-700 dark:text-rose-400",    ring: "ring-rose-500/30",   bg: "bg-rose-500/5",   border: "border-rose-500/40" },
-  violet: { text: "text-violet-700 dark:text-violet-400",ring: "ring-violet-500/30", bg: "bg-violet-500/5", border: "border-violet-500/40" },
-  orange: { text: "text-orange-700 dark:text-orange-400",ring: "ring-orange-500/30", bg: "bg-orange-500/5", border: "border-orange-500/40" },
+const ACCENT: Record<string, { text: string; ring: string; bg: string; border: string }> = {
+  amber: {
+    text: 'text-amber-700 dark:text-amber-400',
+    ring: 'ring-amber-500/30',
+    bg: 'bg-amber-500/5',
+    border: 'border-amber-500/40',
+  },
+  rose: {
+    text: 'text-rose-700 dark:text-rose-400',
+    ring: 'ring-rose-500/30',
+    bg: 'bg-rose-500/5',
+    border: 'border-rose-500/40',
+  },
+  violet: {
+    text: 'text-violet-700 dark:text-violet-400',
+    ring: 'ring-violet-500/30',
+    bg: 'bg-violet-500/5',
+    border: 'border-violet-500/40',
+  },
+  orange: {
+    text: 'text-orange-700 dark:text-orange-400',
+    ring: 'ring-orange-500/30',
+    bg: 'bg-orange-500/5',
+    border: 'border-orange-500/40',
+  },
 };
 
 function SubsectionHeader({
@@ -108,14 +133,12 @@ function SubsectionHeader({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
+      viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className={`flex items-center gap-2 mb-5 ${ACCENT[accent].text}`}
     >
       {icon}
-      <h3 className="text-sm uppercase tracking-[0.18em] font-semibold">
-        {title}
-      </h3>
+      <h3 className="text-sm uppercase tracking-[0.18em] font-semibold">{title}</h3>
     </motion.div>
   );
 }
@@ -136,17 +159,12 @@ function MiniCard({
   return (
     <div
       className={`relative aspect-[2/3] w-12 sm:w-14 rounded-md overflow-hidden ring-1 ring-black/10 bg-white shrink-0 ${
-        faded ? "opacity-40 grayscale-[40%]" : ""
+        faded ? 'opacity-40 grayscale-[40%]' : ''
       } ${
-        highlighted
-          ? `outline outline-2 outline-offset-2 ${ringColor ?? "outline-amber-500"}`
-          : ""
+        highlighted ? `outline outline-2 outline-offset-2 ${ringColor ?? 'outline-amber-500'}` : ''
       }`}
     >
-      <HwatuCardImage
-        card={card}
-        className="absolute inset-0 w-full h-full"
-      />
+      <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
     </div>
   );
 }
@@ -155,7 +173,7 @@ function PiBadge({ count }: { count: number }) {
   const { locale } = useLocale();
   return (
     <span className="inline-flex items-center gap-1 text-xs font-semibold tabular-nums px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
-      +{count} {locale === "ko" ? "피" : "pi"}
+      +{count} {locale === 'ko' ? '피' : 'pi'}
     </span>
   );
 }
@@ -179,17 +197,15 @@ function RuleBlock({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       className={`rounded-lg border ${a.border} ${a.bg} p-5`}
     >
       <div className="flex items-baseline gap-3 mb-3 flex-wrap">
         <h4 className="text-xl font-semibold tracking-tight">
-          {locale === "ko" ? titleKo : titleEn}
+          {locale === 'ko' ? titleKo : titleEn}
         </h4>
-        <span className={`text-xs ${a.text}`}>
-          {locale === "ko" ? titleEn : titleKo}
-        </span>
+        <span className={`text-xs ${a.text}`}>{locale === 'ko' ? titleEn : titleKo}</span>
         {badge}
       </div>
       {children}
@@ -211,22 +227,22 @@ function Jjok() {
       accent="amber"
     >
       <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-        {locale === "ko"
-          ? "내가 낸 손패가 바닥에 짝이 없었지만, 더미에서 뒤집은 카드가 같은 월이었을 때. 두 장 모두 가져가고, 상대 한 명당 피 한 장씩 받아요."
+        {locale === 'ko'
+          ? '내가 낸 손패가 바닥에 짝이 없었지만, 더미에서 뒤집은 카드가 같은 월이었을 때. 두 장 모두 가져가고, 상대 한 명당 피 한 장씩 받아요.'
           : "You played a hand card that didn't match anything on the floor — but the card you flipped from the deck happens to be the same month. Take the pair, plus one pi from each opponent."}
       </p>
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex flex-col items-center gap-1.5">
           <MiniCard id="01-gwang" highlighted />
           <span className="text-[10px] text-foreground/50">
-            {locale === "ko" ? "내 손패" : "Hand"}
+            {locale === 'ko' ? '내 손패' : 'Hand'}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">→</span>
         <div className="flex flex-col items-center gap-1.5">
           <MiniCard id="01-pi-1" highlighted />
           <span className="text-[10px] text-foreground/50">
-            {locale === "ko" ? "더미에서 뒤집음" : "Flipped"}
+            {locale === 'ko' ? '더미에서 뒤집음' : 'Flipped'}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">=</span>
@@ -235,7 +251,7 @@ function Jjok() {
           <MiniCard id="01-pi-1" />
         </div>
         <span className="text-xs text-foreground/60">
-          {locale === "ko" ? "둘 다 내 것" : "Both taken"}
+          {locale === 'ko' ? '둘 다 내 것' : 'Both taken'}
         </span>
       </div>
     </RuleBlock>
@@ -252,9 +268,9 @@ function Ttadak() {
       accent="amber"
     >
       <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-        {locale === "ko"
-          ? "바닥에 같은 월 카드가 2장 있을 때, 내 손패가 그 월과 같으면 3장 모두 가져가요. 상대 한 명당 피 한 장씩 받아요."
-          : "When two same-month cards are already on the floor and your hand card matches them, you take all three. Plus one pi from each opponent."}
+        {locale === 'ko'
+          ? '바닥에 같은 월 카드가 2장 있을 때, 내 손패가 그 월과 같으면 3장 모두 가져가요. 상대 한 명당 피 한 장씩 받아요.'
+          : 'When two same-month cards are already on the floor and your hand card matches them, you take all three. Plus one pi from each opponent.'}
       </p>
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex flex-col items-start gap-1.5">
@@ -263,21 +279,19 @@ function Ttadak() {
             <MiniCard id="01-pi-2" highlighted />
           </div>
           <span className="text-[10px] text-foreground/50">
-            {locale === "ko"
-              ? "바닥에 이미 2장"
-              : "On floor (2 of January)"}
+            {locale === 'ko' ? '바닥에 이미 2장' : 'On floor (2 of January)'}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">+</span>
         <div className="flex flex-col items-start gap-1.5">
           <MiniCard id="01-gwang" highlighted />
           <span className="text-[10px] text-foreground/50">
-            {locale === "ko" ? "내 손패" : "Your hand"}
+            {locale === 'ko' ? '내 손패' : 'Your hand'}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">=</span>
         <span className="text-xs text-foreground/60 font-semibold">
-          {locale === "ko" ? "3장 모두 내 것" : "Take all three"}
+          {locale === 'ko' ? '3장 모두 내 것' : 'Take all three'}
         </span>
       </div>
     </RuleBlock>
@@ -294,9 +308,9 @@ function Pokdan() {
       accent="amber"
     >
       <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-        {locale === "ko"
-          ? "내 손에 같은 월 카드가 3장이고 바닥에 그 월의 마지막 1장이 있을 때, 한꺼번에 던져 4장 모두 가져가요. 상대 한 명당 피 한 장씩."
-          : "If you hold three cards of the same month and the fourth is on the floor, drop all three at once and take all four. Plus one pi from each opponent."}
+        {locale === 'ko'
+          ? '내 손에 같은 월 카드가 3장이고 바닥에 그 월의 마지막 1장이 있을 때, 한꺼번에 던져 4장 모두 가져가요. 상대 한 명당 피 한 장씩.'
+          : 'If you hold three cards of the same month and the fourth is on the floor, drop all three at once and take all four. Plus one pi from each opponent.'}
       </p>
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex flex-col items-start gap-1.5">
@@ -306,19 +320,19 @@ function Pokdan() {
             <MiniCard id="01-pi-1" highlighted />
           </div>
           <span className="text-[10px] text-foreground/50">
-            {locale === "ko" ? "내 손패 (1월 3장)" : "Hand (3× January)"}
+            {locale === 'ko' ? '내 손패 (1월 3장)' : 'Hand (3× January)'}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">+</span>
         <div className="flex flex-col items-start gap-1.5">
           <MiniCard id="01-pi-2" highlighted />
           <span className="text-[10px] text-foreground/50">
-            {locale === "ko" ? "바닥의 마지막 1월" : "Floor's 4th January"}
+            {locale === 'ko' ? '바닥의 마지막 1월' : "Floor's 4th January"}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">=</span>
         <span className="text-xs text-foreground/60 font-semibold">
-          {locale === "ko" ? "4장 모두 내 것" : "Take all four"}
+          {locale === 'ko' ? '4장 모두 내 것' : 'Take all four'}
         </span>
       </div>
     </RuleBlock>
@@ -332,15 +346,11 @@ function Pokdan() {
 function Ppeok() {
   const { locale } = useLocale();
   return (
-    <RuleBlock
-      titleKo="뻑"
-      titleEn="Ppeok — flip locks the floor"
-      accent="rose"
-    >
+    <RuleBlock titleKo="뻑" titleEn="Ppeok — flip locks the floor" accent="rose">
       <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-        {locale === "ko"
-          ? "내가 낸 손패가 바닥에 짝이 있어 가져가려는 순간, 더미에서 뒤집은 카드도 같은 월이면 — 카드 3장이 한꺼번에 묶여 바닥에 그대로 놓여요. 다음에 그 월을 내는 사람이 모두 가져가요."
-          : "You play a hand card that matches a floor card. But the card you flip is also the same month — all three cards stay locked on the floor. The next player to play that month takes everything."}
+        {locale === 'ko'
+          ? '내가 낸 손패가 바닥에 짝이 있어 가져가려는 순간, 더미에서 뒤집은 카드도 같은 월이면 — 카드 3장이 한꺼번에 묶여 바닥에 그대로 놓여요. 다음에 그 월을 내는 사람이 모두 가져가요.'
+          : 'You play a hand card that matches a floor card. But the card you flip is also the same month — all three cards stay locked on the floor. The next player to play that month takes everything.'}
       </p>
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex flex-col items-start gap-1.5">
@@ -350,22 +360,20 @@ function Ppeok() {
             <MiniCard id="01-pi-1" />
           </div>
           <span className="text-[10px] text-rose-700 dark:text-rose-400 font-semibold">
-            {locale === "ko"
-              ? "1월 3장이 바닥에 묶임"
-              : "3 January cards stuck on floor"}
+            {locale === 'ko' ? '1월 3장이 바닥에 묶임' : '3 January cards stuck on floor'}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">→</span>
         <span className="text-xs text-foreground/60">
-          {locale === "ko"
-            ? "다음에 1월 내는 사람이 4장 한꺼번에 가져감"
-            : "Next player to play a January card sweeps all 4"}
+          {locale === 'ko'
+            ? '다음에 1월 내는 사람이 4장 한꺼번에 가져감'
+            : 'Next player to play a January card sweeps all 4'}
         </span>
       </div>
       <p className="text-xs text-foreground/50 mt-3 italic">
-        {locale === "ko"
-          ? "* 자뻑 — 자기 차례에 내가 낸 손패와 뒤집은 카드가 같은 월이면 그 두 장이 묶여요."
-          : "* 자뻑 (self-ppeok): your own play + flip both being the same month also creates this lock."}
+        {locale === 'ko'
+          ? '* 자뻑 — 자기 차례에 내가 낸 손패와 뒤집은 카드가 같은 월이면 그 두 장이 묶여요.'
+          : '* 자뻑 (self-ppeok): your own play + flip both being the same month also creates this lock.'}
       </p>
     </RuleBlock>
   );
@@ -389,7 +397,7 @@ function Heunduki() {
       accent="violet"
     >
       <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-        {locale === "ko"
+        {locale === 'ko'
           ? "처음 패를 받았을 때 내 손에 같은 월 카드가 3장 있으면, '흔들었다'고 선언할 수 있어요. 그 라운드의 점수가 2배가 돼요."
           : "If your starting hand contains three cards of the same month, you can declare 'shake' — the round's score doubles."}
       </p>
@@ -401,20 +409,18 @@ function Heunduki() {
             <MiniCard id="01-pi-1" highlighted ringColor="outline-violet-500" />
           </div>
           <span className="text-[10px] text-foreground/50">
-            {locale === "ko"
-              ? "내 손에 1월 3장"
-              : "Three January cards in starting hand"}
+            {locale === 'ko' ? '내 손에 1월 3장' : 'Three January cards in starting hand'}
           </span>
         </div>
         <span className="text-foreground/30 text-lg">→</span>
         <span className="text-xs font-semibold text-violet-700 dark:text-violet-400">
-          {locale === "ko" ? "라운드 점수 ×2" : "Round score ×2"}
+          {locale === 'ko' ? '라운드 점수 ×2' : 'Round score ×2'}
         </span>
       </div>
       <p className="text-xs text-foreground/50 mt-3 italic">
-        {locale === "ko"
+        {locale === 'ko'
           ? "* 4장이면 '폭탄 흔들기' — ×2가 누적될 수도 있어요 (룰셋에 따라 다름)."
-          : "* Four-of-a-month is sometimes called bomb-shake — multipliers may stack depending on local rules."}
+          : '* Four-of-a-month is sometimes called bomb-shake — multipliers may stack depending on local rules.'}
       </p>
     </RuleBlock>
   );
@@ -433,22 +439,23 @@ function BakBlock() {
     descEn: string;
   }[] = [
     {
-      titleKo: "피박 (Pi-bak)",
-      titleEn: "Pi-bak",
-      descKo: "내가 스톱했을 때 누군가 피가 7장 미만이면, 그 사람의 부담이 2배.",
-      descEn: "If you stop while an opponent has fewer than 7 pi, their payment doubles.",
+      titleKo: '피박 (Pi-bak)',
+      titleEn: 'Pi-bak',
+      descKo: '내가 스톱했을 때 누군가 피가 7장 미만이면, 그 사람의 부담이 2배.',
+      descEn: 'If you stop while an opponent has fewer than 7 pi, their payment doubles.',
     },
     {
-      titleKo: "광박 (Gwang-bak)",
-      titleEn: "Gwang-bak",
-      descKo: "내가 광 점수를 올렸는데 누군가 광이 0장이면, 그 사람의 부담이 2배.",
-      descEn: "If you score with brights but an opponent has zero brights, their payment doubles.",
+      titleKo: '광박 (Gwang-bak)',
+      titleEn: 'Gwang-bak',
+      descKo: '내가 광 점수를 올렸는데 누군가 광이 0장이면, 그 사람의 부담이 2배.',
+      descEn: 'If you score with brights but an opponent has zero brights, their payment doubles.',
     },
     {
-      titleKo: "멍박 (Meong-bak)",
-      titleEn: "Meong-bak",
-      descKo: "내가 끗(열끗) 점수를 올렸는데 누군가 끗이 5장 미만이면, 그 사람의 부담이 2배.",
-      descEn: "If you score with animals but an opponent has fewer than 5 animals, their payment doubles.",
+      titleKo: '멍박 (Meong-bak)',
+      titleEn: 'Meong-bak',
+      descKo: '내가 끗(열끗) 점수를 올렸는데 누군가 끗이 5장 미만이면, 그 사람의 부담이 2배.',
+      descEn:
+        'If you score with animals but an opponent has fewer than 5 animals, their payment doubles.',
     },
   ];
 
@@ -459,7 +466,7 @@ function BakBlock() {
           key={item.titleKo}
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
+          viewport={{ once: true, margin: '-40px' }}
           transition={{
             duration: 0.4,
             ease: [0.16, 1, 0.3, 1],
@@ -467,14 +474,10 @@ function BakBlock() {
           }}
           className={`rounded-lg border ${ACCENT.orange.border} ${ACCENT.orange.bg} p-4`}
         >
-          <div className={`text-xs font-semibold mb-1 ${ACCENT.orange.text}`}>
-            ×2
-          </div>
-          <h4 className="font-semibold mb-2">
-            {locale === "ko" ? item.titleKo : item.titleEn}
-          </h4>
+          <div className={`text-xs font-semibold mb-1 ${ACCENT.orange.text}`}>×2</div>
+          <h4 className="font-semibold mb-2">{locale === 'ko' ? item.titleKo : item.titleEn}</h4>
           <p className="text-sm text-foreground/70 leading-relaxed">
-            {locale === "ko" ? item.descKo : item.descEn}
+            {locale === 'ko' ? item.descKo : item.descEn}
           </p>
         </motion.div>
       ))}

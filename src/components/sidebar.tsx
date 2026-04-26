@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { NavContent } from "@/components/nav-content";
+import { NavContent } from '@/components/nav-content';
 
 export function Sidebar() {
   return (

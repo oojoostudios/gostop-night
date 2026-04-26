@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
-import { MobileTopbar } from "@/components/mobile-topbar";
-import { Sidebar } from "@/components/sidebar";
+import type { ReactNode } from 'react';
+import { MobileTopbar } from '@/components/mobile-topbar';
+import { Sidebar } from '@/components/sidebar';
 
 export default function GamesLayout({ children }: { children: ReactNode }) {
   return (

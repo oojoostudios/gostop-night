@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { motion } from "motion/react";
+import { motion } from 'motion/react';
 
 export type Toss = {
   /** Final horizontal offset (px) on landing. */
@@ -20,7 +20,7 @@ export function YutStick({
   marked,
   throwId,
   toss = { x: 0, tilt: 0 },
-  size = "md",
+  size = 'md',
   delayIndex = 0,
 }: {
   flatUp: boolean;
@@ -28,11 +28,10 @@ export function YutStick({
   /** Bumping this re-mounts the stick and re-runs the toss animation. */
   throwId?: number;
   toss?: Toss;
-  size?: "sm" | "md";
+  size?: 'sm' | 'md';
   delayIndex?: number;
 }) {
-  const dimensions =
-    size === "sm" ? "w-4 h-12 sm:w-5 sm:h-14" : "w-7 h-24 sm:w-8 sm:h-28";
+  const dimensions = size === 'sm' ? 'w-4 h-12 sm:w-5 sm:h-14' : 'w-7 h-24 sm:w-8 sm:h-28';
 
   const isThrow = throwId !== undefined;
 
@@ -41,9 +40,9 @@ export function YutStick({
       key={throwId}
       className={`relative ${dimensions} shrink-0`}
       style={{
-        transformStyle: "preserve-3d",
+        transformStyle: 'preserve-3d',
         perspective: 360,
-        willChange: "transform",
+        willChange: 'transform',
       }}
       initial={
         isThrow
@@ -71,17 +70,17 @@ export function YutStick({
               delay: delayIndex * 0.03,
               y: {
                 times: [0, 0.32, 0.5, 1],
-                ease: ["easeOut", "linear", "easeIn"],
+                ease: ['easeOut', 'linear', 'easeIn'],
               },
               x: {
                 times: [0, 0.32, 0.5, 1],
-                ease: ["linear", "linear", "easeOut"],
+                ease: ['linear', 'linear', 'easeOut'],
               },
               rotate: {
                 times: [0, 0.32, 0.5, 1],
-                ease: ["easeOut", "linear", "easeOut"],
+                ease: ['easeOut', 'linear', 'easeOut'],
               },
-              rotateX: { ease: "easeOut" },
+              rotateX: { ease: 'easeOut' },
             }
           : { duration: 0.3 }
       }
@@ -89,7 +88,7 @@ export function YutStick({
       {/* Flat face — visible at rotateX = 0 */}
       <div
         className="absolute inset-0 rounded-md bg-gradient-to-b from-amber-100 to-amber-200 ring-1 ring-amber-900/20 shadow-md"
-        style={{ backfaceVisibility: "hidden" }}
+        style={{ backfaceVisibility: 'hidden' }}
       >
         <div className="absolute inset-x-1 top-1 bottom-1 rounded-sm border border-amber-700/15" />
         {marked && (
@@ -101,8 +100,8 @@ export function YutStick({
       <div
         className="absolute inset-0 rounded-md bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 ring-1 ring-amber-950/30 shadow-md"
         style={{
-          backfaceVisibility: "hidden",
-          transform: "rotateX(180deg)",
+          backfaceVisibility: 'hidden',
+          transform: 'rotateX(180deg)',
         }}
       >
         <div className="absolute inset-y-2 left-1/2 -translate-x-1/2 w-px bg-amber-950/50" />

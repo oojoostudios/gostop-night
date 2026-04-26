@@ -7,19 +7,16 @@
  * so the caller controls shape, ring, and motion via the wrapper.
  */
 
-"use client";
+'use client';
 
-import { useId } from "react";
+import { useId } from 'react';
 
 type Props = {
   className?: string;
   ariaLabel?: string;
 };
 
-export function HwatuCardBack({
-  className,
-  ariaLabel = "Card back",
-}: Props) {
+export function HwatuCardBack({ className, ariaLabel = 'Card back' }: Props) {
   const patternId = useId();
   return (
     <svg
@@ -30,49 +27,14 @@ export function HwatuCardBack({
       aria-label={ariaLabel}
     >
       <defs>
-        <pattern
-          id={patternId}
-          width="10"
-          height="10"
-          patternUnits="userSpaceOnUse"
-        >
+        <pattern id={patternId} width="10" height="10" patternUnits="userSpaceOnUse">
           {/* dimple — darker dot at grid intersection */}
-          <circle
-            cx="0"
-            cy="0"
-            r="1.2"
-            fill="var(--mat-deep)"
-            fillOpacity="0.6"
-          />
-          <circle
-            cx="10"
-            cy="0"
-            r="1.2"
-            fill="var(--mat-deep)"
-            fillOpacity="0.6"
-          />
-          <circle
-            cx="0"
-            cy="10"
-            r="1.2"
-            fill="var(--mat-deep)"
-            fillOpacity="0.6"
-          />
-          <circle
-            cx="10"
-            cy="10"
-            r="1.2"
-            fill="var(--mat-deep)"
-            fillOpacity="0.6"
-          />
+          <circle cx="0" cy="0" r="1.2" fill="var(--mat-deep)" fillOpacity="0.6" />
+          <circle cx="10" cy="0" r="1.2" fill="var(--mat-deep)" fillOpacity="0.6" />
+          <circle cx="0" cy="10" r="1.2" fill="var(--mat-deep)" fillOpacity="0.6" />
+          <circle cx="10" cy="10" r="1.2" fill="var(--mat-deep)" fillOpacity="0.6" />
           {/* bump — light highlight in cell center */}
-          <circle
-            cx="5"
-            cy="5"
-            r="1.6"
-            fill="var(--paper)"
-            fillOpacity="0.16"
-          />
+          <circle cx="5" cy="5" r="1.6" fill="var(--paper)" fillOpacity="0.16" />
         </pattern>
       </defs>
 

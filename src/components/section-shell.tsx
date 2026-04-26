@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
 /**
  * SectionShell — full-bleed section wrapper.
@@ -37,15 +37,11 @@ export function SectionShell({
     <section
       id={id}
       className={`relative ${
-        bordered ? "border-t border-foreground/10" : ""
-      } ${className ?? ""}`.trim()}
+        bordered ? 'border-t border-foreground/10' : ''
+      } ${className ?? ''}`.trim()}
     >
       <div className="lg:ml-72">
-        <div
-          className={`max-w-5xl mx-auto px-6 sm:px-8 lg:px-16 ${
-            innerClassName ?? ""
-          }`.trim()}
-        >
+        <div className={`max-w-5xl mx-auto px-6 sm:px-8 lg:px-16 ${innerClassName ?? ''}`.trim()}>
           {children}
         </div>
       </div>

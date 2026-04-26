@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { useLocale } from "@/contexts/locale-context";
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useLocale } from '@/contexts/locale-context';
 import {
   OUTER_PATH,
   SHORTCUTS,
@@ -10,9 +10,9 @@ import {
   getStation,
   type Station,
   type StationKind,
-} from "@/lib/yut-board";
+} from '@/lib/yut-board';
 
-export type BoardHighlight = "none" | "outer" | "shortcut" | "corners";
+export type BoardHighlight = 'none' | 'outer' | 'shortcut' | 'corners';
 
 export type PieceState = {
   /** Stable id used for React keys. */
@@ -20,7 +20,7 @@ export type PieceState = {
   /** Visited stations in order. The piece sits at the last entry. */
   history: ReadonlyArray<string>;
   /** Player color group. Defaults to "p1". */
-  player?: "p1" | "p2";
+  player?: 'p1' | 'p2';
   /** Stack count if this piece represents N pieces stacked together. */
   stack?: number;
   /** Marks a piece as having reached home (renders gold with a star). */
@@ -28,7 +28,7 @@ export type PieceState = {
 };
 
 export function YutBoard({
-  highlight = "none",
+  highlight = 'none',
   piece,
   pieces,
 }: {
@@ -38,12 +38,7 @@ export function YutBoard({
 }) {
   const allPieces = pieces ?? (piece ? [piece] : []);
   return (
-    <svg
-      viewBox="0 0 600 600"
-      className="w-full h-auto"
-      role="img"
-      aria-label="Yutnori board"
-    >
+    <svg viewBox="0 0 600 600" className="w-full h-auto" role="img" aria-label="Yutnori board">
       <defs>
         <radialGradient id="board-bg" cx="50%" cy="50%" r="70%">
           <stop offset="0%" stopColor="#fbf3df" />
@@ -57,53 +52,33 @@ export function YutBoard({
       {/* Outer ring connecting lines */}
       <g
         stroke="#8b6f47"
-        strokeWidth={highlight === "outer" ? 5 : 3}
+        strokeWidth={highlight === 'outer' ? 5 : 3}
         fill="none"
         className="transition-all"
       >
-        <line
-          x1={50} y1={50} x2={550} y2={50}
-          opacity={highlight === "outer" ? 1 : 0.55}
-        />
-        <line
-          x1={550} y1={50} x2={550} y2={550}
-          opacity={highlight === "outer" ? 1 : 0.55}
-        />
-        <line
-          x1={550} y1={550} x2={50} y2={550}
-          opacity={highlight === "outer" ? 1 : 0.55}
-        />
-        <line
-          x1={50} y1={550} x2={50} y2={50}
-          opacity={highlight === "outer" ? 1 : 0.55}
-        />
+        <line x1={50} y1={50} x2={550} y2={50} opacity={highlight === 'outer' ? 1 : 0.55} />
+        <line x1={550} y1={50} x2={550} y2={550} opacity={highlight === 'outer' ? 1 : 0.55} />
+        <line x1={550} y1={550} x2={50} y2={550} opacity={highlight === 'outer' ? 1 : 0.55} />
+        <line x1={50} y1={550} x2={50} y2={50} opacity={highlight === 'outer' ? 1 : 0.55} />
       </g>
 
       {/* Diagonal shortcut lines */}
       <g
         stroke="#8b6f47"
-        strokeWidth={highlight === "shortcut" ? 4 : 2}
-        strokeDasharray={highlight === "shortcut" ? "0" : "6 5"}
+        strokeWidth={highlight === 'shortcut' ? 4 : 2}
+        strokeDasharray={highlight === 'shortcut' ? '0' : '6 5'}
         fill="none"
         className="transition-all"
       >
-        <line
-          x1={50} y1={50} x2={550} y2={550}
-          opacity={highlight === "shortcut" ? 1 : 0.4}
-        />
-        <line
-          x1={550} y1={50} x2={50} y2={550}
-          opacity={highlight === "shortcut" ? 1 : 0.4}
-        />
+        <line x1={50} y1={50} x2={550} y2={550} opacity={highlight === 'shortcut' ? 1 : 0.4} />
+        <line x1={550} y1={50} x2={50} y2={550} opacity={highlight === 'shortcut' ? 1 : 0.4} />
       </g>
 
       {/* Direction arrows on outer ring (only when outer is highlighted) */}
-      {highlight === "outer" && (
-        <DirectionArrows />
-      )}
+      {highlight === 'outer' && <DirectionArrows />}
 
       {/* Animated path tracing */}
-      {highlight === "outer" && (
+      {highlight === 'outer' && (
         <motion.path
           d={pathD(OUTER_PATH)}
           stroke="#d97706"
@@ -113,13 +88,13 @@ export function YutBoard({
           strokeLinejoin="round"
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 0.7 }}
-          transition={{ duration: 2.4, ease: "easeInOut" }}
+          transition={{ duration: 2.4, ease: 'easeInOut' }}
         />
       )}
-      {highlight === "shortcut" &&
+      {highlight === 'shortcut' &&
         SHORTCUTS.map((path, i) => (
           <motion.path
-            key={i}
+            key={path.join('-')}
             d={pathD(path)}
             stroke="#0ea5e9"
             strokeWidth={6}
@@ -128,18 +103,14 @@ export function YutBoard({
             strokeLinejoin="round"
             initial={{ pathLength: 0, opacity: 0 }}
             animate={{ pathLength: 1, opacity: 0.75 }}
-            transition={{ duration: 1.6, ease: "easeInOut", delay: i * 0.2 }}
+            transition={{ duration: 1.6, ease: 'easeInOut', delay: i * 0.2 }}
           />
         ))}
 
       {/* Stations */}
       <g>
         {STATIONS.map((station) => (
-          <StationDot
-            key={station.id}
-            station={station}
-            highlight={highlight}
-          />
+          <StationDot key={station.id} station={station} highlight={highlight} />
         ))}
       </g>
 
@@ -148,11 +119,7 @@ export function YutBoard({
         <g>
           <AnimatePresence>
             {allPieces.map((p, i) => (
-              <PieceMarker
-                key={p.id ?? `piece-${i}`}
-                piece={p}
-                isSolo={allPieces.length === 1}
-              />
+              <PieceMarker key={p.id ?? `piece-${i}`} piece={p} isSolo={allPieces.length === 1} />
             ))}
           </AnimatePresence>
         </g>
@@ -161,13 +128,7 @@ export function YutBoard({
   );
 }
 
-function PieceMarker({
-  piece,
-  isSolo,
-}: {
-  piece: PieceState;
-  isSolo: boolean;
-}) {
+function PieceMarker({ piece, isSolo }: { piece: PieceState; isSolo: boolean }) {
   const history = piece.history;
   const [displayedIndex, setDisplayedIndex] = useState(0);
 
@@ -190,8 +151,7 @@ function PieceMarker({
   const prevHistoryLengthRef = useRef(history.length);
   const [returningHome, setReturningHome] = useState(false);
   useEffect(() => {
-    const wasReset =
-      history.length === 0 && prevHistoryLengthRef.current > 0;
+    const wasReset = history.length === 0 && prevHistoryLengthRef.current > 0;
     prevHistoryLengthRef.current = history.length;
     if (wasReset) {
       setReturningHome(true);
@@ -201,20 +161,16 @@ function PieceMarker({
   }, [history.length]);
 
   const visited = history.slice(0, displayedIndex);
-  const currentId = visited.length > 0 ? visited[visited.length - 1] : "start";
+  const currentId = visited.length > 0 ? visited[visited.length - 1] : 'start';
   const current = getStation(currentId);
 
-  const player = piece.player ?? "p1";
+  const player = piece.player ?? 'p1';
   const completed = piece.completed ?? false;
   const stackCount = piece.stack ?? 1;
 
-  const fill = completed
-    ? "#fbbf24"
-    : player === "p1"
-      ? "#dc2626"
-      : "#2563eb";
-  const stroke = completed ? "#92400e" : "#fff";
-  const traceColor = player === "p1" ? "#dc2626" : "#2563eb";
+  const fill = completed ? '#fbbf24' : player === 'p1' ? '#dc2626' : '#2563eb';
+  const stroke = completed ? '#92400e' : '#fff';
+  const traceColor = player === 'p1' ? '#dc2626' : '#2563eb';
 
   const moveDuration = returningHome ? 0.75 : 0.28;
   const moveEase: [number, number, number, number] = returningHome
@@ -231,7 +187,7 @@ function PieceMarker({
       {/* Trace path — only when this is the only piece on the board. */}
       {isSolo && visited.length > 0 && !completed && (
         <motion.path
-          d={tracePath(["start", ...visited])}
+          d={tracePath(['start', ...visited])}
           stroke={traceColor}
           strokeWidth={4}
           fill="none"
@@ -247,10 +203,10 @@ function PieceMarker({
         fill={fill}
         stroke={stroke}
         strokeWidth={3}
-        initial={{ cx: getStation("start").x, cy: getStation("start").y }}
+        initial={{ cx: getStation('start').x, cy: getStation('start').y }}
         animate={{ cx: current.x, cy: current.y }}
         transition={{ duration: moveDuration, ease: moveEase }}
-        style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}
+        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.25))' }}
       />
 
       {/* Brief returning-home flash on top of the piece */}
@@ -279,8 +235,8 @@ function PieceMarker({
           style={{
             fontSize: 16,
             fontWeight: 700,
-            fill: "#92400e",
-            pointerEvents: "none",
+            fill: '#92400e',
+            pointerEvents: 'none',
           }}
         >
           ★
@@ -325,18 +281,12 @@ function tracePath(stationIds: ReadonlyArray<string>): string {
   return stationIds
     .map((id, i) => {
       const s = getStation(id);
-      return `${i === 0 ? "M" : "L"} ${s.x} ${s.y}`;
+      return `${i === 0 ? 'M' : 'L'} ${s.x} ${s.y}`;
     })
-    .join(" ");
+    .join(' ');
 }
 
-function StationDot({
-  station,
-  highlight,
-}: {
-  station: Station;
-  highlight: BoardHighlight;
-}) {
+function StationDot({ station, highlight }: { station: Station; highlight: BoardHighlight }) {
   const { locale } = useLocale();
   const visual = stationVisual(station.kind, station.id, highlight);
 
@@ -360,63 +310,56 @@ function StationDot({
           style={{
             fontSize: 14,
             fontWeight: 600,
-            fontFamily: "inherit",
+            fontFamily: 'inherit',
           }}
         >
-          {locale === "ko" ? station.nameKo : station.nameEn}
+          {locale === 'ko' ? station.nameKo : station.nameEn}
         </text>
       )}
     </g>
   );
 }
 
-function stationVisual(
-  kind: StationKind,
-  id: string,
-  highlight: BoardHighlight,
-) {
-  const cornerHighlighted =
-    highlight === "corners" && (kind === "corner" || kind === "start");
-  const onShortcut =
-    highlight === "shortcut" &&
-    SHORTCUTS.some((path) => path.includes(id));
+function stationVisual(kind: StationKind, id: string, highlight: BoardHighlight) {
+  const cornerHighlighted = highlight === 'corners' && (kind === 'corner' || kind === 'start');
+  const onShortcut = highlight === 'shortcut' && SHORTCUTS.some((path) => path.includes(id));
 
   switch (kind) {
-    case "start":
+    case 'start':
       return {
         r: cornerHighlighted ? 26 : 22,
-        fill: "#d97706",
-        stroke: "#7c2d12",
+        fill: '#d97706',
+        stroke: '#7c2d12',
         strokeWidth: cornerHighlighted ? 4 : 2.5,
       };
-    case "corner":
+    case 'corner':
       return {
         r: cornerHighlighted ? 22 : 18,
-        fill: "#fff7ed",
-        stroke: cornerHighlighted ? "#dc2626" : "#9a6f43",
+        fill: '#fff7ed',
+        stroke: cornerHighlighted ? '#dc2626' : '#9a6f43',
         strokeWidth: cornerHighlighted ? 4 : 2.5,
       };
-    case "center":
+    case 'center':
       return {
         r: onShortcut ? 22 : 20,
-        fill: onShortcut ? "#0ea5e9" : "#fefce8",
-        stroke: onShortcut ? "#0c4a6e" : "#9a6f43",
+        fill: onShortcut ? '#0ea5e9' : '#fefce8',
+        stroke: onShortcut ? '#0c4a6e' : '#9a6f43',
         strokeWidth: onShortcut ? 4 : 2.5,
       };
-    case "diagonal":
+    case 'diagonal':
       return {
         r: onShortcut ? 14 : 12,
-        fill: onShortcut ? "#0ea5e9" : "#fffbeb",
-        stroke: onShortcut ? "#0c4a6e" : "#a18256",
+        fill: onShortcut ? '#0ea5e9' : '#fffbeb',
+        stroke: onShortcut ? '#0c4a6e' : '#a18256',
         strokeWidth: onShortcut ? 3 : 1.5,
       };
-    case "outer":
+    case 'outer':
     default:
       return {
-        r: highlight === "outer" ? 16 : 14,
-        fill: "#fffbeb",
-        stroke: highlight === "outer" ? "#d97706" : "#a18256",
-        strokeWidth: highlight === "outer" ? 3 : 2,
+        r: highlight === 'outer' ? 16 : 14,
+        fill: '#fffbeb',
+        stroke: highlight === 'outer' ? '#d97706' : '#a18256',
+        strokeWidth: highlight === 'outer' ? 3 : 2,
       };
   }
 }
@@ -438,15 +381,7 @@ function DirectionArrows() {
   );
 }
 
-function Arrow({
-  cx,
-  cy,
-  angle,
-}: {
-  cx: number;
-  cy: number;
-  angle: number;
-}) {
+function Arrow({ cx, cy, angle }: { cx: number; cy: number; angle: number }) {
   return (
     <g transform={`translate(${cx} ${cy}) rotate(${angle})`}>
       <polygon points="0,-5 8,0 0,5" />
@@ -458,7 +393,7 @@ function pathD(stationIds: ReadonlyArray<string>): string {
   return stationIds
     .map((id, i) => {
       const s = getStation(id);
-      return `${i === 0 ? "M" : "L"} ${s.x} ${s.y}`;
+      return `${i === 0 ? 'M' : 'L'} ${s.x} ${s.y}`;
     })
-    .join(" ");
+    .join(' ');
 }

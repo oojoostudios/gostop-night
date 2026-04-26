@@ -5,16 +5,16 @@
 // Side effects (피박/광박/멍박/흔들기/고배수) are NOT modeled here — those
 // require knowing the round outcome and other players' state.
 
-import { HWATU_DECK, type HwatuType } from "@/lib/hwatu";
+import { HWATU_DECK, type HwatuType } from '@/lib/hwatu';
 
-export const HONGDAN_IDS = ["01-tti", "02-tti", "03-tti"] as const;
-export const CHEONGDAN_IDS = ["06-tti", "09-tti", "10-tti"] as const;
-export const CHODAN_IDS = ["04-tti", "05-tti", "07-tti"] as const;
-export const GODORI_IDS = ["02-kkeut", "04-kkeut", "08-kkeut"] as const;
-export const BIGWANG_ID = "12-gwang";
+export const HONGDAN_IDS = ['01-tti', '02-tti', '03-tti'] as const;
+export const CHEONGDAN_IDS = ['06-tti', '09-tti', '10-tti'] as const;
+export const CHODAN_IDS = ['04-tti', '05-tti', '07-tti'] as const;
+export const GODORI_IDS = ['02-kkeut', '04-kkeut', '08-kkeut'] as const;
+export const BIGWANG_ID = '12-gwang';
 
 export type Combo = {
-  id: "hongdan" | "cheongdan" | "chodan" | "godori";
+  id: 'hongdan' | 'cheongdan' | 'chodan' | 'godori';
   label: string;
   labelKo: string;
   points: number;
@@ -33,16 +33,16 @@ export type Score = {
 };
 
 const COMBOS: ReadonlyArray<{
-  id: Combo["id"];
+  id: Combo['id'];
   label: string;
   labelKo: string;
   ids: ReadonlyArray<string>;
   points: number;
 }> = [
-  { id: "hongdan",   label: "Hongdan",   labelKo: "홍단",   ids: HONGDAN_IDS,   points: 3 },
-  { id: "cheongdan", label: "Cheongdan", labelKo: "청단",   ids: CHEONGDAN_IDS, points: 3 },
-  { id: "chodan",    label: "Chodan",    labelKo: "초단",   ids: CHODAN_IDS,    points: 3 },
-  { id: "godori",    label: "Godori",    labelKo: "고도리", ids: GODORI_IDS,    points: 5 },
+  { id: 'hongdan', label: 'Hongdan', labelKo: '홍단', ids: HONGDAN_IDS, points: 3 },
+  { id: 'cheongdan', label: 'Cheongdan', labelKo: '청단', ids: CHEONGDAN_IDS, points: 3 },
+  { id: 'chodan', label: 'Chodan', labelKo: '초단', ids: CHODAN_IDS, points: 3 },
+  { id: 'godori', label: 'Godori', labelKo: '고도리', ids: GODORI_IDS, points: 5 },
 ];
 
 export function computeScore(selectedIds: ReadonlySet<string>): Score {
@@ -54,8 +54,8 @@ export function computeScore(selectedIds: ReadonlySet<string>): Score {
   for (const card of HWATU_DECK) {
     if (!selectedIds.has(card.id)) continue;
     counts[card.type] += 1;
-    if (card.type === "pi") {
-      piEffective += card.tag === "쌍피" ? 2 : 1;
+    if (card.type === 'pi') {
+      piEffective += card.tag === '쌍피' ? 2 : 1;
     }
     if (card.id === BIGWANG_ID) hasBigwang = true;
   }
@@ -86,7 +86,7 @@ export function computeScore(selectedIds: ReadonlySet<string>): Score {
       points: combo.points,
     });
     // Combo points add to their type's tally
-    if (combo.id === "godori") breakdown.kkeut += combo.points;
+    if (combo.id === 'godori') breakdown.kkeut += combo.points;
     else breakdown.tti += combo.points;
   }
 

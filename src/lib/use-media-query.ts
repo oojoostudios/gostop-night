@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 /**
  * Subscribes to a CSS media query and returns whether it currently matches.
@@ -18,12 +18,12 @@ export function useMediaQuery(query: string): boolean {
     const mql = window.matchMedia(query);
     const update = () => setMatches(mql.matches);
     update();
-    mql.addEventListener("change", update);
-    return () => mql.removeEventListener("change", update);
+    mql.addEventListener('change', update);
+    return () => mql.removeEventListener('change', update);
   }, [query]);
 
   return matches;
 }
 
 /** Tailwind's `lg` breakpoint is 1024px — anything narrower is mobile/tablet. */
-export const useIsMobile = () => useMediaQuery("(max-width: 1023px)");
+export const useIsMobile = () => useMediaQuery('(max-width: 1023px)');

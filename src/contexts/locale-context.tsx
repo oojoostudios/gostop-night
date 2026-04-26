@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
-export type Locale = "en" | "ko";
+export type Locale = 'en' | 'ko';
 
-const STORAGE_KEY = "gostop:locale";
+const STORAGE_KEY = 'gostop:locale';
 
 type LocaleContextValue = {
   locale: Locale;
@@ -14,12 +14,12 @@ type LocaleContextValue = {
 const LocaleContext = createContext<LocaleContextValue | undefined>(undefined);
 
 function isLocale(value: unknown): value is Locale {
-  return value === "en" || value === "ko";
+  return value === 'en' || value === 'ko';
 }
 
 export function LocaleProvider({
   children,
-  defaultLocale = "en",
+  defaultLocale = 'en',
 }: {
   children: ReactNode;
   defaultLocale?: Locale;
@@ -46,15 +46,12 @@ export function LocaleProvider({
     }
   }, [locale, hydrated]);
 
-  return (
-    <LocaleContext.Provider value={{ locale, setLocale }}>
-      {children}
-    </LocaleContext.Provider>
-  );
+  const value = useMemo(() => ({ locale, setLocale }), [locale]);
+  return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
 
 export function useLocale() {
   const ctx = useContext(LocaleContext);
-  if (!ctx) throw new Error("useLocale must be used within a LocaleProvider");
+  if (!ctx) throw new Error('useLocale must be used within a LocaleProvider');
   return ctx;
 }

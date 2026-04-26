@@ -1,16 +1,13 @@
-"use client";
+'use client';
 
-import { useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { RotateCcw, Sparkles } from "lucide-react";
-import { Button } from "@heroui/react";
-import { useLocale } from "@/contexts/locale-context";
-import { resolveThrow, type ThrowKind } from "@/lib/yutnori";
-import { playResult, playThrow, unlockAudio } from "@/lib/sound";
-import {
-  YutThrowScene,
-  type YutThrowSceneApi,
-} from "@/components/yut-throw-scene";
+import { useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { RotateCcw, Sparkles } from 'lucide-react';
+import { Button } from '@heroui/react';
+import { useLocale } from '@/contexts/locale-context';
+import { resolveThrow, type ThrowKind } from '@/lib/yutnori';
+import { playResult, playThrow, unlockAudio } from '@/lib/sound';
+import { YutThrowScene, type YutThrowSceneApi } from '@/components/yut-throw-scene';
 
 export function YutThrowSimulator() {
   const { locale } = useLocale();
@@ -44,10 +41,10 @@ export function YutThrowSimulator() {
     <div className="rounded-xl border border-foreground/15 bg-foreground/[0.02] overflow-hidden">
       <div className="px-6 pt-6 pb-2 flex items-baseline justify-between">
         <div className="text-[10px] uppercase tracking-[0.2em] text-foreground/50">
-          {locale === "ko" ? "직접 던져보기" : "Try a throw"}
+          {locale === 'ko' ? '직접 던져보기' : 'Try a throw'}
         </div>
         <div className="text-[10px] text-foreground/40 italic">
-          {locale === "ko" ? "진짜 3D 물리" : "Real 3D physics"}
+          {locale === 'ko' ? '진짜 3D 물리' : 'Real 3D physics'}
         </div>
       </div>
 
@@ -64,28 +61,23 @@ export function YutThrowSimulator() {
             isDisabled={throwing}
             className="gap-2"
           >
-            <Sparkles className={`size-4 ${throwing ? "animate-spin" : ""}`} />
+            <Sparkles className={`size-4 ${throwing ? 'animate-spin' : ''}`} />
             {throwing
-              ? locale === "ko"
-                ? "굴러가는 중…"
-                : "Tumbling…"
+              ? locale === 'ko'
+                ? '굴러가는 중…'
+                : 'Tumbling…'
               : hasThrown
-                ? locale === "ko"
-                  ? "다시 던지기"
-                  : "Throw again"
-                : locale === "ko"
-                  ? "윷 던지기"
-                  : "Throw the sticks"}
+                ? locale === 'ko'
+                  ? '다시 던지기'
+                  : 'Throw again'
+                : locale === 'ko'
+                  ? '윷 던지기'
+                  : 'Throw the sticks'}
           </Button>
           {hasThrown && !throwing && (
-            <Button
-              variant="ghost"
-              size="md"
-              onPress={onReset}
-              className="gap-1.5 text-xs"
-            >
+            <Button variant="ghost" size="md" onPress={onReset} className="gap-1.5 text-xs">
               <RotateCcw className="size-3.5" />
-              {locale === "ko" ? "정리" : "Reset"}
+              {locale === 'ko' ? '정리' : 'Reset'}
             </Button>
           )}
         </div>
@@ -102,15 +94,15 @@ export function YutThrowSimulator() {
                 className="flex items-baseline gap-3"
               >
                 <span className="text-3xl font-semibold tracking-tight">
-                  {locale === "ko" ? result.nameKo : result.nameEn}
+                  {locale === 'ko' ? result.nameKo : result.nameEn}
                 </span>
                 <span className="text-base text-foreground/60 tabular-nums">
                   {result.move > 0 ? `+${result.move}` : result.move}
-                  {locale === "ko" ? "칸" : ""}
+                  {locale === 'ko' ? '칸' : ''}
                 </span>
                 {result.extraThrow && (
                   <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
-                    {locale === "ko" ? "한 번 더!" : "extra throw!"}
+                    {locale === 'ko' ? '한 번 더!' : 'extra throw!'}
                   </span>
                 )}
               </motion.div>

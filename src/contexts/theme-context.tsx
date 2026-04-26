@@ -1,16 +1,18 @@
-"use client";
+'use client';
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
-} from "react";
+} from 'react';
 
-export type Theme = "light" | "dark";
+export type Theme = 'light' | 'dark';
 
-const STORAGE_KEY = "gostop:theme";
+const STORAGE_KEY = 'gostop:theme';
 
 type ThemeContextValue = {
   theme: Theme;
@@ -21,12 +23,12 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 function isTheme(value: unknown): value is Theme {
-  return value === "light" || value === "dark";
+  return value === 'light' || value === 'dark';
 }
 
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
+  defaultTheme = 'light',
 }: {
   children: ReactNode;
   defaultTheme?: Theme;
@@ -45,7 +47,7 @@ export function ThemeProvider({
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.classList.toggle('dark', theme === 'dark');
     if (!hydrated) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, theme);
@@ -54,18 +56,18 @@ export function ThemeProvider({
     }
   }, [theme, hydrated]);
 
-  const toggleTheme = () =>
-    setTheme((current) => (current === "dark" ? "light" : "dark"));
-
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
+  const toggleTheme = useCallback(
+    () => setTheme((current) => (current === 'dark' ? 'light' : 'dark')),
+    [],
   );
+
+  const value = useMemo(() => ({ theme, setTheme, toggleTheme }), [theme, toggleTheme]);
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {
   const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error("useTheme must be used within a ThemeProvider");
+  if (!ctx) throw new Error('useTheme must be used within a ThemeProvider');
   return ctx;
 }

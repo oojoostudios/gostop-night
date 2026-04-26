@@ -1,25 +1,15 @@
-@import "tailwindcss";
-@import "@heroui/styles";
+@import 'tailwindcss';
+@import '@heroui/styles';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --font-sans:
-    var(--font-geist-sans),
-    "Apple SD Gothic Neo",
-    "Pretendard Variable",
-    Pretendard,
-    "Noto Sans KR",
-    system-ui,
-    sans-serif;
+    var(--font-geist-sans), 'Apple SD Gothic Neo', 'Pretendard Variable', Pretendard,
+    'Noto Sans KR', system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
-  --font-accent:
-    var(--font-serif-accent),
-    "Instrument Serif",
-    Georgia,
-    "Times New Roman",
-    serif;
+  --font-accent: var(--font-serif-accent), 'Instrument Serif', Georgia, 'Times New Roman', serif;
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
@@ -36,24 +26,24 @@
   :root,
   .light,
   .default,
-  [data-theme="light"],
-  [data-theme="default"] {
+  [data-theme='light'],
+  [data-theme='default'] {
     /* 핵심 팔레트 토큰 (마장 가이드와 호환되는 hex) */
-    --paper: #f2ecdc;        /* 한지 — 사이트 기본 배경 */
-    --paper-deep: #e9dfc8;   /* 진한 한지 — 섹션 액센트 */
-    --card: #fffdf5;         /* 카드/패널 배경 — 거의 흰색이지만 미세하게 따뜻 */
-    --ink: #25211a;          /* 본문 텍스트 — 따뜻한 검정 */
-    --muted-ink: #777064;    /* 부 텍스트 */
+    --paper: #f2ecdc; /* 한지 — 사이트 기본 배경 */
+    --paper-deep: #e9dfc8; /* 진한 한지 — 섹션 액센트 */
+    --card: #fffdf5; /* 카드/패널 배경 — 거의 흰색이지만 미세하게 따뜻 */
+    --ink: #25211a; /* 본문 텍스트 — 따뜻한 검정 */
+    --muted-ink: #777064; /* 부 텍스트 */
     --line: rgba(75, 65, 47, 0.14); /* 구분선 */
 
     /* 한국 고스톱 시그니처 액센트 */
-    --mat: #a9362c;          /* 화투 매트 빨강 */
-    --mat-deep: #7a2018;     /* 짙은 매트 */
-    --mat-soft: #efe0d5;     /* 매트 분위기의 부드러운 배경 */
+    --mat: #a9362c; /* 화투 매트 빨강 */
+    --mat-deep: #7a2018; /* 짙은 매트 */
+    --mat-soft: #efe0d5; /* 매트 분위기의 부드러운 배경 */
 
-    --felt: #167737;         /* 펠트 그린 */
-    --felt-deep: #07542a;    /* 짙은 펠트 */
-    --felt-soft: #dfe9d9;    /* 펠트 분위기의 부드러운 배경 */
+    --felt: #167737; /* 펠트 그린 */
+    --felt-deep: #07542a; /* 짙은 펠트 */
+    --felt-soft: #dfe9d9; /* 펠트 분위기의 부드러운 배경 */
 
     /* HeroUI / Tailwind v4 시스템 토큰을 위 팔레트로 매핑 */
     --accent: var(--mat);
@@ -71,7 +61,7 @@
   }
 
   .dark,
-  [data-theme="dark"] {
+  [data-theme='dark'] {
     /* 어둠 모드 — 어두운 나무판 + 따뜻한 호롱 */
     --paper: #1d1a14;
     --paper-deep: #15120d;
@@ -114,8 +104,12 @@
 
 /* highlight-sweep: 핵심 키워드 강조 — 스크롤 진입 시 좌→우 배경 스캔 */
 @keyframes highlight-sweep {
-  from { background-size: 0% 100%; }
-  to   { background-size: 100% 100%; }
+  from {
+    background-size: 0% 100%;
+  }
+  to {
+    background-size: 100% 100%;
+  }
 }
 
 .sweep-mark {
@@ -136,15 +130,30 @@
   animation-delay: var(--sweep-delay, 200ms);
 }
 
-.sweep-mark-rose  { --sweep-color: oklch(0.78 0.18 18 / 0.4); }
-.sweep-mark-violet{ --sweep-color: oklch(0.78 0.18 295 / 0.4); }
-.sweep-mark-emerald{ --sweep-color: oklch(0.82 0.16 155 / 0.4); }
+.sweep-mark-rose {
+  --sweep-color: oklch(0.78 0.18 18 / 0.4);
+}
+.sweep-mark-violet {
+  --sweep-color: oklch(0.78 0.18 295 / 0.4);
+}
+.sweep-mark-emerald {
+  --sweep-color: oklch(0.82 0.16 155 / 0.4);
+}
 
 /* live-dot breath: 게임 진행 인디케이터 — 점이 천천히 호흡 */
 @keyframes live-dot-breath {
-  0%   { transform: scale(1);   opacity: 0.55; }
-  70%  { transform: scale(2.4); opacity: 0; }
-  100% { transform: scale(2.4); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
 }
 
 .live-dot {
@@ -152,7 +161,7 @@
   display: inline-block;
 }
 .live-dot::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   border-radius: 9999px;
@@ -162,8 +171,14 @@
 
 /* drill-in: 카드 상세 패널 진입 — 살짝 축소 → 정사이즈 */
 @keyframes drill-in {
-  from { opacity: 0; transform: scale(0.94); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 .animate-drill-in {
   animation: drill-in 380ms cubic-bezier(0.32, 0.72, 0, 1);
@@ -174,8 +189,14 @@
  * SSR-safe — initial state는 opacity 1로, animation이 0 → 1 trip을 처리.
  * (motion.div의 initial=opacity:0이 hydration 실패 시 카드를 영구 invisible로 만드는 문제를 회피) */
 @keyframes card-fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .card-fade-in {
   animation: card-fade-in 320ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
@@ -200,27 +221,15 @@
 
 /* 섹션 01 화투 카드 — 따뜻한 한지 톤 */
 .section-cards-bg {
-  --section-bg: radial-gradient(
-    ellipse 80% 60% at 50% 0%,
-    var(--paper-deep) 0%,
-    transparent 70%
-  );
+  --section-bg: radial-gradient(ellipse 80% 60% at 50% 0%, var(--paper-deep) 0%, transparent 70%);
 }
 
 /* 섹션 02 분배 + 03 흐름 — 부드러운 펠트 (게임판 느낌) */
 .section-flow-bg {
-  --section-bg: radial-gradient(
-    ellipse 70% 50% at 50% 30%,
-    var(--felt-soft) 0%,
-    transparent 75%
-  );
+  --section-bg: radial-gradient(ellipse 70% 50% at 50% 30%, var(--felt-soft) 0%, transparent 75%);
 }
 .dark .section-flow-bg {
-  --section-bg: radial-gradient(
-    ellipse 70% 50% at 50% 30%,
-    var(--felt-soft) 0%,
-    transparent 75%
-  );
+  --section-bg: radial-gradient(ellipse 70% 50% at 50% 30%, var(--felt-soft) 0%, transparent 75%);
 }
 
 /* 섹션 04 점수 — 짙은 펠트 그린 (도박판 / 매트) */
@@ -247,11 +256,7 @@
 
 /* 섹션 05 특수 룰 — 따뜻한 매트 분위기 (살짝 적빛) */
 .section-special-bg {
-  --section-bg: radial-gradient(
-    ellipse 70% 50% at 30% 30%,
-    var(--mat-soft) 0%,
-    transparent 75%
-  );
+  --section-bg: radial-gradient(ellipse 70% 50% at 30% 30%, var(--mat-soft) 0%, transparent 75%);
 }
 
 /* 섹션 06 고/스톱 — 강렬한 화투 매트 빨강 (결정의 순간) */
@@ -288,11 +293,15 @@ body {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.92  0 0 0 0 0.85  0 0 0 0.04 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 
-
 /* score-cell-emphasis: 5광 / 최고 점수 셀의 펄싱 글로우 */
 @keyframes score-cell-glow {
-  0%, 100% { box-shadow: 0 0 0 0 oklch(0.78 0.18 75 / 0); }
-  50%      { box-shadow: 0 0 0 6px oklch(0.78 0.18 75 / 0.18); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.78 0.18 75 / 0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px oklch(0.78 0.18 75 / 0.18);
+  }
 }
 .score-cell-emphasis {
   animation: score-cell-glow 2.6s ease-in-out infinite;
@@ -311,5 +320,7 @@ body {
   .animate-drill-in {
     animation: none !important;
   }
-  .sweep-mark { background-size: 100% 100%; }
+  .sweep-mark {
+    background-size: 100% 100%;
+  }
 }

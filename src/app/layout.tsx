@@ -1,32 +1,31 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
-import Script from "next/script";
-import "./globals.css";
-import { Providers } from "@/components/providers";
-import { ScrollProgress } from "@/components/scroll-progress";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google';
+import Script from 'next/script';
+import './globals.css';
+import { Providers } from '@/components/providers';
+import { ScrollProgress } from '@/components/scroll-progress';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 // Serif italic accent — used for the Mahjong-style "Learn *go-stop*" title
 const instrumentSerif = Instrument_Serif({
-  variable: "--font-serif-accent",
-  subsets: ["latin"],
-  weight: "400",
-  style: "italic",
+  variable: '--font-serif-accent',
+  subsets: ['latin'],
+  weight: '400',
+  style: 'italic',
 });
 
 export const metadata: Metadata = {
-  title: "Go-Stop: A Visual Guide",
-  description:
-    "Learn how to play 고스톱 (Go-Stop), the Korean card game, in five minutes.",
+  title: 'Go-Stop: A Visual Guide',
+  description: 'Learn how to play 고스톱 (Go-Stop), the Korean card game, in five minutes.',
 };
 
 export default function RootLayout({

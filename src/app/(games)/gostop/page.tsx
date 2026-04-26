@@ -1,18 +1,18 @@
-import type { Metadata } from "next";
-import { Hero } from "@/components/hero";
-import { EtymologyBand } from "@/components/etymology-band";
-import { SectionCards } from "@/components/section-cards";
-import { SectionDeal } from "@/components/section-deal";
-import { SectionFlow } from "@/components/section-flow";
-import { SectionGoStop } from "@/components/section-gostop";
-import { SectionScoring } from "@/components/section-scoring";
-import { SectionSpecial } from "@/components/section-special";
-import { SiteFooter } from "@/components/site-footer";
+import type { Metadata } from 'next';
+import { Hero } from '@/components/hero';
+import { EtymologyBand } from '@/components/etymology-band';
+import { SectionCards } from '@/components/section-cards';
+import { SectionDeal } from '@/components/section-deal';
+import { SectionFlow } from '@/components/section-flow';
+import { SectionGoStop } from '@/components/section-gostop';
+import { SectionScoring } from '@/components/section-scoring';
+import { SectionSpecial } from '@/components/section-special';
+import { SiteFooter } from '@/components/site-footer';
 
 export const metadata: Metadata = {
-  title: "Go-Stop · A Visual Guide to Korean Games",
+  title: 'Go-Stop · A Visual Guide to Korean Games',
   description:
-    "Learn how to play 고스톱 (Go-Stop) — the Korean card game families gather around — in five minutes.",
+    'Learn how to play 고스톱 (Go-Stop) — the Korean card game families gather around — in five minutes.',
 };
 
 export default function GoStopPage() {

@@ -1,4 +1,4 @@
-import type { HwatuCard as HwatuCardData } from "@/lib/hwatu";
+import type { HwatuCard as HwatuCardData } from '@/lib/hwatu';
 
 /**
  * Renders a single hwatu card image.
@@ -21,9 +21,8 @@ type Props = {
 
 export function HwatuCardImage(props: Props) {
   const { className, ariaLabel } = props;
-  const src = "card" in props && props.card ? props.card.image : props.path;
-  const label =
-    ariaLabel ?? ("card" in props && props.card ? props.card.nameKo : "");
+  const src = 'card' in props && props.card ? props.card.image : props.path;
+  const label = ariaLabel ?? ('card' in props && props.card ? props.card.nameKo : '');
   return (
     <img
       src={src}

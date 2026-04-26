@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   forwardRef,
@@ -8,16 +8,11 @@ import {
   useRef,
   useState,
   type RefObject,
-} from "react";
-import * as THREE from "three";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { ContactShadows, Environment } from "@react-three/drei";
-import {
-  CuboidCollider,
-  Physics,
-  RigidBody,
-  type RapierRigidBody,
-} from "@react-three/rapier";
+} from 'react';
+import * as THREE from 'three';
+import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { ContactShadows, Environment } from '@react-three/drei';
+import { CuboidCollider, Physics, RigidBody, type RapierRigidBody } from '@react-three/rapier';
 
 const STICK_W = 0.7;
 const STICK_H = 0.18;
@@ -25,7 +20,7 @@ const STICK_L = 3.4;
 const STICK_COUNT = 4;
 const REST_GAP = 0.95;
 
-const WOOD_TEXTURE_URL = "/textures/wood-diff.jpg";
+const WOOD_TEXTURE_URL = '/textures/wood-diff.jpg';
 
 export type YutThrowSceneApi = {
   throwSticks: () => void;
@@ -54,7 +49,7 @@ function SceneSkeleton() {
 export const YutThrowScene = forwardRef<YutThrowSceneApi, YutThrowSceneProps>(
   function YutThrowScene({ onResult, onThrowStart }, ref) {
     const stickRefs = useRef<(RapierRigidBody | null)[]>(
-      Array(STICK_COUNT).fill(null),
+      Array.from({ length: STICK_COUNT }, () => null),
     );
     const [throwing, setThrowing] = useState(false);
     const throwStartTime = useRef(0);
@@ -105,10 +100,7 @@ export const YutThrowScene = forwardRef<YutThrowSceneApi, YutThrowSceneProps>(
     const reset = () => {
       stickRefs.current.forEach((stick, i) => {
         if (!stick) return;
-        stick.setTranslation(
-          { x: (i - (STICK_COUNT - 1) / 2) * REST_GAP, y: 0.4, z: 0 },
-          true,
-        );
+        stick.setTranslation({ x: (i - (STICK_COUNT - 1) / 2) * REST_GAP, y: 0.4, z: 0 }, true);
         stick.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
         stick.setLinvel({ x: 0, y: 0, z: 0 }, true);
         stick.setAngvel({ x: 0, y: 0, z: 0 }, true);
@@ -131,19 +123,15 @@ export const YutThrowScene = forwardRef<YutThrowSceneApi, YutThrowSceneProps>(
         camera={{ position: [0, 7, 7], fov: 42 }}
         dpr={[1, 2]}
         gl={{ antialias: true }}
-        style={{ position: "absolute", inset: 0 }}
+        style={{ position: 'absolute', inset: 0 }}
       >
-        <color attach="background" args={["#1c1614"]} />
+        <color attach="background" args={['#1c1614']} />
 
         {/* Image-based lighting — bounces warm/neutral light off everything */}
         <Environment preset="warehouse" background={false} environmentIntensity={0.7} />
 
         {/* Subtle key light for directional shape definition */}
-        <directionalLight
-          position={[6, 10, 4]}
-          intensity={0.55}
-          color="#fff2dd"
-        />
+        <directionalLight position={[6, 10, 4]} intensity={0.55} color="#fff2dd" />
 
         <Physics gravity={[0, -22, 0]}>
           <Floor />
@@ -278,44 +266,14 @@ function YutStickBody({
       <mesh castShadow receiveShadow>
         <boxGeometry args={[STICK_W, STICK_H, STICK_L]} />
         {/* Order: +X, -X, +Y (top = flat), -Y (bottom = round), +Z, -Z */}
-        <meshStandardMaterial
-          attach="material-0"
-          map={endTex}
-          color="#a07852"
-          roughness={0.65}
-        />
-        <meshStandardMaterial
-          attach="material-1"
-          map={endTex}
-          color="#a07852"
-          roughness={0.65}
-        />
+        <meshStandardMaterial attach="material-0" map={endTex} color="#a07852" roughness={0.65} />
+        <meshStandardMaterial attach="material-1" map={endTex} color="#a07852" roughness={0.65} />
         {/* Flat side — light, lifted */}
-        <meshStandardMaterial
-          attach="material-2"
-          map={flatTex}
-          color="#f0d8a0"
-          roughness={0.55}
-        />
+        <meshStandardMaterial attach="material-2" map={flatTex} color="#f0d8a0" roughness={0.55} />
         {/* Round side — dark, shadowed */}
-        <meshStandardMaterial
-          attach="material-3"
-          map={roundTex}
-          color="#5c3a22"
-          roughness={0.8}
-        />
-        <meshStandardMaterial
-          attach="material-4"
-          map={sideTex}
-          color="#8b5e3c"
-          roughness={0.7}
-        />
-        <meshStandardMaterial
-          attach="material-5"
-          map={sideTex}
-          color="#8b5e3c"
-          roughness={0.7}
-        />
+        <meshStandardMaterial attach="material-3" map={roundTex} color="#5c3a22" roughness={0.8} />
+        <meshStandardMaterial attach="material-4" map={sideTex} color="#8b5e3c" roughness={0.7} />
+        <meshStandardMaterial attach="material-5" map={sideTex} color="#8b5e3c" roughness={0.7} />
       </mesh>
     </RigidBody>
   );

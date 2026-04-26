@@ -4,7 +4,7 @@
 let cached: AudioContext | null = null;
 
 function ctx(): AudioContext | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
   if (!cached) {
     type WindowWithWebkit = typeof window & {
       webkitAudioContext?: typeof AudioContext;
@@ -26,7 +26,7 @@ export function playThrow() {
   // Low rumble
   const osc = ac.createOscillator();
   const gain = ac.createGain();
-  osc.type = "sawtooth";
+  osc.type = 'sawtooth';
   osc.frequency.setValueAtTime(120, now);
   osc.frequency.exponentialRampToValueAtTime(50, now + 0.45);
   gain.gain.setValueAtTime(0.0001, now);
@@ -39,7 +39,7 @@ export function playThrow() {
   // Higher whoosh layered on top
   const osc2 = ac.createOscillator();
   const gain2 = ac.createGain();
-  osc2.type = "triangle";
+  osc2.type = 'triangle';
   osc2.frequency.setValueAtTime(400, now);
   osc2.frequency.exponentialRampToValueAtTime(180, now + 0.3);
   gain2.gain.setValueAtTime(0.0001, now);
@@ -58,7 +58,7 @@ export function playClack(volume = 0.18) {
 
   const osc = ac.createOscillator();
   const gain = ac.createGain();
-  osc.type = "triangle";
+  osc.type = 'triangle';
   // Slight pitch variation per call so sticks don't all sound identical.
   const pitch = 180 + Math.random() * 80;
   osc.frequency.setValueAtTime(pitch, now);
@@ -86,7 +86,7 @@ export function playResult() {
   for (const note of notes) {
     const osc = ac.createOscillator();
     const gain = ac.createGain();
-    osc.type = "sine";
+    osc.type = 'sine';
     osc.frequency.setValueAtTime(note.freq, now + note.offset);
     gain.gain.setValueAtTime(0.0001, now + note.offset);
     gain.gain.exponentialRampToValueAtTime(0.12, now + note.offset + 0.01);
@@ -100,7 +100,7 @@ export function playResult() {
 /** Resume the audio context after a user gesture. Browsers require this. */
 export function unlockAudio() {
   const ac = ctx();
-  if (ac && ac.state === "suspended") {
+  if (ac && ac.state === 'suspended') {
     ac.resume();
   }
 }

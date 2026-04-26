@@ -23,7 +23,7 @@ const instrumentSerif = Instrument_Serif({
   style: 'italic',
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://gostopguide.com';
 const SITE_NAME = 'Go-Stop: A Visual Guide';
 const SITE_DESCRIPTION =
   'Learn how to play 고스톱 (Go-Stop), the Korean card game, in five minutes — a visual guide for first-time players.';

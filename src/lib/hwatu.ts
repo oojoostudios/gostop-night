@@ -72,10 +72,10 @@ export const HWATU_TYPES: Record<HwatuType, { label: string; labelKo: string; bl
 /**
  * Standard 48-card hwatu deck. 5 광, 10 띠, 9 끗, 24 피.
  *
- * Image paths are sliced from `/public/hwatu-deck.svg` (3000×3300 viewBox)
- * into 8 cols × 6 rows. Within each row, cols 0–3 are the month listed first,
- * cols 4–7 are that month + 6. Within each month's four slots the order is
- * highest-tier first (광 if it exists, else 끗), then 띠, then pi/쌍피.
+ * Card PNGs live in `/public/cards/cell-r{row}-c{col}.png` on an 8×6 grid.
+ * Within each row, cols 0–3 are the month listed first, cols 4–7 are that
+ * month + 6. Within each month's four slots the order is highest-tier first
+ * (광 if it exists, else 끗), then 띠, then pi/쌍피.
  */
 export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
   // 1월 — 송학 (row 0, cols 0–3)

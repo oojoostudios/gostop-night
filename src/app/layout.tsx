@@ -23,9 +23,37 @@ const instrumentSerif = Instrument_Serif({
   style: 'italic',
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const SITE_NAME = 'Go-Stop: A Visual Guide';
+const SITE_DESCRIPTION =
+  'Learn how to play 고스톱 (Go-Stop), the Korean card game, in five minutes — a visual guide for first-time players.';
+
 export const metadata: Metadata = {
-  title: 'Go-Stop: A Visual Guide',
-  description: 'Learn how to play 고스톱 (Go-Stop), the Korean card game, in five minutes.',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_NAME,
+    template: '%s · Go-Stop',
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: 'jaeha', url: 'https://github.com/jaehafe' }],
+  creator: 'jaeha',
+  keywords: ['go-stop', '고스톱', '화투', 'hwatu', 'Korean card game', 'visual guide'],
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    locale: 'en_US',
+    alternateLocale: 'ko_KR',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    creator: '@miniapp223',
+  },
 };
 
 export default function RootLayout({

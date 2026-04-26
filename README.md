@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+![Go-Stop: A Visual Guide](./src/app/opengraph-image.png)
 
-First, run the development server:
+# Go-Stop: A Visual Guide
+
+A visual guide to Korean go-stop (고스톱), for first-time players.
+
+[Live demo →](#) <!-- TODO: replace once deployed -->
+
+</div>
+
+---
+
+## About
+
+Go-stop is the most popular card game in Korea — played at every family gathering, every Lunar New Year, every Chuseok. But the rules look brutal on Wikipedia: **48 cards, 12 monthly suits, four card tiers, special calls, scoring multipliers, and a decision every turn.**
+
+This site walks you through them visually, in about five minutes. It's the guide I wished existed when I tried to teach friends and they bounced off "what's a 쌍피".
+
+Inspired by [themahjong.guide](https://themahjong.guide) — the structure, paper-and-mat tone, and tile-by-tile teaching approach all came from there.
+
+## Sections
+
+- **What is hwatu?** — the 48-card deck broken down by tier (광 / 띠 / 끗 / 피)
+- **How a round begins** — interactive shuffle and deal demo
+- **How a round works** — 9 scenarios: normal match, double match, ttadak, jjok, ppeok, ssakssalri, pokdan, jappeok
+- **Scoring** — bright / ribbon / animal / pip combos with running totals
+- **Special rules** — go vs. stop, sweep bonuses, bombs, self-traps
+- **Go or stop?** — when to push for more, when to lock in
+
+## Tech stack
+
+- [Next.js 16](https://nextjs.org) (App Router) · React 19 · TypeScript
+- [Tailwind CSS v4](https://tailwindcss.com)
+- [HeroUI v3](https://heroui.com) — UI primitives
+- [motion](https://motion.dev) — animations
+- [Pragmatic drag and drop](https://atlassian.design/components/pragmatic-drag-and-drop) — interactive demos
+- pnpm · husky · oxlint · oxfmt
+
+## Local development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Useful scripts:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm format         # oxfmt --write
+pnpm lint:ox        # oxlint
+pnpm build          # production build
+```
 
-## Learn More
+## Contributing
 
-To learn more about Next.js, take a look at the following resources:
+Issues and PRs welcome. Easiest places to help:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Translations** — the site has an `en` / `ko` toggle. If a phrase reads awkwardly in either language, that's a one-line fix.
+- **Rule clarifications** — go-stop has many regional variants. If something's wrong or oversimplified for your region, open an issue.
+- **A11y / mobile polish** — the site is responsive but rough edges welcome.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Credits
 
-## Deploy on Vercel
+- Inspired by [themahjong.guide](https://themahjong.guide).
+- Hwatu card images derive from a master SVG slice (see `/public/cards`). Source attribution and licensing are being clarified — see [open issues](../../issues) before reusing the images.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Code: [MIT](./LICENSE).
+
+Illustrations follow their original source license (see Credits).
+
+---
+
+Built by [jaeha](https://github.com/jaehafe) · [@miniapp223](https://x.com/miniapp223)

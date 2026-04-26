@@ -19,6 +19,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const game = getActiveGame(pathname);
   const sections = SECTIONS_BY_GAME[game];
+  const visibleVariants = VARIANTS.filter((v) => !v.disabled);
   const [active, setActive] = useState<string>(sections[0].id);
 
   // Reset active section when switching games.
@@ -99,13 +100,13 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      {game === "gostop" && (
+      {game === "gostop" && visibleVariants.length > 0 && (
         <div className="flex flex-col gap-2">
           <div className="text-[10px] uppercase tracking-[0.18em] text-foreground/50">
             {locale === "ko" ? "룰셋" : "Ruleset"}
           </div>
           <div className="flex flex-wrap gap-1">
-            {VARIANTS.map((v) => (
+            {visibleVariants.map((v) => (
               <motion.button
                 key={v.id}
                 type="button"
@@ -184,7 +185,12 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
 
 /**
  * Brand block — replaces the previous 2-column GameTabs since yutnori is
- * still WIP. A simple Mahjong-guide-style stacked title (Korean + hanja).
+ * still WIP. Shows the GAME name (고스톱 / Go-Stop) in both scripts.
+ *
+ * Why no `花鬪` here: hwatu (花鬪) is the CARDS, not the game. Mixing the
+ * two as a brand mark — `Go-Stop / 花鬪` — reads as if they're the same
+ * thing. Hero handles the cards-game relationship explicitly with a
+ * tagline; the sidebar only needs the game's name.
  */
 function BrandBlock({ locale }: { locale: "ko" | "en" }) {
   return (
@@ -192,12 +198,12 @@ function BrandBlock({ locale }: { locale: "ko" | "en" }) {
       <div className="text-xl font-semibold tracking-tight leading-tight text-foreground group-hover:text-foreground transition-colors">
         {locale === "ko" ? "고스톱" : "Go-Stop"}
       </div>
-      {/* Hanja for hwatu cards — Mahjong-guide style (their subtitle is "麻將"). */}
+      {/* Same game in the other script — like Mahjong's English/中文 pair. */}
       <div
         className="text-base text-foreground/55 leading-tight mt-0.5"
         style={{ fontFamily: "var(--font-accent)" }}
       >
-        花鬪
+        {locale === "ko" ? "Go-Stop" : "고스톱"}
       </div>
     </Link>
   );

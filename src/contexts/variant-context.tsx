@@ -8,10 +8,11 @@ export const VARIANTS: ReadonlyArray<{
   id: Variant;
   label: string;
   labelKo: string;
+  disabled?: boolean;
 }> = [
   { id: "standard", label: "Go-Stop", labelKo: "고스톱" },
-  { id: "matgo", label: "Matgo", labelKo: "맞고" },
-  { id: "minhwatu", label: "Minhwatu", labelKo: "민화투" },
+  { id: "matgo", label: "Matgo", labelKo: "맞고", disabled: true },
+  { id: "minhwatu", label: "Minhwatu", labelKo: "민화투", disabled: true },
 ];
 
 type VariantContextValue = {

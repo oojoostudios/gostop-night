@@ -18,6 +18,36 @@ import {
 
 const TYPE_ORDER: ReadonlyArray<HwatuType> = ["gwang", "tti", "kkeut", "pi"];
 
+// Per-month one-line note for the Mahjong-style row layout:
+// `[info-left] [tiles-right]`. Each row gets a short blurb explaining
+// the motif's meaning so readers don't need to expand each card to learn.
+const MONTH_NOTE: Record<number, { ko: string; en: string }> = {
+  1:  { ko: "한 해의 첫 패. 송학(소나무 + 두루미)은 장수와 기품의 상징.",
+        en: "First of the year. Pine and crane symbolize longevity and dignity." },
+  2:  { ko: "이른 봄. 매화 가지에 휘파람새가 봄을 처음 알려요.",
+        en: "Early spring. A bush warbler perches on plum, the first songbird." },
+  3:  { ko: "벚꽃 만발. 광은 만막(慢幕) 아래의 꽃놀이 풍경.",
+        en: "Cherry blossoms in full bloom. The bright depicts a hanami curtain." },
+  4:  { ko: "등나무(흑싸리). 두견새가 달을 가르는 옛 그림 그대로.",
+        en: "Wisteria — colloquially called 흑싸리. A cuckoo crosses the moon." },
+  5:  { ko: "제비붓꽃(난초). 야츠하시(八橋) 다리와 꽃이 어우러져요.",
+        en: "Iris — colloquially 난초. The art shows the famous yatsuhashi bridge." },
+  6:  { ko: "모란(목단)이 활짝. 부귀화로 불리며 나비와 함께.",
+        en: "Peony — the 'flower of wealth' — paired with butterflies." },
+  7:  { ko: "한여름의 홍싸리. 이노시카초의 멧돼지가 등장.",
+        en: "Red bush clover. The boar — part of the boar-deer-butterfly trio." },
+  8:  { ko: "공산명월(空山明月). 빈 산 위 보름달은 가을의 정수.",
+        en: "Empty mountain, full moon — the most poetic moon in East Asian art." },
+  9:  { ko: "국화. 술잔(국준)으로 무병장수를 비는 중양절 풍습.",
+        en: "Chrysanthemum. The sake cup is for the longevity festival on 9/9." },
+  10: { ko: "단풍이 절정. 사슴이 가을의 대표 동물로 함께해요.",
+        en: "Peak maple. The stag stands as the iconic autumn animal." },
+  11: { ko: "오동(똥광). 봉황이 오직 오동나무에만 앉는다는 전설.",
+        en: "Paulownia ('poo-bright'). The phoenix only lands on this tree." },
+  12: { ko: "비. 오노노 미치카제(小野道風)가 우산 쓴 모습 — 끈기의 상징.",
+        en: "Rain. Calligrapher Ono no Michikaze under an umbrella — perseverance." },
+};
+
 const TYPE_BADGE: Record<HwatuType, string> = {
   gwang: "bg-amber-500 text-white",
   tti: "bg-rose-500 text-white",
@@ -177,22 +207,41 @@ export function SectionCards() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-10 lg:gap-12 items-start">
-        {/* Cards by month */}
-        <div className="space-y-7">
+        {/* Cards by month — Mahjong-guide-style row layout:
+         *   [info column on left] [4 small tiles on right]
+         * Tighter density and per-row context make 12 months scan easily. */}
+        <div className="space-y-5">
           {MONTHS.map((month, monthIdx) => {
             const monthCards = visibleDeck.filter((c) => c.month === month.num);
             if (monthCards.length === 0) return null;
+            const note = MONTH_NOTE[month.num];
             return (
-              <div key={month.num}>
-                <div className="flex items-baseline gap-2 mb-2.5 text-sm">
-                  <span className="font-semibold text-foreground tabular-nums">
-                    {month.num.toString().padStart(2, "0")}월
-                  </span>
-                  <span className="text-foreground/50">
-                    {locale === "ko" ? month.motifKo : month.motif}
-                  </span>
+              <div
+                key={month.num}
+                className="grid grid-cols-1 sm:grid-cols-[minmax(0,170px)_1fr] gap-3 sm:gap-5 items-start py-2 border-t border-foreground/[0.06] first:border-t-0"
+              >
+                {/* Info column (left) — month number, motif Ko/En, lore */}
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-semibold tabular-nums leading-none">
+                      {month.num.toString().padStart(2, "0")}
+                    </span>
+                    <span className="text-sm font-semibold text-foreground/85">
+                      {locale === "ko" ? month.motifKo : month.motif}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-foreground/50 mt-0.5">
+                    {locale === "ko" ? month.motif : month.motifKo}
+                  </div>
+                  {note && (
+                    <p className="text-[11px] text-foreground/65 mt-2 leading-snug max-w-[16rem]">
+                      {locale === "ko" ? note.ko : note.en}
+                    </p>
+                  )}
                 </div>
-                <div className="grid grid-cols-4 gap-2.5">
+
+                {/* Tiles row (right) — 4 small cards */}
+                <div className="grid grid-cols-4 gap-1.5 sm:gap-2 max-w-[24rem]">
                   {monthCards.map((card, cardIdx) => (
                     <div
                       key={card.id}

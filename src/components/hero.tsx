@@ -66,9 +66,9 @@ export function Hero({
       <FloatingShapes />
 
       <div className="lg:ml-72 relative z-10 w-full">
-        <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-10 lg:gap-16 items-center">
+        <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl px-6 sm:px-8 grid grid-cols-1 xl:grid-cols-[auto_auto] gap-10 xl:gap-2 items-center">
         {/* LEFT — title block */}
-        <div className="max-w-2xl">
+        <div className="max-w-md">
           <motion.div
             key={`eyebrow-${animKey}`}
             initial={{ opacity: 0, y: 8 }}
@@ -208,9 +208,15 @@ function CardFan() {
       initial={{ opacity: 0, scale: 0.85, rotate: -6 }}
       animate={{ opacity: 1, scale: 1, rotate: 0 }}
       transition={{ delay: 0.25, duration: 0.7, ease: EASE }}
-      className="relative hidden lg:block w-[420px] h-[420px] shrink-0"
+      className="relative hidden md:block w-[260px] h-[260px] xl:w-[400px] xl:h-[400px] shrink-0"
       aria-hidden
     >
+      {/*
+       * Inner box is always 400×400 (the geometry the fan was authored for).
+       * On md viewports we scale the whole thing down to 0.65 so the hard-coded
+       * card distances and sizes still line up. On lg+ it renders at full size.
+       */}
+      <div className="absolute left-1/2 top-1/2 w-[400px] h-[400px] -ml-[200px] -mt-[200px] origin-center scale-[0.65] xl:scale-100">
       {/* Concentric ambient rings — decorative, must not block card hover */}
       <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-amber-500/[0.06] via-rose-500/[0.04] to-transparent blur-2xl" />
 
@@ -282,6 +288,7 @@ function CardFan() {
           </motion.div>
         );
       })}
+      </div>
     </motion.div>
   );
 }

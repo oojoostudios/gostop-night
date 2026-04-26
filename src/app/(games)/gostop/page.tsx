@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/hero";
+import { EtymologyBand } from "@/components/etymology-band";
 import { SectionCards } from "@/components/section-cards";
 import { SectionDeal } from "@/components/section-deal";
 import { SectionFlow } from "@/components/section-flow";
@@ -23,6 +24,7 @@ export default function GoStopPage() {
         blurbKo="한국 사람들이 명절마다 화투로 치는 고스톱. 5분만에 룰을 익혀보세요."
         blurbEn="The Korean card game families gather around during holidays. Learn the rules in five minutes."
       />
+      <EtymologyBand />
       <SectionCards />
       <SectionDeal />
       <SectionFlow />

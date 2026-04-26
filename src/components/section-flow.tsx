@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ChevronLeft, ChevronRight, Layers, Lock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
 import { Button } from "@heroui/react";
 import { useLocale } from "@/contexts/locale-context";
 import { FadeInOnView } from "@/components/fade-in-on-view";
 import { HwatuCardImage } from "@/components/hwatu-card-image";
+import { HwatuCardBack } from "@/components/hwatu-card-back";
 import { HWATU_DECK, type HwatuCard as HwatuCardData } from "@/lib/hwatu";
 
 const cardById = (id: string): HwatuCardData => {
@@ -1071,10 +1072,10 @@ function DeckPile({
       </div>
       <div className="relative h-24 w-16 sm:w-[72px]">
         <div
-          className="absolute inset-0 rounded-md bg-zinc-700 ring-1 ring-black/20 flex items-center justify-center text-zinc-300"
+          className="absolute inset-0 rounded-md overflow-hidden ring-1 ring-black/20 shadow-sm"
           aria-hidden
         >
-          <Layers className="size-5" />
+          <HwatuCardBack className="absolute inset-0 w-full h-full" />
         </div>
         <div className="absolute inset-x-0 -bottom-5 text-center text-[10px] tabular-nums text-foreground/50">
           ×{count}

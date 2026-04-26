@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ChevronRight, Layers, RotateCcw, Shuffle } from "lucide-react";
+import { ChevronRight, RotateCcw, Shuffle } from "lucide-react";
 import { Button } from "@heroui/react";
 import { useLocale } from "@/contexts/locale-context";
 import { FadeInOnView } from "@/components/fade-in-on-view";
 import { HwatuCardImage } from "@/components/hwatu-card-image";
+import { HwatuCardBack } from "@/components/hwatu-card-back";
 import { HWATU_DECK, type HwatuCard as HwatuCardData } from "@/lib/hwatu";
 
 const cardById = (id: string): HwatuCardData | undefined =>
@@ -351,12 +352,10 @@ function FaceDownCard({ delay = 0 }: { delay?: number }) {
         damping: 22,
         delay,
       }}
-      className="relative aspect-[2/3] w-14 sm:w-16 rounded-md ring-1 ring-black/20 bg-gradient-to-br from-zinc-700 to-zinc-900 flex items-center justify-center"
+      className="relative aspect-[2/3] w-14 sm:w-16 rounded-md overflow-hidden ring-1 ring-black/20 shadow-sm"
       aria-hidden
     >
-      <span className="text-zinc-400 text-[10px] tracking-widest font-medium">
-        花鬪
-      </span>
+      <HwatuCardBack className="absolute inset-0 w-full h-full" />
     </motion.div>
   );
 }
@@ -373,7 +372,7 @@ function DeckPile({ count }: { count: number }) {
         {[2, 1, 0].map((offset) => (
           <div
             key={offset}
-            className="absolute rounded-md bg-gradient-to-br from-zinc-700 to-zinc-900 ring-1 ring-black/30 flex items-center justify-center text-zinc-300"
+            className="absolute rounded-md overflow-hidden ring-1 ring-black/25 shadow-sm"
             style={{
               top: -offset * 2,
               left: -offset * 1.5,
@@ -383,7 +382,7 @@ function DeckPile({ count }: { count: number }) {
             }}
             aria-hidden
           >
-            {offset === 0 && <Layers className="size-5" />}
+            <HwatuCardBack className="absolute inset-0 w-full h-full" />
           </div>
         ))}
       </div>

@@ -10,8 +10,9 @@ const cardById = (id: string) => HWATU_DECK.find((c) => c.id === id);
 
 type Pattern = {
   id: string;
-  label: string;
+  /** Korean native term (e.g. 5광, 고도리). */
   labelKo: string;
+  /** Descriptive English name (e.g. Five Brights, Godori). */
   englishName: string;
   points: number;
   /** Which type's accent color to apply to the boxed panel and tab. */
@@ -27,7 +28,6 @@ type Pattern = {
 const PATTERNS: ReadonlyArray<Pattern> = [
   {
     id: "5gwang",
-    label: "5광",
     labelKo: "5광",
     englishName: "Five Brights",
     points: 15,
@@ -40,7 +40,6 @@ const PATTERNS: ReadonlyArray<Pattern> = [
   },
   {
     id: "4gwang",
-    label: "4광",
     labelKo: "4광",
     englishName: "Four Brights",
     points: 4,
@@ -55,7 +54,6 @@ const PATTERNS: ReadonlyArray<Pattern> = [
   },
   {
     id: "3gwang",
-    label: "3광",
     labelKo: "3광",
     englishName: "Three Brights",
     points: 3,
@@ -70,7 +68,6 @@ const PATTERNS: ReadonlyArray<Pattern> = [
   },
   {
     id: "godori",
-    label: "고도리",
     labelKo: "고도리",
     englishName: "Godori",
     points: 5,
@@ -83,7 +80,6 @@ const PATTERNS: ReadonlyArray<Pattern> = [
   },
   {
     id: "hongdan",
-    label: "홍단",
     labelKo: "홍단",
     englishName: "Red Ribbons",
     points: 3,
@@ -96,7 +92,6 @@ const PATTERNS: ReadonlyArray<Pattern> = [
   },
   {
     id: "cheongdan",
-    label: "청단",
     labelKo: "청단",
     englishName: "Blue Ribbons",
     points: 3,
@@ -109,7 +104,6 @@ const PATTERNS: ReadonlyArray<Pattern> = [
   },
   {
     id: "chodan",
-    label: "초단",
     labelKo: "초단",
     englishName: "Grass Ribbons",
     points: 3,
@@ -220,7 +214,7 @@ export function WinningPatterns() {
                 />
               )}
               <span className="relative z-10 font-medium">
-                {locale === "ko" ? p.labelKo : p.label}
+                {locale === "ko" ? p.labelKo : p.englishName}
               </span>
               <span className="relative z-10 mx-1.5 text-foreground/30">·</span>
               <span className="relative z-10 tabular-nums text-xs">
@@ -245,7 +239,7 @@ export function WinningPatterns() {
           <div className="flex items-baseline justify-between gap-3 mb-2 flex-wrap">
             <div>
               <h4 className="text-2xl font-semibold tracking-tight">
-                {locale === "ko" ? active.labelKo : active.label}
+                {locale === "ko" ? active.labelKo : active.englishName}
               </h4>
               <div className={`text-sm ${accent.text}`}>
                 {locale === "ko" ? active.englishName : active.labelKo}

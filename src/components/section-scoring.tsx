@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { motion } from "motion/react";
 import { useLocale } from "@/contexts/locale-context";
 import { ScoreCalculator } from "@/components/score-calculator";
 import { WinningPatterns } from "@/components/winning-patterns";
@@ -11,6 +12,8 @@ import {
   HWATU_TYPES,
   type HwatuType,
 } from "@/lib/hwatu";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 const TYPE_BADGE: Record<HwatuType, string> = {
   gwang: "bg-amber-500 text-white",
@@ -56,10 +59,10 @@ export function SectionScoring() {
       </FadeInOnView>
 
       <div className="space-y-16">
-        <GwangBlock />
-        <TtiBlock />
-        <KkeutBlock />
-        <PiBlock />
+        <FadeInOnView><GwangBlock /></FadeInOnView>
+        <FadeInOnView><TtiBlock /></FadeInOnView>
+        <FadeInOnView><KkeutBlock /></FadeInOnView>
+        <FadeInOnView><PiBlock /></FadeInOnView>
       </div>
 
       <div className="border-t border-foreground/10 pt-14 mt-16">
@@ -137,17 +140,23 @@ function ScoreCell({
   score,
   detail,
   emphasis,
+  delay = 0,
 }: {
   label: string;
   score: string;
   detail?: string;
   emphasis?: boolean;
+  delay?: number;
 }) {
   return (
-    <div
-      className={`rounded-md border px-3 py-2.5 ${
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-30px" }}
+      transition={{ duration: 0.36, ease: EASE, delay }}
+      className={`relative rounded-md border px-3 py-2.5 ${
         emphasis
-          ? "border-amber-500 bg-amber-500/5"
+          ? "border-amber-500 bg-amber-500/5 score-cell-emphasis"
           : "border-foreground/15"
       }`}
     >
@@ -160,7 +169,7 @@ function ScoreCell({
           {detail}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -180,20 +189,42 @@ function ComboCallout({
   borderClass: string;
 }) {
   return (
-    <div className={`rounded-lg border ${borderClass} p-4`}>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.45, ease: EASE }}
+      whileHover="lift"
+      className={`group rounded-lg border ${borderClass} p-4 transition-shadow hover:shadow-md`}
+    >
       <div className="flex items-baseline gap-2 mb-2">
         <span className="font-semibold">{title}</span>
-        <span className="text-sm font-semibold tabular-nums text-foreground/70">
+        <motion.span
+          variants={{ lift: { scale: 1.08 } }}
+          transition={{ type: "spring", stiffness: 360, damping: 22 }}
+          className="text-sm font-semibold tabular-nums text-foreground/70 inline-block origin-left"
+        >
           {score}
-        </span>
+        </motion.span>
       </div>
       <p className="text-sm text-foreground/70 leading-relaxed mb-3">{desc}</p>
       <div className="flex gap-2">
-        {cardIds.map((id) => (
-          <MiniCard key={id} id={id} highlighted ringColor={ringColor} />
+        {cardIds.map((id, i) => (
+          <motion.div
+            key={id}
+            variants={{ lift: { y: -4 } }}
+            transition={{
+              type: "spring",
+              stiffness: 320,
+              damping: 22,
+              delay: i * 0.04,
+            }}
+          >
+            <MiniCard id={id} highlighted ringColor={ringColor} />
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -215,27 +246,39 @@ function GwangBlock() {
         <ScoreCell
           label={locale === "ko" ? "3광 (비광 X)" : "3 brights"}
           score={locale === "ko" ? "3점" : "3 pts"}
+          delay={0}
         />
         <ScoreCell
           label={locale === "ko" ? "3광 (비광 O)" : "3 with 비광"}
           score={locale === "ko" ? "2점" : "2 pts"}
           detail={locale === "ko" ? "비광 차감" : "rain penalty"}
+          delay={0.06}
         />
         <ScoreCell
           label={locale === "ko" ? "4광" : "4 brights"}
           score={locale === "ko" ? "4점" : "4 pts"}
+          delay={0.12}
         />
         <ScoreCell
           label={locale === "ko" ? "5광" : "5 brights"}
           score={locale === "ko" ? "15점" : "15 pts"}
           detail={locale === "ko" ? "최고 점수" : "max"}
           emphasis
+          delay={0.18}
         />
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {gwangs.map((g) => (
-          <div key={g.id} className="flex flex-col items-center gap-1.5">
+        {gwangs.map((g, i) => (
+          <motion.div
+            key={g.id}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.4, ease: EASE, delay: i * 0.05 }}
+            whileHover={{ y: -3 }}
+            className="flex flex-col items-center gap-1.5"
+          >
             <MiniCard
               id={g.id}
               highlighted={g.id === biggang}
@@ -249,7 +292,7 @@ function GwangBlock() {
                 </span>
               )}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
@@ -346,13 +389,20 @@ function KkeutBlock() {
         {locale === "ko" ? "전체 끗 (9장)" : "All animals (9)"}
       </div>
       <div className="flex flex-wrap gap-1.5">
-        {kkeuts.map((k) => (
-          <MiniCard
+        {kkeuts.map((k, i) => (
+          <motion.div
             key={k.id}
-            id={k.id}
-            highlighted={GODORI.includes(k.id)}
-            ringColor="outline-emerald-500"
-          />
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-30px" }}
+            transition={{ duration: 0.32, ease: EASE, delay: i * 0.04 }}
+          >
+            <MiniCard
+              id={k.id}
+              highlighted={GODORI.includes(k.id)}
+              ringColor="outline-emerald-500"
+            />
+          </motion.div>
         ))}
       </div>
     </div>
@@ -380,13 +430,27 @@ function PiBlock() {
           count={regularPi.length}
         >
           <div className="flex flex-wrap gap-1.5">
-            {regularPi.slice(0, 8).map((p) => (
-              <MiniCard key={p.id} id={p.id} />
+            {regularPi.slice(0, 8).map((p, i) => (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, y: 6 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{ duration: 0.3, ease: EASE, delay: i * 0.03 }}
+              >
+                <MiniCard id={p.id} />
+              </motion.div>
             ))}
             {regularPi.length > 8 && (
-              <div className="aspect-[2/3] w-14 sm:w-16 rounded-md bg-foreground/5 ring-1 ring-foreground/10 flex items-center justify-center text-[11px] text-foreground/50 tabular-nums">
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{ duration: 0.3, ease: EASE, delay: 8 * 0.03 }}
+                className="aspect-[2/3] w-14 sm:w-16 rounded-md bg-foreground/5 ring-1 ring-foreground/10 flex items-center justify-center text-[11px] text-foreground/50 tabular-nums"
+              >
                 +{regularPi.length - 8}
-              </div>
+              </motion.div>
             )}
           </div>
         </Block>
@@ -397,13 +461,30 @@ function PiBlock() {
           accent="purple"
         >
           <div className="flex gap-1.5">
-            {ssangPi.map((p) => (
-              <MiniCard
+            {ssangPi.map((p, i) => (
+              <motion.div
                 key={p.id}
-                id={p.id}
-                highlighted
-                ringColor="outline-purple-500"
-              />
+                initial={{ opacity: 0, scale: 0.85 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{
+                  type: "spring",
+                  stiffness: 380,
+                  damping: 22,
+                  delay: i * 0.08,
+                }}
+                whileHover={{ y: -3, scale: 1.04 }}
+                className="relative"
+              >
+                <MiniCard
+                  id={p.id}
+                  highlighted
+                  ringColor="outline-purple-500"
+                />
+                <span className="absolute -top-1 -right-1 text-[9px] font-bold bg-purple-600 text-white px-1 rounded-full leading-none py-0.5">
+                  ×2
+                </span>
+              </motion.div>
             ))}
           </div>
         </Block>

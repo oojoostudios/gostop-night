@@ -225,10 +225,10 @@ function DetailPanel({
     <AnimatePresence mode="wait">
       <motion.div
         key={card.id}
-        initial={{ opacity: 0, scale: 0.94, y: 6 }}
+        initial={{ opacity: 0, scale: 0.96, y: 4 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: -6 }}
-        transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
+        exit={{ opacity: 0, scale: 0.98, y: -4 }}
+        transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
         style={{ transformOrigin: "center top" }}
         className="rounded-lg border border-foreground/15 bg-foreground/[0.02] overflow-hidden"
       >

@@ -23,7 +23,8 @@ type StageState = {
   flipped?: string;
   deckCount: number;
   highlight?: {
-    hand?: string;
+    /** Hand cards to highlight (single id allowed for ergonomics). */
+    hand?: string | string[];
     floor?: string[];
     taken?: string[];
     /** Floor cards that are locked (뻑) — rendered with rose styling. */
@@ -375,6 +376,274 @@ const SWEEP_STEPS: Step[] = [
   },
 ];
 
+/* -------------------------------------------------------------------------- */
+/* Normal — double match (hand match + flip also matches)                      */
+/* -------------------------------------------------------------------------- */
+
+const DOUBLE_HAND_INIT = ["01-gwang", "05-tti", "07-pi-1", "09-kkeut"];
+const DOUBLE_FLOOR_INIT = ["01-pi-1", "05-pi-1", "08-gwang", "11-pi-3"];
+const DOUBLE_HAND_AFTER = ["05-tti", "07-pi-1", "09-kkeut"];
+
+const DOUBLE_STEPS: Step[] = [
+  {
+    id: "setup",
+    title: "Pick the 1월 bright",
+    titleKo: "1월 광을 골라요",
+    desc: "Floor has a 1월 피 — straightforward pair-take, just like the basic turn.",
+    descKo:
+      "바닥에 1월 피가 있어서 1월 광으로 매치하면 평범한 쌍 매치가 돼요.",
+    state: {
+      hand: DOUBLE_HAND_INIT,
+      floor: DOUBLE_FLOOR_INIT,
+      taken: [],
+      deckCount: 19,
+      highlight: { hand: "01-gwang", floor: ["01-pi-1"] },
+    },
+  },
+  {
+    id: "match",
+    title: "Take the 1월 pair",
+    titleKo: "1월 쌍을 먹어요",
+    desc: "1월 광 + 1월 피 go to your taken pile.",
+    descKo: "1월 광과 1월 피가 내 먹은 패로.",
+    state: {
+      hand: DOUBLE_HAND_AFTER,
+      floor: ["05-pi-1", "08-gwang", "11-pi-3"],
+      taken: ["01-gwang", "01-pi-1"],
+      deckCount: 19,
+      highlight: { taken: ["01-gwang", "01-pi-1"] },
+    },
+  },
+  {
+    id: "flip-match",
+    title: "Flip is 5월 — also matches!",
+    titleKo: "더미를 뒤집었더니 5월 — 매치!",
+    desc:
+      "You flip the deck. It's 5월 피, and the floor still has a 5월 piece. Lucky double match in one turn.",
+    descKo:
+      "더미를 뒤집었더니 5월 피. 바닥에 5월이 아직 있어서 또 한 쌍이 매치돼요. 한 턴에 두 쌍을 가져가는 운 좋은 차례.",
+    state: {
+      hand: DOUBLE_HAND_AFTER,
+      floor: ["05-pi-1", "08-gwang", "11-pi-3"],
+      taken: ["01-gwang", "01-pi-1"],
+      deckCount: 18,
+      flipped: "05-pi-2",
+      highlight: { floor: ["05-pi-1"] },
+    },
+  },
+  {
+    id: "take-both",
+    title: "Take 5월 pair too",
+    titleKo: "5월 쌍도 먹어요",
+    desc:
+      "Both 5월 cards now join your taken pile. Four cards harvested in a single turn — no bonus pi though, since this isn't 쪽 or 따닥.",
+    descKo:
+      "5월 카드 두 장 모두 내 먹은 패로. 한 턴에 4장 수확! 단, 쪽이나 따닥이 아니라서 보너스 피는 없어요.",
+    state: {
+      hand: DOUBLE_HAND_AFTER,
+      floor: ["08-gwang", "11-pi-3"],
+      taken: ["01-gwang", "01-pi-1", "05-pi-2", "05-pi-1"],
+      deckCount: 18,
+      highlight: { taken: ["05-pi-2", "05-pi-1"] },
+    },
+  },
+];
+
+/* -------------------------------------------------------------------------- */
+/* Normal — no match (forced discard)                                          */
+/* -------------------------------------------------------------------------- */
+
+const NOMATCH_HAND_INIT = ["01-gwang", "03-tti", "07-pi-1", "09-kkeut"];
+const NOMATCH_FLOOR_INIT = ["02-tti", "04-pi-1", "11-pi-3", "12-pi"];   
+const NOMATCH_HAND_AFTER = ["03-tti", "07-pi-1", "09-kkeut"];
+
+const NOMATCH_STEPS: Step[] = [
+  {
+    id: "setup",
+    title: "No matching month in hand",
+    titleKo: "손에 매치할 월이 없어요",
+    desc:
+      "Look at the floor — 2월, 4월, 11월, 12월. Your hand has 1월, 3월, 7월, 9월. Zero overlap.",
+    descKo:
+      "바닥은 2/4/11/12월. 내 손은 1/3/7/9월. 겹치는 월이 하나도 없어요.",
+    state: {
+      hand: NOMATCH_HAND_INIT,
+      floor: NOMATCH_FLOOR_INIT,
+      taken: [],
+      deckCount: 19,
+    },
+  },
+  {
+    id: "discard",
+    title: "Discard a card to the floor",
+    titleKo: "한 장을 바닥에 버려요",
+    desc:
+      "When you can't match, you must still play a card from your hand — it just sits face-up on the floor for someone else to take later.",
+    descKo:
+      "매치할 수 없을 땐 그래도 손패 한 장은 내야 해요. 그 카드는 그냥 바닥에 놓여서 나중에 다른 사람이 가져갈 수 있어요.",
+    state: {
+      hand: NOMATCH_HAND_AFTER,
+      floor: [...NOMATCH_FLOOR_INIT, "01-gwang"],
+      taken: [],
+      deckCount: 19,
+      highlight: { floor: ["01-gwang"] },
+    },
+  },
+  {
+    id: "flip-no-match",
+    title: "Flip the deck — also no match",
+    titleKo: "더미 뒤집기 — 이것도 매치 없음",
+    desc:
+      "You still flip the top deck card. 7월 피 doesn't match any month on the floor either, so it joins the floor too. Empty-handed turn.",
+    descKo:
+      "더미도 뒤집어요. 7월 피도 바닥과 안 맞아서 바닥행. 한 장도 못 가져간 빈손 차례.",
+    state: {
+      hand: NOMATCH_HAND_AFTER,
+      floor: [...NOMATCH_FLOOR_INIT, "01-gwang", "07-pi-2"],
+      taken: [],
+      deckCount: 18,
+      highlight: { floor: ["07-pi-2"] },
+    },
+  },
+];
+
+/* -------------------------------------------------------------------------- */
+/* 폭탄 (Pokdan) — 3 in hand + 1 on floor = bomb                                */
+/* -------------------------------------------------------------------------- */
+
+const POKDAN_HAND_INIT = ["01-gwang", "01-tti", "01-pi-1", "03-tti"];
+const POKDAN_FLOOR_INIT = ["01-pi-2", "04-pi-1", "08-gwang"];
+const POKDAN_HAND_AFTER = ["03-tti"];
+
+const POKDAN_STEPS: Step[] = [
+  {
+    id: "setup",
+    title: "Three 1월 in hand, one 1월 on floor",
+    titleKo: "손엔 1월 3장, 바닥엔 1월 1장",
+    desc:
+      "You're holding three 1월 cards (광 + 띠 + 피). The fourth — a 1월 piece — is sitting on the floor. Bomb condition.",
+    descKo:
+      "내 손에 1월 카드가 3장 (광·띠·피). 그 월의 마지막 한 장이 바닥에 있어요. 폭탄 조건이에요.",
+    state: {
+      hand: POKDAN_HAND_INIT,
+      floor: POKDAN_FLOOR_INIT,
+      taken: [],
+      deckCount: 19,
+      highlight: {
+        hand: ["01-gwang", "01-tti", "01-pi-1"],
+        floor: ["01-pi-2"],
+      },
+    },
+  },
+  {
+    id: "drop",
+    title: "Drop all three at once",
+    titleKo: "3장을 한꺼번에 던져요",
+    desc:
+      "Instead of one card per turn, you slam all three same-month cards down at once and sweep the floor card too. All four 1월 cards into your taken pile.",
+    descKo:
+      "보통 한 턴에 한 장씩 내지만, 폭탄은 같은 월 3장을 한꺼번에 내려놓고 바닥의 1장까지 함께 쓸어가요. 1월 4장 모두 내 먹은 패로.",
+    state: {
+      hand: POKDAN_HAND_AFTER,
+      floor: ["04-pi-1", "08-gwang"],
+      taken: ["01-gwang", "01-tti", "01-pi-1", "01-pi-2"],
+      deckCount: 19,
+      highlight: { taken: ["01-gwang", "01-tti", "01-pi-1", "01-pi-2"] },
+      bonusPi: 2,
+    },
+  },
+  {
+    id: "flip",
+    title: "Flip the deck — bonus pi already earned",
+    titleKo: "더미 뒤집기 — 보너스 피는 이미 확보",
+    desc:
+      "You still flip a card afterwards. 5월 피 doesn't match — it joins the floor. The pokdan already earned you one pi from each opponent.",
+    descKo:
+      "그래도 더미는 뒤집어요. 5월 피는 매치 없어서 바닥행. 폭탄으로 이미 상대 한 명당 피 1장씩 챙긴 상태.",
+    state: {
+      hand: POKDAN_HAND_AFTER,
+      floor: ["04-pi-1", "08-gwang", "05-pi-1"],
+      taken: ["01-gwang", "01-tti", "01-pi-1", "01-pi-2"],
+      deckCount: 18,
+      bonusPi: 2,
+    },
+  },
+];
+
+/* -------------------------------------------------------------------------- */
+/* 자뻑 (Self-ppeok) — hand play + own deck flip = same month                   */
+/* -------------------------------------------------------------------------- */
+
+const SELFPPEOK_HAND_INIT = ["01-gwang", "03-tti", "07-pi-1", "09-kkeut"];
+const SELFPPEOK_FLOOR_INIT = ["04-pi-1", "08-gwang", "11-pi-3"];
+const SELFPPEOK_HAND_AFTER = ["03-tti", "07-pi-1", "09-kkeut"];
+
+const SELFPPEOK_STEPS: Step[] = [
+  {
+    id: "setup",
+    title: "1월 광 in hand, no 1월 on floor",
+    titleKo: "1월 광 손에, 바닥엔 1월 없음",
+    desc:
+      "You hold the 1월 bright. The floor has no 1월 — same starting point as 쪽 (jjok). Played card will land on the floor with no match.",
+    descKo:
+      "1월 광을 들고 있어요. 바닥엔 1월이 없어서 — 쪽과 똑같은 시작 — 카드를 내면 짝 없이 바닥에 놓여요.",
+    state: {
+      hand: SELFPPEOK_HAND_INIT,
+      floor: SELFPPEOK_FLOOR_INIT,
+      taken: [],
+      deckCount: 19,
+      highlight: { hand: "01-gwang" },
+    },
+  },
+  {
+    id: "play-no-match",
+    title: "Play 1월 광 — joins floor",
+    titleKo: "1월 광을 냈는데 짝 없음",
+    desc: "1월 광 sits down on the floor with no partner.",
+    descKo: "1월 광이 짝 없이 바닥에 놓여요.",
+    state: {
+      hand: SELFPPEOK_HAND_AFTER,
+      floor: [...SELFPPEOK_FLOOR_INIT, "01-gwang"],
+      taken: [],
+      deckCount: 19,
+      highlight: { floor: ["01-gwang"] },
+    },
+  },
+  {
+    id: "flip-self-match",
+    title: "Flip is 1월 too — 자뻑!",
+    titleKo: "더미도 1월 — 자뻑!",
+    desc:
+      "Now you flip the deck card and it's another 1월. Both came from YOU this turn (your hand-play + your own flip). That's 자뻑 (self-ppeok).",
+    descKo:
+      "더미 뒤집은 게 또 1월. 이번 턴에 둘 다 내가 만든 거예요 — 내가 낸 손패 + 내가 뒤집은 카드. 이게 자뻑.",
+    state: {
+      hand: SELFPPEOK_HAND_AFTER,
+      floor: [...SELFPPEOK_FLOOR_INIT, "01-gwang"],
+      taken: [],
+      deckCount: 18,
+      flipped: "01-pi-1",
+      highlight: { floor: ["01-gwang"] },
+    },
+  },
+  {
+    id: "take-both",
+    title: "Take both — but no opponent pi",
+    titleKo: "둘 다 가져가지만 보너스 피는 없음",
+    desc:
+      "Since both 1월 cards came from your own actions, you take them — but unlike 쪽, you don't get bonus pi from each opponent. (Some house rules treat 자뻑 as locked floor instead — check your group's variant.)",
+    descKo:
+      "둘 다 내가 만든 1월이라 그대로 가져가요. 단, 쪽과 달리 상대 보너스 피는 없어요. (일부 룰셋에선 자뻑을 묶임 처리 — 모임 룰 확인.)",
+    state: {
+      hand: SELFPPEOK_HAND_AFTER,
+      floor: SELFPPEOK_FLOOR_INIT,
+      taken: ["01-gwang", "01-pi-1"],
+      deckCount: 18,
+      highlight: { taken: ["01-gwang", "01-pi-1"] },
+    },
+  },
+];
+
 const SCENARIOS: ReadonlyArray<Scenario> = [
   {
     id: "normal",
@@ -383,6 +652,26 @@ const SCENARIOS: ReadonlyArray<Scenario> = [
     blurb: "A vanilla turn with a single match.",
     blurbKo: "한 번 매치되는 평범한 차례.",
     steps: NORMAL_STEPS,
+  },
+  {
+    id: "double",
+    label: "Double match",
+    labelKo: "더블 매치",
+    blurb:
+      "Hand play matches one floor card, then the deck flip also matches a different floor card. Two pairs in one turn.",
+    blurbKo:
+      "손패가 바닥과 매치된 후, 더미에서 뒤집은 카드도 바닥의 다른 카드와 매치. 한 턴에 두 쌍.",
+    steps: DOUBLE_STEPS,
+  },
+  {
+    id: "no-match",
+    label: "No match",
+    labelKo: "매치 없음",
+    blurb:
+      "Your hand has no matching month and the deck flip is also a miss. You discard a card and end the turn empty-handed.",
+    blurbKo:
+      "손에 매치할 월도 없고 더미 뒤집기도 빗나가요. 카드 한 장 버리고 빈손으로 차례 종료.",
+    steps: NOMATCH_STEPS,
   },
   {
     id: "jjok",
@@ -423,6 +712,26 @@ const SCENARIOS: ReadonlyArray<Scenario> = [
     blurbKo:
       "내 매치가 바닥의 마지막 카드를 가져가서 텅 비게 돼요. 바닥을 청소한 상으로 상대 피 한 장씩.",
     steps: SWEEP_STEPS,
+  },
+  {
+    id: "pokdan",
+    label: "폭탄 (Pokdan)",
+    labelKo: "폭탄",
+    blurb:
+      "Three same-month cards in your hand and the fourth on the floor — slam all three down at once and sweep all four. Bonus pi from each opponent.",
+    blurbKo:
+      "손에 같은 월 3장 + 바닥에 그 월의 마지막 1장. 3장을 한꺼번에 던져 4장 다 가져가요. 상대 피 보너스까지.",
+    steps: POKDAN_STEPS,
+  },
+  {
+    id: "self-ppeok",
+    label: "자뻑 (Self-ppeok)",
+    labelKo: "자뻑",
+    blurb:
+      "Your played card and your deck flip are the same month — both came from you this turn. Take both, but no opponent bonus pi.",
+    blurbKo:
+      "내가 낸 손패와 내가 뒤집은 카드가 같은 월 — 한 턴에 둘 다 내가 만들었어요. 둘 다 가져가지만 상대 보너스 피는 없음.",
+    steps: SELFPPEOK_STEPS,
   },
 ];
 
@@ -634,7 +943,13 @@ function Stage({ state }: { state: StageState }) {
         helpKo="다른 플레이어에겐 안 보여요."
         helpEn="Hidden from other players."
         cardIds={state.hand}
-        highlightedIds={state.highlight?.hand ? [state.highlight.hand] : undefined}
+        highlightedIds={
+          state.highlight?.hand
+            ? Array.isArray(state.highlight.hand)
+              ? state.highlight.hand
+              : [state.highlight.hand]
+            : undefined
+        }
       />
     </div>
   );

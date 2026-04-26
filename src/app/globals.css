@@ -143,6 +143,21 @@
   animation: card-fade-in 320ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
+/* score-cell-emphasis: 5광 / 최고 점수 셀의 펄싱 글로우 */
+@keyframes score-cell-glow {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.78 0.18 75 / 0); }
+  50%      { box-shadow: 0 0 0 6px oklch(0.78 0.18 75 / 0.18); }
+}
+.score-cell-emphasis {
+  animation: score-cell-glow 2.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .score-cell-emphasis,
+  .card-fade-in {
+    animation: none !important;
+  }
+}
+
 /* 감소 모션 사용자 존중 */
 @media (prefers-reduced-motion: reduce) {
   .sweep-mark,

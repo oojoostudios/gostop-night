@@ -21,11 +21,11 @@ export function HwatuCard({
     <motion.button
       type="button"
       onClick={() => onSelect?.(card)}
-      whileHover={{ y: -4 }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ type: "spring", stiffness: 380, damping: 28 }}
+      whileHover={{ y: -6, scale: 1.03 }}
+      whileTap={{ scale: 0.94, y: -2 }}
+      transition={{ type: "spring", stiffness: 600, damping: 22, mass: 0.5 }}
       aria-label={`${card.month}월 ${locale === "ko" ? typeMeta.labelKo : typeMeta.label}`}
-      className={`relative w-full aspect-[2/3] rounded-md overflow-hidden bg-white shadow-sm ring-1 ring-black/10 ${
+      className={`relative w-full aspect-[2/3] rounded-md overflow-hidden bg-white shadow-sm ring-1 ring-black/10 transition-shadow hover:shadow-md ${
         isActive ? "outline outline-2 outline-offset-2 outline-foreground" : ""
       }`}
     >

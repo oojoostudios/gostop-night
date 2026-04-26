@@ -119,7 +119,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                 }}
                 className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
                   variant === v.id
-                    ? "bg-foreground text-background border-foreground"
+                    ? "bg-[var(--mat)] text-white border-[var(--mat)]"
                     : "border-foreground/20 text-foreground/60 hover:text-foreground hover:bg-foreground/5"
                 }`}
               >
@@ -149,7 +149,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
               }}
               className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
                 locale === l
-                  ? "bg-foreground text-background border-foreground"
+                  ? "bg-[var(--felt)] text-white border-[var(--felt)]"
                   : "border-foreground/20 text-foreground/60 hover:text-foreground hover:bg-foreground/5"
               }`}
             >

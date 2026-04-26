@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "motion/react";
 import { useLocale } from "@/contexts/locale-context";
+import { HwatuCardImage } from "@/components/hwatu-card-image";
 import { HWATU_TYPES, type HwatuCard as HwatuCardData } from "@/lib/hwatu";
 
 export function HwatuCard({
@@ -29,12 +29,9 @@ export function HwatuCard({
         isActive ? "outline outline-2 outline-offset-2 outline-foreground" : ""
       }`}
     >
-      <Image
-        src={card.image}
-        alt={locale === "ko" ? card.nameKo : card.name}
-        fill
-        sizes="(max-width: 1024px) 25vw, 150px"
-        className="object-cover"
+      <HwatuCardImage
+        card={card}
+        className="absolute inset-0 w-full h-full"
       />
     </motion.button>
   );

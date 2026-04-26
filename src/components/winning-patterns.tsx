@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useLocale } from "@/contexts/locale-context";
+import { HwatuCardImage } from "@/components/hwatu-card-image";
 import { HWATU_DECK, MONTHS } from "@/lib/hwatu";
 
 const cardById = (id: string) => HWATU_DECK.find((c) => c.id === id);
@@ -275,12 +275,9 @@ export function WinningPatterns() {
                   <div
                     className={`relative aspect-[2/3] w-16 sm:w-20 rounded-md overflow-hidden ring-1 ring-black/10 bg-white outline outline-2 outline-offset-2 ${accent.ring}`}
                   >
-                    <Image
-                      src={card.image}
-                      alt={card.nameKo}
-                      fill
-                      sizes="96px"
-                      className="object-cover"
+                    <HwatuCardImage
+                      card={card}
+                      className="absolute inset-0 w-full h-full"
                     />
                   </div>
                   <div className="text-[10px] tabular-nums text-foreground/55 text-center leading-tight">

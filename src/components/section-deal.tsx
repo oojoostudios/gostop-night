@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronRight, Layers, RotateCcw, Shuffle } from "lucide-react";
 import { Button } from "@heroui/react";
 import { useLocale } from "@/contexts/locale-context";
 import { FadeInOnView } from "@/components/fade-in-on-view";
+import { HwatuCardImage } from "@/components/hwatu-card-image";
 import { HWATU_DECK, type HwatuCard as HwatuCardData } from "@/lib/hwatu";
 
 const cardById = (id: string): HwatuCardData | undefined =>
@@ -178,9 +178,9 @@ export function SectionDeal() {
             aria-label={`Go to step ${i + 1}`}
             className={`h-1.5 rounded-full transition-all ${
               i === step
-                ? "w-8 bg-foreground"
+                ? "w-8 bg-[var(--mat)]"
                 : i < step
-                  ? "w-4 bg-foreground/40"
+                  ? "w-4 bg-[var(--mat)]/40"
                   : "w-4 bg-foreground/15 hover:bg-foreground/30"
             }`}
           />
@@ -332,12 +332,9 @@ function FaceUpCard({
       }}
       className="relative aspect-[2/3] w-14 sm:w-16 rounded-md overflow-hidden ring-1 ring-black/10 bg-white"
     >
-      <Image
-        src={card.image}
-        alt={card.nameKo}
-        fill
-        sizes="80px"
-        className="object-cover"
+      <HwatuCardImage
+        card={card}
+        className="absolute inset-0 w-full h-full"
       />
     </motion.div>
   );

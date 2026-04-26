@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { RotateCcw, Trophy } from "lucide-react";
 import { Button } from "@heroui/react";
 import { useLocale } from "@/contexts/locale-context";
+import { HwatuCardImage } from "@/components/hwatu-card-image";
 import {
   HWATU_DECK,
   HWATU_TYPES,
@@ -148,12 +148,9 @@ function ToggleCard({
           : "opacity-40 hover:opacity-80 grayscale-[40%] hover:grayscale-0"
       }`}
     >
-      <Image
-        src={card.image}
-        alt=""
-        fill
-        sizes="80px"
-        className="object-cover pointer-events-none"
+      <HwatuCardImage
+        card={card}
+        className="absolute inset-0 w-full h-full pointer-events-none"
       />
       {card.tag === "쌍피" && (
         <span className="absolute bottom-1 right-1 text-[8px] font-bold bg-purple-600 text-white px-1 rounded-sm">

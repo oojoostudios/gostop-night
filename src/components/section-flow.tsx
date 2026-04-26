@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronLeft, ChevronRight, Layers, Lock } from "lucide-react";
 import { Button } from "@heroui/react";
 import { useLocale } from "@/contexts/locale-context";
 import { FadeInOnView } from "@/components/fade-in-on-view";
+import { HwatuCardImage } from "@/components/hwatu-card-image";
 import { HWATU_DECK, type HwatuCard as HwatuCardData } from "@/lib/hwatu";
 
 const cardById = (id: string): HwatuCardData => {
@@ -801,14 +801,15 @@ export function SectionFlow() {
               }}
               className={`relative px-3.5 py-1.5 rounded-full text-sm transition-colors ${
                 isActive
-                  ? "text-background font-medium"
+                  ? "text-white font-medium"
                   : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
               }`}
             >
               {isActive && (
                 <motion.span
                   layoutId="flow-scenario-pill"
-                  className="absolute inset-0 rounded-full bg-foreground"
+                  className="absolute inset-0 rounded-full"
+                  style={{ backgroundColor: "var(--mat)" }}
                   transition={{
                     type: "spring",
                     stiffness: 480,
@@ -890,9 +891,9 @@ export function SectionFlow() {
             aria-label={`Go to step ${i + 1}`}
             className={`h-1.5 rounded-full transition-all ${
               i === stepIndex
-                ? "w-8 bg-foreground"
+                ? "w-8 bg-[var(--mat)]"
                 : i < stepIndex
-                  ? "w-4 bg-foreground/40"
+                  ? "w-4 bg-[var(--mat)]/40"
                   : "w-4 bg-foreground/15 hover:bg-foreground/30"
             }`}
           />
@@ -1040,12 +1041,9 @@ function MiniCard({
             : "ring-black/10"
       }`}
     >
-      <Image
-        src={card.image}
-        alt={card.nameKo}
-        fill
-        sizes="80px"
-        className="object-cover"
+      <HwatuCardImage
+        card={card}
+        className="absolute inset-0 w-full h-full"
       />
       {locked && (
         <div className="absolute top-0.5 right-0.5 bg-rose-500 text-white rounded-full p-0.5">
@@ -1097,12 +1095,9 @@ function DeckPile({
               style={{ zIndex: 50 }}
               className="absolute inset-0 rounded-md overflow-hidden ring-2 ring-amber-500 ring-offset-2 bg-white shadow-lg"
             >
-              <Image
-                src={flippedCard.image}
-                alt={flippedCard.nameKo}
-                fill
-                sizes="80px"
-                className="object-cover"
+              <HwatuCardImage
+                card={flippedCard}
+                className="absolute inset-0 w-full h-full"
               />
             </motion.div>
           )}

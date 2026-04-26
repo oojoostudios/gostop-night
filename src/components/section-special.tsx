@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import type { ReactNode } from "react";
 import { motion } from "motion/react";
 import { Sparkles, AlertTriangle, Zap, X } from "lucide-react";
 import { useLocale } from "@/contexts/locale-context";
 import { FadeInOnView } from "@/components/fade-in-on-view";
+import { HwatuCardImage } from "@/components/hwatu-card-image";
 import { HWATU_DECK } from "@/lib/hwatu";
 
 const cardById = (id: string) => HWATU_DECK.find((c) => c.id === id);
@@ -143,12 +143,9 @@ function MiniCard({
           : ""
       }`}
     >
-      <Image
-        src={card.image}
-        alt={card.nameKo}
-        fill
-        sizes="64px"
-        className="object-cover"
+      <HwatuCardImage
+        card={card}
+        className="absolute inset-0 w-full h-full"
       />
     </div>
   );

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { Drawer } from "@heroui/react";
 import { useLocale } from "@/contexts/locale-context";
 import { useIsMobile } from "@/lib/use-media-query";
 import { HwatuCard } from "@/components/hwatu-card";
+import { HwatuCardImage } from "@/components/hwatu-card-image";
 import { FadeInOnView } from "@/components/fade-in-on-view";
 import {
   HWATU_DECK,
@@ -354,12 +354,9 @@ function TypeOverview({
                     whileHover={{ y: -3 }}
                     className="relative aspect-[2/3] w-12 sm:w-14 rounded-md overflow-hidden ring-1 ring-black/10 bg-white shrink-0"
                   >
-                    <Image
-                      src={card.image}
-                      alt={card.nameKo}
-                      fill
-                      sizes="60px"
-                      className="object-cover"
+                    <HwatuCardImage
+                      card={card}
+                      className="absolute inset-0 w-full h-full"
                     />
                   </motion.div>
                 );
@@ -393,14 +390,15 @@ function FilterChip({
       transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.6 }}
       className={`relative flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm transition-colors ${
         active
-          ? "text-background"
+          ? "text-white"
           : "text-foreground/70 hover:bg-foreground/10 hover:text-foreground bg-foreground/5"
       }`}
     >
       {active && (
         <motion.span
           layoutId="cards-filter-pill"
-          className="absolute inset-0 rounded-full bg-foreground"
+          className="absolute inset-0 rounded-full"
+          style={{ backgroundColor: "var(--mat)" }}
           transition={{
             type: "spring",
             stiffness: 480,
@@ -419,7 +417,7 @@ function FilterChip({
         <span className="font-medium">{label}</span>
         <span
           className={`text-xs tabular-nums ${
-            active ? "text-background/60" : "text-foreground/40"
+            active ? "text-white/70" : "text-foreground/40"
           }`}
         >
           {count}
@@ -489,12 +487,9 @@ function DetailPanel({
 
         <div className="px-5">
           <div className="aspect-[2/3] relative max-w-[200px] mx-auto rounded-md overflow-hidden ring-1 ring-black/10 bg-white">
-            <Image
-              src={card.image}
-              alt={locale === "ko" ? card.nameKo : card.name}
-              fill
-              sizes="200px"
-              className="object-cover"
+            <HwatuCardImage
+              card={card}
+              className="absolute inset-0 w-full h-full"
             />
           </div>
         </div>

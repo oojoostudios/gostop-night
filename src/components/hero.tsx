@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { motion } from "motion/react";
 import { useLocale } from "@/contexts/locale-context";
+import { HwatuCardImage } from "@/components/hwatu-card-image";
 
 const EASE = [0.32, 0.72, 0, 1] as const;
 
@@ -17,12 +17,12 @@ const STATS = [
 // Cards used for the right-side fan sigil
 const FAN_CARDS = [
   "/cards/cell-r5-c4.png", // 12월 비광
-  "/cards/cell-r5-c0.png", // 11월
-  "/cards/cell-r4-c0.png", // 10월
-  "/cards/cell-r3-c0.png", // 9월
-  "/cards/cell-r2-c0.png", // 8월 광
+  "/cards/cell-r4-c4.png", // 11월 오동광
+  "/cards/cell-r3-c4.png", // 10월 사슴
+  "/cards/cell-r2-c0.png", // 3월 벚꽃광
+  "/cards/cell-r1-c4.png", // 8월 공산광
   "/cards/cell-r0-c0.png", // 1월 송학광
-  "/cards/cell-r0-c4.png", // 5월
+  "/cards/cell-r0-c4.png", // 7월 멧돼지
 ] as const;
 
 export function Hero({
@@ -257,13 +257,9 @@ function CardFan() {
                 "box-shadow 320ms cubic-bezier(0.32, 0.72, 0, 1)",
             }}
           >
-            <Image
-              src={src}
-              alt=""
-              fill
-              sizes="128px"
-              className="object-cover pointer-events-none"
-              priority={i < 3}
+            <HwatuCardImage
+              path={src}
+              className="absolute inset-0 w-full h-full pointer-events-none"
             />
           </motion.div>
         );

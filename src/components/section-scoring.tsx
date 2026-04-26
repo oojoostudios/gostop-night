@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import type { ReactNode } from "react";
 import { motion } from "motion/react";
 import { useLocale } from "@/contexts/locale-context";
 import { ScoreCalculator } from "@/components/score-calculator";
 import { WinningPatterns } from "@/components/winning-patterns";
 import { FadeInOnView } from "@/components/fade-in-on-view";
+import { HwatuCardImage } from "@/components/hwatu-card-image";
 import {
   HWATU_DECK,
   HWATU_TYPES,
@@ -128,12 +128,9 @@ function MiniCard({
           : ""
       }`}
     >
-      <Image
-        src={card.image}
-        alt={card.nameKo}
-        fill
-        sizes="80px"
-        className="object-cover"
+      <HwatuCardImage
+        card={card}
+        className="absolute inset-0 w-full h-full"
       />
     </div>
   );

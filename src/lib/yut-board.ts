@@ -134,5 +134,4 @@ export const OUTER_NEXT: Record<string, string> = (() => {
 export const SHORTCUT_FROM: Record<string, ReadonlyArray<string>> = {
   ne: ['ne-d1', 'ne-d2', 'center', 'sw-d1', 'sw-d2', 'sw'],
   nw: ['nw-d1', 'nw-d2', 'center', 'se-d1', 'se-d2', 'start'],
-  sw: ['sw-d2', 'sw-d1', 'center', 'ne-d2', 'ne-d1', 'ne'],
 };

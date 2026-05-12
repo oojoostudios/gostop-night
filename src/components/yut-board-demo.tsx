@@ -70,7 +70,6 @@ export function YutBoardDemo() {
   ) => {
     const prevHistory = [...history];
     setHistory((h) => [...h, ...newSteps]);
-    const updatedHistory = [...prevHistory, ...newSteps];
 
     const isFinished = finalPos === 'start' && prevHistory.length > 0;
 

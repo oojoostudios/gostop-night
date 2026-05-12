@@ -135,3 +135,93 @@ export const SHORTCUT_FROM: Record<string, ReadonlyArray<string>> = {
   ne: ['ne-d1', 'ne-d2', 'center', 'sw-d1', 'sw-d2', 'sw'],
   nw: ['nw-d1', 'nw-d2', 'center', 'se-d1', 'se-d2', 'start'],
 };
+
+/** Diagonal next-station map (corners and center excluded — they require choice). */
+export const DIAGONAL_NEXT: Record<string, string> = {
+  'ne-d1': 'ne-d2',
+  'ne-d2': 'center',
+  'sw-d1': 'sw-d2',
+  'sw-d2': 'sw',
+  'nw-d1': 'nw-d2',
+  'nw-d2': 'center',
+  'se-d1': 'se-d2',
+  'se-d2': 'start',
+};
+
+/** At center, the exit depends on which diagonal the piece entered from. */
+export const CENTER_EXITS: Record<string, { straight: string; turn: string }> = {
+  'ne-d2': { straight: 'sw-d1', turn: 'se-d1' },
+  'nw-d2': { straight: 'se-d1', turn: 'sw-d1' },
+};
+
+/** Stations that are on a diagonal (used to decide which next-map to consult). */
+const DIAGONAL_STATIONS = new Set(Object.keys(DIAGONAL_NEXT));
+
+/** After exiting a diagonal at sw, the piece rejoins the outer ring. */
+const DIAGONAL_EXIT_TO_OUTER = new Set(['sw']);
+
+export type PathChoice = {
+  type: 'corner' | 'center';
+  station: string;
+  options: { key: string; next: string }[];
+};
+
+/** Resolve the next station given current position and full history.
+ *  When `passingThrough` is true the piece still has steps remaining and
+ *  cannot stop here, so choice points auto-resolve to the default direction
+ *  (outer ring for corners, straight for center). */
+export function getNext(
+  pos: string,
+  history: ReadonlyArray<string>,
+  passingThrough = false,
+): { next: string | null; choice: PathChoice | null } {
+  if (pos === 'center') {
+    const prevIdx = history.lastIndexOf('center') - 1;
+    const prev = prevIdx >= 0 ? history[prevIdx] : null;
+    const exit = prev ? CENTER_EXITS[prev] : null;
+    if (exit) {
+      if (passingThrough) {
+        return { next: exit.straight, choice: null };
+      }
+      return {
+        next: null,
+        choice: {
+          type: 'center',
+          station: 'center',
+          options: [
+            { key: 'straight', next: exit.straight },
+            { key: 'turn', next: exit.turn },
+          ],
+        },
+      };
+    }
+    return { next: 'sw-d1', choice: null };
+  }
+
+  if (DIAGONAL_STATIONS.has(pos)) {
+    return { next: DIAGONAL_NEXT[pos], choice: null };
+  }
+
+  if (DIAGONAL_EXIT_TO_OUTER.has(pos)) {
+    return { next: OUTER_NEXT[pos] ?? null, choice: null };
+  }
+
+  if (pos in SHORTCUT_FROM && pos !== 'start') {
+    if (passingThrough) {
+      return { next: OUTER_NEXT[pos], choice: null };
+    }
+    return {
+      next: null,
+      choice: {
+        type: 'corner',
+        station: pos,
+        options: [
+          { key: 'shortcut', next: SHORTCUT_FROM[pos][0] },
+          { key: 'outer', next: OUTER_NEXT[pos] },
+        ],
+      },
+    };
+  }
+
+  return { next: OUTER_NEXT[pos] ?? null, choice: null };
+}

@@ -6,13 +6,8 @@ import { Dices, Plus, RotateCcw, Trophy } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { useLocale } from '@/contexts/locale-context';
 import { YutBoard, type PieceState } from '@/components/yut-board';
-import { OUTER_NEXT, SHORTCUT_FROM, getStation } from '@/lib/yut-board';
+import { getNext, getStation, type PathChoice } from '@/lib/yut-board';
 import { resolveThrow, type ThrowKind } from '@/lib/yutnori';
-
-type ShortcutOption = {
-  fromCorner: string;
-  path: ReadonlyArray<string>;
-};
 
 export function YutBoardDemo() {
   const { locale } = useLocale();
@@ -20,80 +15,151 @@ export function YutBoardDemo() {
   const [history, setHistory] = useState<string[]>([]);
   const [finished, setFinished] = useState(false);
   const [rolling, setRolling] = useState(false);
-  const [pendingShortcut, setPendingShortcut] = useState<ShortcutOption | null>(null);
+  const [pendingChoice, setPendingChoice] = useState<PathChoice | null>(null);
   const [lastThrow, setLastThrow] = useState<ThrowKind | null>(null);
-  /** Set when the last throw was 윷/모 — the next throw is a bonus. */
   const [bonusReady, setBonusReady] = useState(false);
+  /** Remaining steps from the current throw (paused while a choice is pending). */
+  const [remainingSteps, setRemainingSteps] = useState(0);
+  /** Direction chosen at a choice point — consumed as the first step of the next throw. */
+  const [chosenDirection, setChosenDirection] = useState<string | null>(null);
 
   const currentStation = history.length === 0 ? 'start' : history[history.length - 1];
 
+  const advancePiece = (
+    startPos: string,
+    steps: number,
+    currentHistory: string[],
+    firstNext?: string,
+  ) => {
+    const newSteps: string[] = [];
+    let pos = startPos;
+    let stepsLeft = steps;
+    let choice: PathChoice | null = null;
+
+    for (let i = 0; i < stepsLeft; i++) {
+      let next: string | null;
+      if (i === 0 && firstNext) {
+        next = firstNext;
+      } else {
+        const result = getNext(pos, [...currentHistory, ...newSteps], true);
+        next = result.next;
+      }
+      if (!next) break;
+      newSteps.push(next);
+      pos = next;
+      if (pos === 'start' && (currentHistory.length > 0 || newSteps.length > 1)) break;
+    }
+
+    if (!choice) {
+      const finalCheck = getNext(pos, [...currentHistory, ...newSteps]);
+      if (finalCheck.choice) {
+        choice = finalCheck.choice;
+        stepsLeft = 0;
+      }
+    }
+
+    return { newSteps, finalPos: pos, choice, stepsLeft };
+  };
+
+  const applyMove = (
+    newSteps: string[],
+    finalPos: string,
+    choice: PathChoice | null,
+    stepsLeft: number,
+    throwResult: ThrowKind,
+  ) => {
+    const prevHistory = [...history];
+    setHistory((h) => [...h, ...newSteps]);
+    const updatedHistory = [...prevHistory, ...newSteps];
+
+    const isFinished = finalPos === 'start' && prevHistory.length > 0;
+
+    const animDelay = 320 * newSteps.length + 80;
+    window.setTimeout(() => {
+      if (isFinished) {
+        setFinished(true);
+        setBonusReady(false);
+        setRemainingSteps(0);
+      } else if (choice) {
+        setPendingChoice(choice);
+        setRemainingSteps(stepsLeft);
+      } else {
+        setRemainingSteps(0);
+      }
+      setBonusReady(throwResult.extraThrow ?? false);
+      setRolling(false);
+    }, animDelay);
+  };
+
   const onThrow = () => {
-    if (rolling || finished || pendingShortcut) return;
+    if (rolling || finished || pendingChoice) return;
     setRolling(true);
 
-    // Random throw — 16 equally likely stick combinations.
     const sticks = Array.from({ length: 4 }, () => Math.random() < 0.5);
     const result = resolveThrow(sticks);
     setLastThrow(result);
 
-    // Pre-compute the new path along the outer ring.
-    const startId = currentStation;
-    const newSteps: string[] = [];
-    let pos = startId;
-    for (let i = 0; i < result.move; i++) {
-      const next = OUTER_NEXT[pos];
-      newSteps.push(next);
-      pos = next;
-      if (next === 'start') break;
+    const dir = chosenDirection;
+    if (dir) setChosenDirection(null);
+
+    const { newSteps, finalPos, choice, stepsLeft } = advancePiece(
+      currentStation,
+      result.move,
+      history,
+      dir ?? undefined,
+    );
+
+    applyMove(newSteps, finalPos, choice, stepsLeft, result);
+  };
+
+  const resolveChoice = (chosenNextStation: string) => {
+    if (!pendingChoice) return;
+    setPendingChoice(null);
+
+    if (remainingSteps === 0) {
+      setChosenDirection(chosenNextStation);
+      return;
     }
-    const finalStation = pos;
-    const newFinished = finalStation === 'start' && startId !== 'start';
 
-    setHistory((h) => [...h, ...newSteps]);
+    setRolling(true);
+    const prevHistory = [...history];
+    const steps = remainingSteps - 1;
+    const firstStep = [chosenNextStation];
 
-    // After the piece animates, possibly offer a shortcut and update bonus state.
-    const animDelay = 320 * newSteps.length + 80;
+    const { newSteps, finalPos, choice, stepsLeft } = advancePiece(chosenNextStation, steps, [
+      ...prevHistory,
+      chosenNextStation,
+    ]);
+
+    const allNewSteps = [...firstStep, ...newSteps];
+    setHistory((h) => [...h, ...allNewSteps]);
+    const isFinished = finalPos === 'start' && prevHistory.length > 0;
+
+    const animDelay = 320 * allNewSteps.length + 80;
     window.setTimeout(() => {
-      if (newFinished) {
+      if (isFinished) {
         setFinished(true);
         setBonusReady(false);
-      } else if (finalStation in SHORTCUT_FROM && finalStation !== 'start') {
-        setPendingShortcut({
-          fromCorner: finalStation,
-          path: SHORTCUT_FROM[finalStation],
-        });
+        setRemainingSteps(0);
+      } else if (choice) {
+        setPendingChoice(choice);
+        setRemainingSteps(stepsLeft);
+      } else {
+        setRemainingSteps(0);
       }
-      // Update bonus chain — yut/mo earn another throw, regardless of move outcome.
-      setBonusReady(result.extraThrow ?? false);
       setRolling(false);
     }, animDelay);
-  };
-
-  const takeShortcut = () => {
-    if (!pendingShortcut) return;
-    setRolling(true);
-    const path = [...pendingShortcut.path];
-    setHistory((h) => [...h, ...path]);
-    setPendingShortcut(null);
-    const final = path[path.length - 1];
-    const animDelay = 320 * path.length + 80;
-    window.setTimeout(() => {
-      if (final === 'start') setFinished(true);
-      setRolling(false);
-    }, animDelay);
-  };
-
-  const declineShortcut = () => {
-    setPendingShortcut(null);
   };
 
   const reset = () => {
     setHistory([]);
     setFinished(false);
     setRolling(false);
-    setPendingShortcut(null);
+    setPendingChoice(null);
     setLastThrow(null);
     setBonusReady(false);
+    setRemainingSteps(0);
+    setChosenDirection(null);
   };
 
   const piece: PieceState = { history };
@@ -128,7 +194,7 @@ export function YutBoardDemo() {
         {/* Last throw reveal */}
         <div className="min-h-12">
           <AnimatePresence mode="wait">
-            {lastThrow && !pendingShortcut && !finished && (
+            {lastThrow && !pendingChoice && !finished && (
               <motion.div
                 key={`throw-${history.length}`}
                 initial={{ opacity: 0, y: 4 }}
@@ -160,32 +226,79 @@ export function YutBoardDemo() {
           </AnimatePresence>
         </div>
 
-        {/* Shortcut prompt */}
+        {/* Path choice prompt (corner shortcut or center direction) */}
         <AnimatePresence>
-          {pendingShortcut && (
+          {pendingChoice && (
             <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
-              className="rounded-md border border-sky-500/40 bg-sky-500/5 px-4 py-3"
+              className={`rounded-md border px-4 py-3 ${
+                pendingChoice.type === 'corner'
+                  ? 'border-sky-500/40 bg-sky-500/5'
+                  : 'border-violet-500/40 bg-violet-500/5'
+              }`}
             >
-              <div className="text-xs font-semibold text-sky-700 dark:text-sky-400 mb-1">
-                {locale === 'ko' ? '코너에 정확히 멈췄어요!' : 'Landed exactly on a corner!'}
-              </div>
-              <p className="text-xs text-foreground/65 mb-3">
-                {locale === 'ko'
-                  ? '지름길로 가운데를 거쳐 가로지를 수 있어요. 갈래요?'
-                  : 'You can take the diagonal shortcut through the center. Take it?'}
-              </p>
-              <div className="flex gap-2">
-                <Button variant="primary" size="sm" onPress={takeShortcut} className="text-xs">
-                  {locale === 'ko' ? '지름길로!' : 'Take shortcut'}
-                </Button>
-                <Button variant="ghost" size="sm" onPress={declineShortcut} className="text-xs">
-                  {locale === 'ko' ? '그냥 외곽' : 'Stay outer'}
-                </Button>
-              </div>
+              {pendingChoice.type === 'corner' ? (
+                <>
+                  <div className="text-xs font-semibold text-sky-700 dark:text-sky-400 mb-1">
+                    {locale === 'ko' ? '코너에 정확히 멈췄어요!' : 'Landed exactly on a corner!'}
+                  </div>
+                  <p className="text-xs text-foreground/65 mb-3">
+                    {locale === 'ko'
+                      ? '지름길로 가운데를 거쳐 가로지를 수 있어요. 갈래요?'
+                      : 'You can take the diagonal shortcut through the center. Take it?'}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onPress={() => resolveChoice(pendingChoice.options[0].next)}
+                      className="text-xs"
+                    >
+                      {locale === 'ko' ? '지름길로!' : 'Take shortcut'}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onPress={() => resolveChoice(pendingChoice.options[1].next)}
+                      className="text-xs"
+                    >
+                      {locale === 'ko' ? '그냥 외곽' : 'Stay outer'}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-xs font-semibold text-violet-700 dark:text-violet-400 mb-1">
+                    {locale === 'ko' ? '가운데(방)에 도착!' : 'Arrived at the center!'}
+                  </div>
+                  <p className="text-xs text-foreground/65 mb-3">
+                    {locale === 'ko'
+                      ? '직진할 수도, 방향을 꺾어 다른 대각선으로 갈 수도 있어요.'
+                      : 'You can continue straight or turn onto the other diagonal.'}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onPress={() => resolveChoice(pendingChoice.options[1].next)}
+                      className="text-xs"
+                    >
+                      {locale === 'ko' ? '방향 꺾기' : 'Turn'}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onPress={() => resolveChoice(pendingChoice.options[0].next)}
+                      className="text-xs"
+                    >
+                      {locale === 'ko' ? '직진' : 'Go straight'}
+                    </Button>
+                  </div>
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -221,7 +334,7 @@ export function YutBoardDemo() {
             variant="primary"
             size="md"
             onPress={onThrow}
-            isDisabled={rolling || finished || !!pendingShortcut}
+            isDisabled={rolling || finished || !!pendingChoice}
             className="gap-2"
           >
             <Dices className={`size-4 ${rolling ? 'animate-spin' : ''}`} />

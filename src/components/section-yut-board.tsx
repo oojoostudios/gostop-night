@@ -45,9 +45,8 @@ const HIGHLIGHTS: ReadonlyArray<{
     labelKo: '코너',
     labelEn: 'Corners',
     icon: <CornerUpRight className="size-3.5" />,
-    descKo: '4개 코너 (출발 + 첫모/둘모/셋모) — 지름길 진입 지점이에요.',
-    descEn:
-      'Four corners (start + 3 named corners) — these are the only spots that trigger a shortcut.',
+    descKo: '중앙이랑 첫번째, 두번째 코너가 지름길 진입 지점이에요.',
+    descEn: 'The center and the first two corners are the shortcut entry points.',
   },
 ];
 

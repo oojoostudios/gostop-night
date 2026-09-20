@@ -3,98 +3,229 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  --font-sans:
-    var(--font-geist-sans), 'Apple SD Gothic Neo', 'Pretendard Variable', Pretendard,
-    'Noto Sans KR', system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --font-accent: var(--font-serif-accent), 'Instrument Serif', Georgia, 'Times New Roman', serif;
+/* ══════════════════════════════════════════════════════════════════════════ */
+/*  CLUB GO STOP — DESIGN TOKENS  ·  "Vintage print"                          */
+/*                                                                            */
+/*  An old printed card box: warm paper, fine ink lines, no heavy outlines,   */
+/*  no shadows. Separation comes from color, not from borders.                */
+/*                                                                            */
+/*  This section is the ONE place to restyle the site. Change a value here    */
+/*  and everything that uses it follows, in light and dark mode.              */
+/*                                                                            */
+/*  1. PALETTE  — the hex codes and line strengths. One line per mode. Edit.  */
+/*  2. ROLES    — which palette color plays which role (paper, ink, plum...). */
+/*  3. SHAPES, PRESS, GRAIN, DISPLAY TYPE — corners, hairline, press, grain.  */
+/*                                                                            */
+/*  Dark mode is the `dark` class on <html> (the theme toggle). Any element   */
+/*  can also opt in: `.dark` forces dark inside it, `.light` forces light.    */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+@theme static {
+  /* ── 1. PALETTE ────────────────────────────────────────────────────────── */
+  /* ink, plum and the mascot colors come from the logo. */
+
+  /* paper: page background */
+  --palette-paper-light: #f3eada;
+  --palette-paper-dark: #17302b;
+  /* surface: cards, panels, inputs. Must read clearly lighter than paper */
+  --palette-surface-light: #fffcf2;
+  --palette-surface-dark: #1f3d37;
+  /* ink: body text and hairlines */
+  --palette-ink-light: #1a3731;
+  --palette-ink-dark: #f3eada;
+  /* plum: brand red. Primary buttons, selected state, Ribbon type, the wordmark */
+  --palette-plum-light: #ea3c2f;
+  --palette-plum-dark: #f0584a;
+  /* plum-deep: pressed state */
+  --palette-plum-deep-light: #c43a2d;
+  --palette-plum-deep-dark: #ea3c2f;
+  /* gold: Bright type, "win" moments. A fill, dot or icon. Never text */
+  --palette-gold-light: #e0a43a;
+  --palette-gold-dark: #edb858;
+  /* sage: Junk type, success, balance-check tick. A fill, dot or icon. Never text */
+  --palette-sage-light: #6f8f5a;
+  --palette-sage-dark: #8fae78;
+  /* sky: blue-ribbon combo only. A fill, dot or icon. Never text */
+  --palette-sky-light: #2e5e8c;
+  --palette-sky-dark: #6f9cc8;
+  /* ink-soft: captions and secondary text, as a share of ink. Nothing lighter */
+  --palette-ink-soft-light: 72%;
+  --palette-ink-soft-dark: 78%;
+  /* hairline: card borders and dividers, as a share of ink */
+  --palette-hairline-light: 18%;
+  --palette-hairline-dark: 26%;
+
+  /* ── 2. ROLES (light is the default; the .dark block below swaps them) ── */
+  --color-paper: var(--palette-paper-light);
+  --color-surface: var(--palette-surface-light);
+  --color-ink: var(--palette-ink-light);
+  --color-plum: var(--palette-plum-light);
+  --color-plum-deep: var(--palette-plum-deep-light);
+  --color-gold: var(--palette-gold-light);
+  --color-sage: var(--palette-sage-light);
+  --color-sky: var(--palette-sky-light);
+
+  /* ── 3. SHAPES ─────────────────────────────────────────────────────────── */
+  /* cards and panels */
+  --radius-card: 10px;
+  /* inputs */
+  --radius-input: 8px;
+  /* chips and buttons: full pills. Nothing rounder than this */
+  --radius-pill: 9999px;
+  /* the one border in the whole design: cards only */
+  --hairline-width: 1px;
+
+  /* ── PRESS: a pressed button darkens to plum-deep and moves this far ──── */
+  --press-shift: 1px;
+  --press-time: 100ms;
+
+  /* ── PAPER GRAIN: strength of the noise over the page (0.04 to 0.06) ──── */
+  --grain-opacity: 0.05;
+
+  /* ── DISPLAY TYPE: Fraunces weight and optical size (9 low, 144 high) ─── */
+  --display-weight: 600;
+  --display-opsz: 144;
 }
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/* K-culture theme — 한지 (paper) base + 화투 매트 액센트 (matgo red/felt green)*/
-/*                                                                            */
-/* 마장 가이드의 paper philosophy를 기본으로 차용 (#f2ecdc 톤),                 */
-/* 그 위에 한국 고스톱의 시각적 정체성을 추가:                                  */
-/*  - 빨간 화투 매트 (--mat)        : 명절에 깔던 그 빨간 비닐 매트              */
-/*  - 펠트 그린 (--felt)            : 점수/도박판 분위기                        */
-/*  - 따뜻한 한지 (--paper)         : 베이스, 한옥/온돌 느낌                     */
-/* ────────────────────────────────────────────────────────────────────────── */
+/* Light: the default on the page, and an "island" that forces light colors on one
+ * element even inside dark mode (the mascot badge is one: its outlines are dark,
+ * so it needs light paper). This rule must stay ABOVE the dark one below, so that
+ * `.dark` wins when both match the page root. */
+:root,
+.light,
+[data-theme='light'],
+.mascot-badge {
+  --color-paper: var(--palette-paper-light);
+  --color-surface: var(--palette-surface-light);
+  --color-ink: var(--palette-ink-light);
+  --color-plum: var(--palette-plum-light);
+  --color-plum-deep: var(--palette-plum-deep-light);
+  --color-gold: var(--palette-gold-light);
+  --color-sage: var(--palette-sage-light);
+  --color-sky: var(--palette-sky-light);
+  --ink-soft-strength: var(--palette-ink-soft-light);
+  --hairline-strength: var(--palette-hairline-light);
+  color-scheme: light;
+}
 
-@layer base {
-  :root,
-  .light,
-  .default,
-  [data-theme='light'],
-  [data-theme='default'] {
-    /* 핵심 팔레트 토큰 (마장 가이드와 호환되는 hex) */
-    --paper: #f2ecdc; /* 한지 — 사이트 기본 배경 */
-    --paper-deep: #e9dfc8; /* 진한 한지 — 섹션 액센트 */
-    --card: #fffdf5; /* 카드/패널 배경 — 거의 흰색이지만 미세하게 따뜻 */
-    --ink: #25211a; /* 본문 텍스트 — 따뜻한 검정 */
-    --muted-ink: #777064; /* 부 텍스트 */
-    --line: rgba(75, 65, 47, 0.14); /* 구분선 */
+/* Dark mode: the same roles, pointed at the dark half of the palette. */
+.dark,
+[data-theme='dark'] {
+  --color-paper: var(--palette-paper-dark);
+  --color-surface: var(--palette-surface-dark);
+  --color-ink: var(--palette-ink-dark);
+  --color-plum: var(--palette-plum-dark);
+  --color-plum-deep: var(--palette-plum-deep-dark);
+  --color-gold: var(--palette-gold-dark);
+  --color-sage: var(--palette-sage-dark);
+  --color-sky: var(--palette-sky-dark);
+  --ink-soft-strength: var(--palette-ink-soft-dark);
+  --hairline-strength: var(--palette-hairline-dark);
+  color-scheme: dark;
+}
 
-    /* 한국 고스톱 시그니처 액센트 */
-    --mat: #a9362c; /* 화투 매트 빨강 */
-    --mat-deep: #7a2018; /* 짙은 매트 */
-    --mat-soft: #efe0d5; /* 매트 분위기의 부드러운 배경 */
+/* Tokens built FROM the colors above. They are declared on every theme scope
+ * (not just the page root) so a `.dark` or `.light` island gets its own copy. */
+:root,
+.light,
+[data-theme='light'],
+.dark,
+[data-theme='dark'],
+.mascot-badge {
+  /* Secondary text and lines are ink at a set strength. */
+  --color-ink-soft: color-mix(in oklab, var(--color-ink) var(--ink-soft-strength), transparent);
+  --color-hairline: color-mix(in oklab, var(--color-ink) var(--hairline-strength), transparent);
 
-    --felt: #167737; /* 펠트 그린 */
-    --felt-deep: #07542a; /* 짙은 펠트 */
-    --felt-soft: #dfe9d9; /* 펠트 분위기의 부드러운 배경 */
+  /* HeroUI (buttons, drawers) reads its own variable names. Point them all at
+   * the tokens above so it follows the theme too. */
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+  --surface: var(--color-surface);
+  --surface-foreground: var(--color-ink);
+  --surface-secondary: color-mix(in oklab, var(--color-ink) 5%, var(--color-surface));
+  --surface-secondary-foreground: var(--color-ink);
+  --surface-tertiary: color-mix(in oklab, var(--color-ink) 9%, var(--color-surface));
+  --surface-tertiary-foreground: var(--color-ink);
+  --overlay: var(--color-surface);
+  --overlay-foreground: var(--color-ink);
+  --muted: var(--color-ink-soft);
+  --default: color-mix(in oklab, var(--color-ink) 7%, var(--color-paper));
+  --default-foreground: var(--color-ink);
+  --accent: var(--color-plum);
+  --accent-foreground: var(--color-surface);
+  --field-background: var(--color-surface);
+  --field-foreground: var(--color-ink);
+  --field-placeholder: var(--color-ink-soft);
+  --field-border: transparent;
+  --field-radius: var(--radius-input);
+  --success: var(--color-sage);
+  --success-foreground: var(--color-ink);
+  --warning: var(--color-gold);
+  --warning-foreground: var(--color-ink);
+  --danger: var(--color-plum-deep);
+  --danger-foreground: var(--color-surface);
+  --link: var(--color-plum-deep);
+  --focus: var(--color-plum);
+  --radius: var(--radius-card);
+  --border: var(--color-hairline);
+  --separator: var(--color-hairline);
+  /* No shadows anywhere. */
+  --surface-shadow: 0 0 0 0 transparent;
+  --overlay-shadow: 0 0 0 0 transparent;
+  --field-shadow: 0 0 0 0 transparent inset;
 
-    /* HeroUI / Tailwind v4 시스템 토큰을 위 팔레트로 매핑 */
-    --accent: var(--mat);
-    --accent-foreground: var(--paper);
-    --focus: var(--accent);
-    --radius: 0.625rem;
+  /* Old variable names the not-yet-restyled components still use. Each one is
+   * an alias of a token above. Delete this group once step 2 is done. */
+  --paper: var(--color-paper);
+  --ink: var(--color-ink);
+  --card: var(--color-surface);
+  --line: var(--color-hairline);
+  --paper-deep: color-mix(in oklab, var(--color-ink) 7%, var(--color-paper));
+  --muted-ink: var(--color-ink-soft);
+  --mat: var(--color-plum);
+  --mat-deep: var(--color-plum-deep);
+  --mat-soft: color-mix(in oklab, var(--color-plum) 14%, var(--color-paper));
+  --felt: var(--color-sage);
+  --felt-deep: color-mix(in oklab, var(--color-sage) 55%, var(--color-ink));
+  --felt-soft: color-mix(in oklab, var(--color-sage) 16%, var(--color-paper));
+}
 
-    --background: var(--paper);
-    --surface: var(--card);
-    --surface-secondary: var(--paper-deep);
-    --surface-tertiary: oklch(0.9 0.018 80);
+/* Utilities for the tokens that are declared above rather than in @theme. */
+@utility text-ink-soft {
+  color: var(--color-ink-soft);
+}
+@utility border-hairline {
+  border-color: var(--color-hairline);
+}
+@utility bg-hairline {
+  background-color: var(--color-hairline);
+}
 
-    --border: var(--line);
-    --separator: var(--line);
-  }
-
-  .dark,
-  [data-theme='dark'] {
-    /* 어둠 모드 — 어두운 나무판 + 따뜻한 호롱 */
-    --paper: #1d1a14;
-    --paper-deep: #15120d;
-    --card: #28241c;
-    --ink: #f2ecdc;
-    --muted-ink: #aea696;
-    --line: rgba(220, 200, 160, 0.12);
-
-    --mat: #c25040;
-    --mat-deep: #8b3025;
-    --mat-soft: #2a1916;
-
-    --felt: #2a9656;
-    --felt-deep: #15673a;
-    --felt-soft: #1a261d;
-
-    --accent: var(--mat);
-    --accent-foreground: var(--paper);
-    --focus: var(--accent);
-
-    --background: var(--paper);
-    --surface: var(--card);
-    --surface-secondary: var(--paper-deep);
-    --surface-tertiary: #34302a;
-
-    --border: var(--line);
-    --separator: var(--line);
-  }
+/* ── Fonts. The faces themselves are chosen in src/lib/fonts.ts ────────────
+ * Display is Fraunces for Latin with Gowun Batang Bold behind it for Korean
+ * (Fraunces has no Hangul, so the browser falls through to Gowun per character). */
+@theme inline {
+  --font-display:
+    var(--font-display-latin), var(--font-display-ko), Georgia, 'Apple SD Gothic Neo', serif;
+  --font-sans: var(--font-body-face), 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-heading: var(--font-sans);
+  /* Old name still used by a few components. Points at the body font until
+   * those components are restyled. */
+  --font-accent: var(--font-sans);
 }
 
 @layer base {
   html {
     @apply font-sans;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    /* Korean wraps between words, never in the middle of one. */
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
 }
 
@@ -275,22 +406,171 @@
   );
 }
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/* 한지 텍스처 — body에 SVG noise를 옅게 깔아 종이의 "결" 표현                  */
-/* 인라인 data-URI라 별도 자산 없음. 한 번 다운로드 후 모든 섹션에 통용.        */
-/* ────────────────────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+/*  PAPER GRAIN — a faint print texture over the whole page                   */
+/*                                                                            */
+/*  Made with an inline SVG feTurbulence filter used as a mask, so the specks */
+/*  take the `ink` color in both modes (dark specks on light paper, cream     */
+/*  specks on dark). Strength is `--grain-opacity` above. The layer ignores   */
+/*  taps and clicks. `.grain-layer` puts the same texture on one element,     */
+/*  above the page grain (used by the /stylecheck strength comparison).       */
+/* ══════════════════════════════════════════════════════════════════════════ */
 
-body {
-  /* SVG turbulence(0.85) — 종이 섬유처럼 보이는 미세 노이즈, 7% 불투명도. */
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.16  0 0 0 0 0.10  0 0 0 0.07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  background-attachment: fixed;
-  background-size: 220px 220px;
-  background-color: var(--background);
+:root {
+  --grain-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.4 0 0 0 -0.2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 
-.dark body {
-  /* 어둠 모드는 더 옅게 — 노이즈가 어두운 배경에서 도드라지면 거슬림 */
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.92  0 0 0 0 0.85  0 0 0 0.04 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: var(--color-ink);
+  opacity: var(--grain-opacity);
+  -webkit-mask-image: var(--grain-mask);
+  mask-image: var(--grain-mask);
+  -webkit-mask-size: 220px 220px;
+  mask-size: 220px 220px;
+}
+
+.grain-layer {
+  position: relative;
+  z-index: 10000;
+}
+.grain-layer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: var(--color-ink);
+  opacity: var(--grain-strength, var(--grain-opacity));
+  -webkit-mask-image: var(--grain-mask);
+  mask-image: var(--grain-mask);
+  -webkit-mask-size: 220px 220px;
+  mask-size: 220px 220px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/*  PRINT PIECES — shared look for cards, chips, buttons, inputs, badge       */
+/*  Built only from the tokens above. No shadows. The card hairline is the    */
+/*  only border. (Names start with `club-` so they can't clash with HeroUI.)  */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+@layer components {
+  /* Display type: Fraunces at the weight and optical size set above. */
+  .font-display {
+    font-weight: var(--display-weight);
+    font-variation-settings: 'opsz' var(--display-opsz);
+  }
+
+  .club-card {
+    background: var(--color-surface);
+    color: var(--color-ink);
+    border: var(--hairline-width) solid var(--color-hairline);
+    border-radius: var(--radius-card);
+  }
+
+  .club-input {
+    background: var(--color-surface);
+    color: var(--color-ink);
+    border: 0;
+    border-radius: var(--radius-input);
+    padding: 0.65rem 0.9rem;
+    font-size: 1rem;
+  }
+  .club-input::placeholder {
+    color: var(--color-ink-soft);
+  }
+
+  .club-chip,
+  .club-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    white-space: nowrap;
+    border: 0;
+    border-radius: var(--radius-pill);
+    transition:
+      background-color var(--press-time) ease-out,
+      transform var(--press-time) ease-out;
+  }
+
+  /* Chips: no border at rest. The selected one is a solid plum pill. */
+  .club-chip {
+    background: var(--color-surface);
+    color: var(--color-ink);
+    padding: 0.4rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  .club-chip[aria-pressed='true'] {
+    background: var(--color-plum);
+    color: var(--color-surface);
+  }
+
+  /* Buttons: primary is solid plum. 19px bold counts as "large text" for
+   * contrast, which is what the surface-on-plum label needs. */
+  .club-btn {
+    padding: 0.6rem 1.5rem;
+    font-size: 1.1875rem;
+    font-weight: 700;
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+  .club-btn--primary {
+    background: var(--color-plum);
+    color: var(--color-surface);
+  }
+  /* Pressed: darkens to plum-deep and moves down by --press-shift. That's all. */
+  .club-btn:active,
+  .club-btn.is-pressed {
+    transform: translateY(var(--press-shift));
+  }
+  .club-btn--primary:active,
+  .club-btn--primary.is-pressed {
+    background: var(--color-plum-deep);
+  }
+
+  /* Keyboard focus only. A focus ring is an accessibility need, not decoration. */
+  .club-chip:focus-visible,
+  .club-btn:focus-visible,
+  .club-input:focus-visible {
+    outline: 2px solid var(--color-plum);
+    outline-offset: 2px;
+  }
+
+  /* Mascot badge: the mascot's outlines are the same dark green as the dark
+   * page, so on dark mode it sits on a round badge. The badge is a light
+   * island (see the token section at the top), so it always uses the LIGHT
+   * paper color. No outline and no shadow: the color change is the edge. */
+  .mascot-badge {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 1;
+    background: var(--color-paper);
+    border-radius: 9999px;
+  }
+  /* The mascot is taller than the circle, so it is centered explicitly.
+   * Set its width on the image (about 78% of the badge). */
+  .mascot-badge > img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    max-width: none;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .club-chip,
+  .club-btn {
+    transition: none;
+  }
 }
 
 /* score-cell-emphasis: 5광 / 최고 점수 셀의 펄싱 글로우 */

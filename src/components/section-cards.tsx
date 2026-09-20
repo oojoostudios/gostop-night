@@ -82,7 +82,7 @@ const TYPE_BADGE: Record<HwatuType, string> = {
 
 // Mahjong-guide-style overview: each type gets a hanja sigil + romanization +
 // English meaning. The hanja column follows the Terms table in CLAUDE.md
-// (광=光, 열=動, 피=皮). This trio (Korean / Hanja / Romanization / English) lets
+// (광=光, 띠=紅, 열=動, 피=皮). This trio (Korean / Hanja / Romanization / English) lets
 // non-Korean readers anchor on the English while still showing cultural roots.
 const TYPE_OVERVIEW: Record<
   HwatuType,
@@ -107,10 +107,7 @@ const TYPE_OVERVIEW: Record<
     sample: ['01-gwang', '03-gwang', '08-gwang', '11-gwang', '12-gwang'],
   },
   tti: {
-    // 短 — short for 短冊 (tanzaku, the strip of paper). The compound combos
-    // 紅短 (홍단), 青短 (청단), 草短 (초단) are all "<color>-short", literally
-    // "<color> tanzaku". So 短 (not 帶) is the etymologically correct hanja.
-    hanja: '短',
+    hanja: '紅',
     roman: 'Tti',
     english: 'Ribbons',
     perMonth: 1,

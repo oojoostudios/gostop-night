@@ -77,8 +77,8 @@ export const HWATU_TYPES: Record<
   kkeut: {
     label: 'Animal',
     labelKo: '열',
-    blurb: 'Cards depicting animals. Ten of these scores one point.',
-    blurbKo: '동물이 그려진 카드. 10장 모으면 1점.',
+    blurb: 'Cards depicting animals. Five of these score one point.',
+    blurbKo: '동물이 그려진 카드. 5장부터 1점.',
   },
   pi: {
     label: 'Junk',
@@ -89,7 +89,7 @@ export const HWATU_TYPES: Record<
 };
 
 // Combos. Written once here so every card in a combo says the same thing.
-const BRIGHTS = { combo: 'Brights', comboKo: '광 Brights' };
+const BRIGHTS = { combo: 'Brights', comboKo: '삼광 · 사광 · 오광' };
 const RED = { combo: '홍단 Red' };
 const GRASS = { combo: '초단 Grass' };
 const BLUE = { combo: '청단 Blue' };
@@ -97,7 +97,7 @@ const GODORI = { combo: 'Godori 고도리' };
 const NO_COMBO = { combo: 'No combo · 조합 없음' };
 const RAIN_BRIGHT = {
   combo: 'Brights (Rain: 3 Brights = 2 pts)',
-  comboKo: '광 Brights (비광 포함 3광 = 2점)',
+  comboKo: '삼광 · 사광 · 오광 (비광 포함 삼광 = 2점)',
 };
 
 /** Short English name for a type label, then Korean. Used by the caption. */
@@ -276,8 +276,9 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     nameKo: '흑싸리 두견새',
     ...GODORI,
     image: '/cards/m04-animal.webp',
-    lore: 'A cuckoo crosses the moon over black bush clover — a classical motif of solitude and nostalgia.',
-    loreKo: '흑싸리 위로 달을 가르는 두견새. 고독과 그리움을 상징하는 옛 그림 그대로예요.',
+    lore: 'A cuckoo crosses the moon over wisteria — a classical motif of solitude and nostalgia. The Korean name 흑싸리 literally means "black bush clover", but the flower is wisteria.',
+    loreKo:
+      '등나무 위로 달을 가르는 두견새. 고독과 그리움을 상징하는 옛 그림 그대로예요. 흑싸리는 글자 그대로 "검은 싸리"라는 뜻이지만, 그려진 꽃은 등나무예요.',
   },
   {
     id: '04-tti',
@@ -507,7 +508,7 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     name: 'Maple + Deer',
     nameKo: '단풍 사슴',
     image: '/cards/m10-animal.webp',
-    lore: "A stag among red maple leaves. Together with 멧돼지 (boar) and 나비 (butterfly), this forms 고도리 — wait no, that's the bird trio. Deer pairs with autumn instead.",
+    lore: 'A stag among red maple leaves — the most iconic animal of autumn.',
     loreKo: '단풍 사이의 사슴. 가을의 가장 상징적인 동물.',
   },
   {
@@ -598,8 +599,8 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     name: 'Rain Willow + Swallow',
     nameKo: '비 제비',
     image: '/cards/m12-animal.webp',
-    lore: "A swallow against rain — the rain card's animal, traveling through storms. Often a bonus card in 고도리 sets.",
-    loreKo: '빗속을 가르는 제비 — 비 카드의 동물. 고도리 짝의 일부로 점수가 되는 카드예요.',
+    lore: "A swallow against rain — the rain card's animal, traveling through storms.",
+    loreKo: '빗속을 가르는 제비 — 비 카드의 동물.',
   },
   {
     id: '12-tti',

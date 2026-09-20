@@ -9,6 +9,7 @@ import { HwatuCardImage } from '@/components/hwatu-card-image';
 import {
   HWATU_DECK,
   HWATU_TYPES,
+  cardLabel,
   type HwatuCard as HwatuCardData,
   type HwatuType,
 } from '@/lib/hwatu';
@@ -124,7 +125,6 @@ function ToggleCard({
   selected: boolean;
   onClick: () => void;
 }) {
-  const { locale } = useLocale();
   return (
     <motion.button
       type="button"
@@ -132,7 +132,7 @@ function ToggleCard({
       whileTap={{ scale: 0.94 }}
       transition={{ type: 'spring', stiffness: 380, damping: 28 }}
       aria-pressed={selected}
-      aria-label={locale === 'ko' ? card.nameKo : card.name}
+      aria-label={cardLabel(card)}
       className={`relative aspect-[2/3] w-14 sm:w-16 rounded-md overflow-hidden ring-1 ring-black/10 bg-white transition-all ${
         selected
           ? 'outline outline-2 outline-offset-2 outline-foreground shadow'

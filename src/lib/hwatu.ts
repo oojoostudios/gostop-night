@@ -4,13 +4,28 @@ export type HwatuCard = {
   id: string;
   month: number;
   type: HwatuType;
-  /** Specific name of the card (e.g. "송학" / "Pine and crane") */
+  /** Card name in English, exactly as in CLAUDE.md's card table (e.g. "Pine Red Ribbon"). */
   name: string;
+  /** Card name in Korean (e.g. "송학 홍단"). */
   nameKo: string;
-  /** Special tag rendered on the card face, if any (e.g. "쌍피", "비광") */
+  /**
+   * Marks the two double-junk cards ("쌍피"). The scoring code counts these as
+   * 2 junk, so keep it on exactly those cards.
+   */
   tag?: string;
   tagKo?: string;
-  /** Path to the rendered card image (PNG sliced from the master deck SVG). */
+  /**
+   * Overrides the type label for this one card, for cards whose value doesn't
+   * match their type's generic label (September's sake cup, which can be played
+   * as an animal OR two junk; the double-junk cards, worth 2 junk each). Falls
+   * back to `HWATU_TYPES[type].label` when unset.
+   */
+  typeLabel?: string;
+  typeLabelKo?: string;
+  /** Combo this card belongs to. Bilingual as written unless `comboKo` is set. Unset = none. */
+  combo?: string;
+  comboKo?: string;
+  /** Path to the card image (WebP made from assets-source/cards). */
   image: string;
   /** Cultural / historical context. Populated for the 5 brights and 9 animals. */
   lore?: string;
@@ -19,27 +34,28 @@ export type HwatuCard = {
 
 export type Month = {
   num: number;
+  /** Short English month name, e.g. "Mar". */
+  abbr: string;
+  /** Flower / motif in English, e.g. "Pampas Grass". */
   motif: string;
+  /** Month name in Korean, e.g. "공산". */
   motifKo: string;
 };
 
-// English motifs use the BOTANICALLY accurate name; Korean names use the
-// common nickname. 4월 (등나무 / Wisteria) is colloquially called 흑싸리,
-// and 5월 (제비붓꽃 / Iris) is colloquially called 난초 — both Korean
-// names persist as game shorthand even though they don't match the plant.
+// Month names come from the "Month KO" column in CLAUDE.md's card table.
 export const MONTHS: ReadonlyArray<Month> = [
-  { num: 1, motif: 'Pine & crane', motifKo: '송학' },
-  { num: 2, motif: 'Plum & warbler', motifKo: '매조' },
-  { num: 3, motif: 'Cherry blossom', motifKo: '벚꽃' },
-  { num: 4, motif: 'Wisteria', motifKo: '흑싸리' },
-  { num: 5, motif: 'Iris', motifKo: '난초' },
-  { num: 6, motif: 'Peony', motifKo: '모란' },
-  { num: 7, motif: 'Red bush clover', motifKo: '홍싸리' },
-  { num: 8, motif: 'Pampas & moon', motifKo: '공산명월' },
-  { num: 9, motif: 'Chrysanthemum', motifKo: '국화' },
-  { num: 10, motif: 'Maple', motifKo: '단풍' },
-  { num: 11, motif: 'Paulownia', motifKo: '오동' },
-  { num: 12, motif: 'Rain & willow', motifKo: '비' },
+  { num: 1, abbr: 'Jan', motif: 'Pine', motifKo: '송학' },
+  { num: 2, abbr: 'Feb', motif: 'Plum Blossom', motifKo: '매조' },
+  { num: 3, abbr: 'Mar', motif: 'Cherry Blossom', motifKo: '벚꽃' },
+  { num: 4, abbr: 'Apr', motif: 'Wisteria', motifKo: '흑싸리' },
+  { num: 5, abbr: 'May', motif: 'Iris', motifKo: '난초' },
+  { num: 6, abbr: 'Jun', motif: 'Peony', motifKo: '모란' },
+  { num: 7, abbr: 'Jul', motif: 'Bush Clover', motifKo: '홍싸리' },
+  { num: 8, abbr: 'Aug', motif: 'Pampas Grass', motifKo: '공산' },
+  { num: 9, abbr: 'Sep', motif: 'Chrysanthemum', motifKo: '국진' },
+  { num: 10, abbr: 'Oct', motif: 'Maple', motifKo: '단풍' },
+  { num: 11, abbr: 'Nov', motif: 'Paulownia', motifKo: '오동' },
+  { num: 12, abbr: 'Dec', motif: 'Rain Willow', motifKo: '비' },
 ];
 
 export const HWATU_TYPES: Record<
@@ -60,35 +76,91 @@ export const HWATU_TYPES: Record<
   },
   kkeut: {
     label: 'Animal',
-    labelKo: '끗 (열끗)',
+    labelKo: '열',
     blurb: 'Cards depicting animals. Ten of these scores one point.',
     blurbKo: '동물이 그려진 카드. 10장 모으면 1점.',
   },
   pi: {
-    label: 'Pip',
+    label: 'Junk',
     labelKo: '피',
-    blurb: 'Plain cards. Ten scores one point; doubles (쌍피) count as two.',
+    blurb: 'Plain cards. Ten score one point; doubles (쌍피) count as two.',
     blurbKo: '일반 카드. 10장에 1점, 쌍피는 두 장으로 셉니다.',
   },
 };
 
+// Combos. Written once here so every card in a combo says the same thing.
+const BRIGHTS = { combo: 'Brights', comboKo: '광 Brights' };
+const RED = { combo: '홍단 Red' };
+const GRASS = { combo: '초단 Grass' };
+const BLUE = { combo: '청단 Blue' };
+const GODORI = { combo: 'Godori 고도리' };
+const NO_COMBO = { combo: 'No combo · 조합 없음' };
+const RAIN_BRIGHT = {
+  combo: 'Brights (Rain: 3 Brights = 2 pts)',
+  comboKo: '광 Brights (비광 포함 3광 = 2점)',
+};
+
+/** Short English name for a type label, then Korean. Used by the caption. */
+export function cardTypeLabels(card: HwatuCard): { en: string; ko: string } {
+  const meta = HWATU_TYPES[card.type];
+  return { en: card.typeLabel ?? meta.label, ko: card.typeLabelKo ?? meta.labelKo };
+}
+
 /**
- * Standard 48-card hwatu deck. 5 광, 10 띠, 9 끗, 24 피.
+ * The 3-line card caption used everywhere a card image appears (CLAUDE.md):
+ *   3월 · Mar
+ *   Cherry Blossom Red Ribbon
+ *   벚꽃 홍단 · Ribbon 띠
+ * In Korean, lines 2 and 3 swap places.
+ */
+export function cardCaption(
+  card: HwatuCard,
+  locale: 'en' | 'ko' = 'en',
+): { line1: string; line2: string; line3: string } {
+  const month = MONTHS[card.month - 1];
+  const type = cardTypeLabels(card);
+  const english = card.name;
+  const korean = `${card.nameKo} · ${type.en} ${type.ko}`;
+  return {
+    line1: `${card.month}월 · ${month.abbr}`,
+    line2: locale === 'ko' ? korean : english,
+    line3: locale === 'ko' ? english : korean,
+  };
+}
+
+/**
+ * The caption as one line, for image alt text, hover titles and screen readers
+ * on cards too small to show the full caption. Locale-independent: both
+ * languages are always included.
+ */
+export function cardLabel(card: HwatuCard): string {
+  const { line1, line2, line3 } = cardCaption(card);
+  return `${line1} · ${line2} · ${line3}`;
+}
+
+/** Combo text for the card in the given language, or undefined if it has none. */
+export function cardCombo(card: HwatuCard, locale: 'en' | 'ko' = 'en'): string | undefined {
+  return locale === 'ko' ? (card.comboKo ?? card.combo) : card.combo;
+}
+
+/**
+ * Standard 48-card hwatu deck. 5 광, 10 띠, 9 열, 24 피.
  *
- * Card PNGs live in `/public/cards/cell-r{row}-c{col}.png` on an 8×6 grid.
- * Within each row, cols 0–3 are the month listed first, cols 4–7 are that
- * month + 6. Within each month's four slots the order is highest-tier first
- * (광 if it exists, else 끗), then 띠, then pi/쌍피.
+ * Every name, type and combo below matches the "Card data — FINAL" table in
+ * CLAUDE.md. Card WebPs live in `/public/cards/m{month}-{type}[-n].webp`
+ * (original art). Within each month's slots the order is highest-tier first
+ * (광 if it exists, else 열), then 띠, then 피/쌍피.
  */
 export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
-  // 1월 — 송학 (row 0, cols 0–3)
+  // 1월 — 송학
   {
     id: '01-gwang',
     month: 1,
     type: 'gwang',
-    name: 'Pine bright',
-    nameKo: '송학광',
-    image: '/cards/cell-r0-c0.png',
+    name: 'Pine Bright',
+    nameKo: '송학 광',
+    ...BRIGHTS,
+    image: '/cards/m01-bright.webp',
     lore: "A red-crowned crane stands among pines under a rising sun. In East Asian art, pine and crane together symbolize longevity and dignity — fitting for the year's first card.",
     loreKo:
       '송학(松鶴) — 소나무에 앉은 학과 떠오르는 해. 동아시아 회화에서 송학은 장수와 기품을 상징해요. 한 해의 첫 번째 광답죠.',
@@ -97,37 +169,37 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '01-tti',
     month: 1,
     type: 'tti',
-    name: 'Red ribbon',
-    nameKo: '홍단',
-    tag: '홍단',
-    tagKo: '홍단',
-    image: '/cards/cell-r0-c1.png',
+    name: 'Pine Red Ribbon',
+    nameKo: '송학 홍단',
+    ...RED,
+    image: '/cards/m01-ribbon.webp',
   },
   {
     id: '01-pi-1',
     month: 1,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r0-c2.png',
+    name: 'Pine Junk',
+    nameKo: '송학 피',
+    image: '/cards/m01-junk-1.webp',
   },
   {
     id: '01-pi-2',
     month: 1,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r0-c3.png',
+    name: 'Pine Junk',
+    nameKo: '송학 피',
+    image: '/cards/m01-junk-2.webp',
   },
 
-  // 2월 — 매조 (row 1, cols 0–3)
+  // 2월 — 매조
   {
     id: '02-kkeut',
     month: 2,
     type: 'kkeut',
-    name: 'Warbler',
-    nameKo: '매조 (휘파람새)',
-    image: '/cards/cell-r1-c0.png',
+    name: 'Plum Blossom + Warbler',
+    nameKo: '매조 꾀꼬리',
+    ...GODORI,
+    image: '/cards/m02-animal.webp',
     lore: 'A bush warbler perches on a plum branch — the first songbird of spring, paired with the first blossom.',
     loreKo: '매화 가지에 앉은 휘파람새. 봄을 알리는 첫 새이자 첫 꽃의 짝이에요.',
   },
@@ -135,37 +207,37 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '02-tti',
     month: 2,
     type: 'tti',
-    name: 'Red ribbon',
-    nameKo: '홍단',
-    tag: '홍단',
-    tagKo: '홍단',
-    image: '/cards/cell-r1-c1.png',
+    name: 'Plum Blossom Red Ribbon',
+    nameKo: '매조 홍단',
+    ...RED,
+    image: '/cards/m02-ribbon.webp',
   },
   {
     id: '02-pi-1',
     month: 2,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r1-c2.png',
+    name: 'Plum Blossom Junk',
+    nameKo: '매조 피',
+    image: '/cards/m02-junk-1.webp',
   },
   {
     id: '02-pi-2',
     month: 2,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r1-c3.png',
+    name: 'Plum Blossom Junk',
+    nameKo: '매조 피',
+    image: '/cards/m02-junk-2.webp',
   },
 
-  // 3월 — 벚꽃 (row 2, cols 0–3)
+  // 3월 — 벚꽃
   {
     id: '03-gwang',
     month: 3,
     type: 'gwang',
-    name: 'Cherry bright',
-    nameKo: '벚꽃광',
-    image: '/cards/cell-r2-c0.png',
+    name: 'Cherry Blossom Bright',
+    nameKo: '벚꽃 광',
+    ...BRIGHTS,
+    image: '/cards/m03-bright.webp',
     lore: 'Cherry blossoms under a striped curtain (만막) — the iconic spring picnic scene celebrating brief, brilliant beauty.',
     loreKo: '만막(慢幕) 아래 흩날리는 벚꽃. 화려하지만 짧은 봄의 아름다움을 그린 가장 상징적인 광.',
   },
@@ -173,37 +245,37 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '03-tti',
     month: 3,
     type: 'tti',
-    name: 'Red poetry ribbon',
-    nameKo: '홍단',
-    tag: '홍단',
-    tagKo: '홍단',
-    image: '/cards/cell-r2-c1.png',
+    name: 'Cherry Blossom Red Ribbon',
+    nameKo: '벚꽃 홍단',
+    ...RED,
+    image: '/cards/m03-ribbon.webp',
   },
   {
     id: '03-pi-1',
     month: 3,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r2-c2.png',
+    name: 'Cherry Blossom Junk',
+    nameKo: '벚꽃 피',
+    image: '/cards/m03-junk-1.webp',
   },
   {
     id: '03-pi-2',
     month: 3,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r2-c3.png',
+    name: 'Cherry Blossom Junk',
+    nameKo: '벚꽃 피',
+    image: '/cards/m03-junk-2.webp',
   },
 
-  // 4월 — 흑싸리 (row 3, cols 0–3)
+  // 4월 — 흑싸리
   {
     id: '04-kkeut',
     month: 4,
     type: 'kkeut',
-    name: 'Cuckoo',
-    nameKo: '두견새',
-    image: '/cards/cell-r3-c0.png',
+    name: 'Wisteria + Cuckoo',
+    nameKo: '흑싸리 두견새',
+    ...GODORI,
+    image: '/cards/m04-animal.webp',
     lore: 'A cuckoo crosses the moon over black bush clover — a classical motif of solitude and nostalgia.',
     loreKo: '흑싸리 위로 달을 가르는 두견새. 고독과 그리움을 상징하는 옛 그림 그대로예요.',
   },
@@ -211,37 +283,36 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '04-tti',
     month: 4,
     type: 'tti',
-    name: 'Grass ribbon',
-    nameKo: '초단',
-    tag: '초단',
-    tagKo: '초단',
-    image: '/cards/cell-r3-c1.png',
+    name: 'Wisteria Grass Ribbon',
+    nameKo: '흑싸리 초단',
+    ...GRASS,
+    image: '/cards/m04-ribbon.webp',
   },
   {
     id: '04-pi-1',
     month: 4,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r3-c2.png',
+    name: 'Wisteria Junk',
+    nameKo: '흑싸리 피',
+    image: '/cards/m04-junk-1.webp',
   },
   {
     id: '04-pi-2',
     month: 4,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r3-c3.png',
+    name: 'Wisteria Junk',
+    nameKo: '흑싸리 피',
+    image: '/cards/m04-junk-2.webp',
   },
 
-  // 5월 — 난초 (row 4, cols 0–3)
+  // 5월 — 난초
   {
     id: '05-kkeut',
     month: 5,
     type: 'kkeut',
-    name: 'Bridge',
-    nameKo: '다리',
-    image: '/cards/cell-r4-c0.png',
+    name: 'Iris + Bridge',
+    nameKo: '난초 다리',
+    image: '/cards/m05-animal.webp',
     lore: 'A small wooden bridge over irises — actually a misnamed image, since the original Japanese motif is irises by water without a bridge.',
     loreKo:
       '붓꽃(난초) 사이로 놓인 다리. 원래 일본 하나후다에는 다리 없이 물가 붓꽃만 있었는데, 한국 화투에서 다리가 강조되며 굳어졌어요.',
@@ -250,37 +321,36 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '05-tti',
     month: 5,
     type: 'tti',
-    name: 'Grass ribbon',
-    nameKo: '초단',
-    tag: '초단',
-    tagKo: '초단',
-    image: '/cards/cell-r4-c1.png',
+    name: 'Iris Grass Ribbon',
+    nameKo: '난초 초단',
+    ...GRASS,
+    image: '/cards/m05-ribbon.webp',
   },
   {
     id: '05-pi-1',
     month: 5,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r4-c2.png',
+    name: 'Iris Junk',
+    nameKo: '난초 피',
+    image: '/cards/m05-junk-1.webp',
   },
   {
     id: '05-pi-2',
     month: 5,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r4-c3.png',
+    name: 'Iris Junk',
+    nameKo: '난초 피',
+    image: '/cards/m05-junk-2.webp',
   },
 
-  // 6월 — 모란 (row 5, cols 0–3)
+  // 6월 — 모란
   {
     id: '06-kkeut',
     month: 6,
     type: 'kkeut',
-    name: 'Butterfly',
-    nameKo: '나비',
-    image: '/cards/cell-r5-c0.png',
+    name: 'Peony + Butterflies',
+    nameKo: '모란 나비',
+    image: '/cards/m06-animal.webp',
     lore: 'Butterflies dancing on peonies — the peony is called 부귀화 (flower of wealth), and the butterflies bring elegance and love.',
     loreKo:
       "모란꽃에 앉은 나비. 모란은 '부귀화'라 불리는 부의 꽃이고, 나비는 우아함과 사랑의 상징이에요.",
@@ -289,37 +359,36 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '06-tti',
     month: 6,
     type: 'tti',
-    name: 'Blue ribbon',
-    nameKo: '청단',
-    tag: '청단',
-    tagKo: '청단',
-    image: '/cards/cell-r5-c1.png',
+    name: 'Peony Blue Ribbon',
+    nameKo: '모란 청단',
+    ...BLUE,
+    image: '/cards/m06-ribbon.webp',
   },
   {
     id: '06-pi-1',
     month: 6,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r5-c2.png',
+    name: 'Peony Junk',
+    nameKo: '모란 피',
+    image: '/cards/m06-junk-1.webp',
   },
   {
     id: '06-pi-2',
     month: 6,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r5-c3.png',
+    name: 'Peony Junk',
+    nameKo: '모란 피',
+    image: '/cards/m06-junk-2.webp',
   },
 
-  // 7월 — 홍싸리 (row 0, cols 4–7)
+  // 7월 — 홍싸리
   {
     id: '07-kkeut',
     month: 7,
     type: 'kkeut',
-    name: 'Boar',
-    nameKo: '멧돼지',
-    image: '/cards/cell-r0-c4.png',
+    name: 'Bush Clover + Boar',
+    nameKo: '홍싸리 멧돼지',
+    image: '/cards/m07-animal.webp',
     lore: 'A wild boar charging through red bush clover. Boars symbolize courage and stubborn drive — the spirit of midsummer.',
     loreKo: '홍싸리를 헤치고 달리는 멧돼지. 한여름의 힘찬 기세 — 용기와 고집을 상징해요.',
   },
@@ -327,37 +396,37 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '07-tti',
     month: 7,
     type: 'tti',
-    name: 'Grass ribbon',
-    nameKo: '초단',
-    tag: '초단',
-    tagKo: '초단',
-    image: '/cards/cell-r0-c5.png',
+    name: 'Bush Clover Grass Ribbon',
+    nameKo: '홍싸리 초단',
+    ...GRASS,
+    image: '/cards/m07-ribbon.webp',
   },
   {
     id: '07-pi-1',
     month: 7,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r0-c6.png',
+    name: 'Bush Clover Junk',
+    nameKo: '홍싸리 피',
+    image: '/cards/m07-junk-1.webp',
   },
   {
     id: '07-pi-2',
     month: 7,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r0-c7.png',
+    name: 'Bush Clover Junk',
+    nameKo: '홍싸리 피',
+    image: '/cards/m07-junk-2.webp',
   },
 
-  // 8월 — 공산명월 (row 1, cols 4–7)
+  // 8월 — 공산
   {
     id: '08-gwang',
     month: 8,
     type: 'gwang',
-    name: 'Moon bright',
-    nameKo: '공산광 (달)',
-    image: '/cards/cell-r1-c4.png',
+    name: 'Pampas Grass Bright',
+    nameKo: '공산 광',
+    ...BRIGHTS,
+    image: '/cards/m08-bright.webp',
     lore: 'The full moon rising over a dark mountain. The autumn moon is the most poetic moon in East Asian art — perfectly round, melancholic, complete.',
     loreKo:
       '공산명월(空山明月) — 빈 산 위로 떠오른 보름달. 동아시아 회화에서 가장 시적인 달은 가을달이에요. 완벽하게 둥글고, 적막하고, 가득해요.',
@@ -366,9 +435,10 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '08-kkeut',
     month: 8,
     type: 'kkeut',
-    name: 'Geese',
-    nameKo: '기러기',
-    image: '/cards/cell-r1-c5.png',
+    name: 'Pampas Grass + Geese',
+    nameKo: '공산 기러기',
+    ...GODORI,
+    image: '/cards/m08-animal.webp',
     lore: 'Three geese flying south — the autumn migration, a classical sign of the season changing.',
     loreKo: '남쪽으로 날아가는 기러기 세 마리. 가을의 본격적인 시작을 알리는 고전적 풍경이에요.',
   },
@@ -376,27 +446,29 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '08-pi-1',
     month: 8,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r1-c6.png',
+    name: 'Pampas Grass Junk',
+    nameKo: '공산 피',
+    image: '/cards/m08-junk-1.webp',
   },
   {
     id: '08-pi-2',
     month: 8,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r1-c7.png',
+    name: 'Pampas Grass Junk',
+    nameKo: '공산 피',
+    image: '/cards/m08-junk-2.webp',
   },
 
-  // 9월 — 국화 (row 2, cols 4–7)
+  // 9월 — 국진
   {
     id: '09-kkeut',
     month: 9,
     type: 'kkeut',
-    name: 'Sake cup',
-    nameKo: '국준 (술잔)',
-    image: '/cards/cell-r2-c4.png',
+    name: 'Chrysanthemum + Sake Cup',
+    nameKo: '국진 술잔',
+    typeLabel: 'Animal or Double junk',
+    typeLabelKo: '열 또는 쌍피',
+    image: '/cards/m09-animal.webp',
     lore: 'A sake cup beside chrysanthemums. In some matgo rules this card doubles as a 쌍피 — a hidden bonus that surprises new players.',
     loreKo:
       '국화 옆 술잔. 맞고 룰에서는 이 카드를 쌍피로도 쓸 수 있어요 — 처음 치는 사람이 깜짝 놀라는 숨겨진 룰이에요.',
@@ -405,37 +477,36 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '09-tti',
     month: 9,
     type: 'tti',
-    name: 'Blue ribbon',
-    nameKo: '청단',
-    tag: '청단',
-    tagKo: '청단',
-    image: '/cards/cell-r2-c5.png',
+    name: 'Chrysanthemum Blue Ribbon',
+    nameKo: '국진 청단',
+    ...BLUE,
+    image: '/cards/m09-ribbon.webp',
   },
   {
     id: '09-pi-1',
     month: 9,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r2-c6.png',
+    name: 'Chrysanthemum Junk',
+    nameKo: '국진 피',
+    image: '/cards/m09-junk-1.webp',
   },
   {
     id: '09-pi-2',
     month: 9,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r2-c7.png',
+    name: 'Chrysanthemum Junk',
+    nameKo: '국진 피',
+    image: '/cards/m09-junk-2.webp',
   },
 
-  // 10월 — 단풍 (row 3, cols 4–7)
+  // 10월 — 단풍
   {
     id: '10-kkeut',
     month: 10,
     type: 'kkeut',
-    name: 'Deer',
-    nameKo: '사슴',
-    image: '/cards/cell-r3-c4.png',
+    name: 'Maple + Deer',
+    nameKo: '단풍 사슴',
+    image: '/cards/m10-animal.webp',
     lore: "A stag among red maple leaves. Together with 멧돼지 (boar) and 나비 (butterfly), this forms 고도리 — wait no, that's the bird trio. Deer pairs with autumn instead.",
     loreKo: '단풍 사이의 사슴. 가을의 가장 상징적인 동물.',
   },
@@ -443,37 +514,37 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '10-tti',
     month: 10,
     type: 'tti',
-    name: 'Blue ribbon',
-    nameKo: '청단',
-    tag: '청단',
-    tagKo: '청단',
-    image: '/cards/cell-r3-c5.png',
+    name: 'Maple Blue Ribbon',
+    nameKo: '단풍 청단',
+    ...BLUE,
+    image: '/cards/m10-ribbon.webp',
   },
   {
     id: '10-pi-1',
     month: 10,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r3-c6.png',
+    name: 'Maple Junk',
+    nameKo: '단풍 피',
+    image: '/cards/m10-junk-1.webp',
   },
   {
     id: '10-pi-2',
     month: 10,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r3-c7.png',
+    name: 'Maple Junk',
+    nameKo: '단풍 피',
+    image: '/cards/m10-junk-2.webp',
   },
 
-  // 11월 — 오동 (row 4, cols 4–7)
+  // 11월 — 오동
   {
     id: '11-gwang',
     month: 11,
     type: 'gwang',
-    name: 'Paulownia bright',
-    nameKo: '오동광 (똥광)',
-    image: '/cards/cell-r4-c4.png',
+    name: 'Paulownia Bright',
+    nameKo: '오동 광',
+    ...BRIGHTS,
+    image: '/cards/m11-bright.webp',
     lore: 'A phoenix perched on a paulownia tree. The phoenix supposedly only lands on paulownia, making it the imperial bird. Affectionately nicknamed 똥광 (poo-bright) for its earthy color.',
     loreKo:
       "오동나무에 앉은 봉황. 봉황은 오직 오동나무에만 앉는다 해서 황제의 새. 색이 거뭇해 친근하게 '똥광'이라고도 불려요.",
@@ -482,71 +553,73 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     id: '11-pi-1',
     month: 11,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r4-c5.png',
+    name: 'Paulownia Junk',
+    nameKo: '오동 피',
+    image: '/cards/m11-junk-1.webp',
   },
   {
     id: '11-pi-2',
     month: 11,
     type: 'pi',
-    name: 'Pip',
-    nameKo: '피',
-    image: '/cards/cell-r4-c6.png',
+    name: 'Paulownia Junk',
+    nameKo: '오동 피',
+    image: '/cards/m11-junk-2.webp',
   },
   {
     id: '11-pi-3',
     month: 11,
     type: 'pi',
-    name: 'Double pip',
-    nameKo: '쌍피',
+    name: 'Paulownia Double Junk',
+    nameKo: '오동 쌍피',
     tag: '쌍피',
     tagKo: '쌍피',
-    image: '/cards/cell-r4-c7.png',
+    typeLabel: 'Double junk ×2',
+    typeLabelKo: '쌍피 ×2',
+    image: '/cards/m11-double.webp',
   },
 
-  // 12월 — 비 (row 5, cols 4–7)
+  // 12월 — 비
   {
     id: '12-gwang',
     month: 12,
     type: 'gwang',
-    name: 'Rain bright (Ono no Michikaze)',
-    nameKo: '비광',
-    tag: '비광',
-    tagKo: '비광',
-    image: '/cards/cell-r5-c4.png',
+    name: 'Rain Willow Bright',
+    nameKo: '비 광',
+    ...RAIN_BRIGHT,
+    image: '/cards/m12-bright.webp',
     lore: 'Ono no Michikaze, a Heian-era calligrapher, sheltering under an umbrella. Watching a frog repeatedly leap at a willow branch taught him persistence — the moral of the picture.',
     loreKo:
       '헤이안 시대 서예가 오노노 미치카제(小野道風)가 우산을 쓴 모습. 버드나무에 자꾸 뛰어오르는 개구리를 보고 끈기를 배웠다는 일화가 그림에 담겼어요.',
-  },
-  // 12월 띠 — 표준 고스톱 룰에선 어떤 단(홍/청/초) 콤보에도 속하지 않음.
-  // (일부 변형 룰에서 초단으로 분류) → tag 미부여로 콤보 카운트에서 제외.
-  {
-    id: '12-tti',
-    month: 12,
-    type: 'tti',
-    name: 'Plain ribbon',
-    nameKo: '12월 띠',
-    image: '/cards/cell-r5-c5.png',
   },
   {
     id: '12-kkeut',
     month: 12,
     type: 'kkeut',
-    name: 'Swallow',
-    nameKo: '제비',
-    image: '/cards/cell-r5-c6.png',
+    name: 'Rain Willow + Swallow',
+    nameKo: '비 제비',
+    image: '/cards/m12-animal.webp',
     lore: "A swallow against rain — the rain card's animal, traveling through storms. Often a bonus card in 고도리 sets.",
     loreKo: '빗속을 가르는 제비 — 비 카드의 동물. 고도리 짝의 일부로 점수가 되는 카드예요.',
+  },
+  {
+    id: '12-tti',
+    month: 12,
+    type: 'tti',
+    name: 'Rain Willow Ribbon',
+    nameKo: '비 띠',
+    ...NO_COMBO,
+    image: '/cards/m12-ribbon.webp',
   },
   {
     id: '12-pi',
     month: 12,
     type: 'pi',
-    name: 'Double pip',
-    nameKo: '쌍피',
+    name: 'Rain Willow Double Junk',
+    nameKo: '비 쌍피',
     tag: '쌍피',
     tagKo: '쌍피',
-    image: '/cards/cell-r5-c7.png',
+    typeLabel: 'Double junk ×2',
+    typeLabelKo: '쌍피 ×2',
+    image: '/cards/m12-double.webp',
   },
 ];

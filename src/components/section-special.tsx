@@ -453,7 +453,7 @@ function BakBlock() {
     {
       titleKo: '멍박 (Meong-bak)',
       titleEn: 'Meong-bak',
-      descKo: '내가 끗(열끗) 점수를 올렸는데 누군가 끗이 5장 미만이면, 그 사람의 부담이 2배.',
+      descKo: '내가 열 점수를 올렸는데 누군가 열이 5장 미만이면, 그 사람의 부담이 2배.',
       descEn:
         'If you score with animals but an opponent has fewer than 5 animals, their payment doubles.',
     },

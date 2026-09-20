@@ -22,10 +22,10 @@ Inspired by [themahjong.guide](https://themahjong.guide) — the structure, pape
 
 ## Sections
 
-- **What is hwatu?** — the 48-card deck broken down by tier (광 / 띠 / 끗 / 피)
+- **What is hwatu?** — the 48-card deck broken down by tier (광 / 띠 / 열 / 피)
 - **How a round begins** — interactive shuffle and deal demo
 - **How a round works** — 9 scenarios: normal match, double match, ttadak, jjok, ppeok, ssakssalri, pokdan, jappeok
-- **Scoring** — bright / ribbon / animal / pip combos with running totals
+- **Scoring** — bright / ribbon / animal / junk combos with running totals
 - **Special rules** — go vs. stop, sweep bonuses, bombs, self-traps
 - **Go or stop?** — when to push for more, when to lock in
 

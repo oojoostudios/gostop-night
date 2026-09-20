@@ -885,7 +885,7 @@ function Stage({ state }: { state: StageState }) {
         <Zone
           labelKo="먹은 패"
           labelEn="Taken"
-          helpKo="내가 가져간 카드들. 광/띠/끗/피로 분류돼요."
+          helpKo="내가 가져간 카드들. 광/띠/열/피로 분류돼요."
           helpEn="Cards you've won. Sorted by type at score time."
           cardIds={state.taken}
           highlightedIds={state.highlight?.taken}

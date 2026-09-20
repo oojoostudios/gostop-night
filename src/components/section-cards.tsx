@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Drawer } from '@heroui/react';
 import { useLocale } from '@/contexts/locale-context';
 import { useIsMobile } from '@/lib/use-media-query';
+import { CardCaption } from '@/components/card-caption';
 import { HwatuCard } from '@/components/hwatu-card';
 import { HwatuCardImage } from '@/components/hwatu-card-image';
 import { FadeInOnView } from '@/components/fade-in-on-view';
@@ -55,7 +56,7 @@ const MONTH_NOTE: Record<number, { ko: string; en: string }> = {
     en: 'Empty mountain, full moon — the most poetic moon in East Asian art.',
   },
   9: {
-    ko: '국화. 술잔(국준)으로 무병장수를 비는 중양절 풍습.',
+    ko: '국진. 술잔으로 무병장수를 비는 중양절 풍습.',
     en: 'Chrysanthemum. The sake cup is for the longevity festival on 9/9.',
   },
   10: {
@@ -80,9 +81,8 @@ const TYPE_BADGE: Record<HwatuType, string> = {
 };
 
 // Mahjong-guide-style overview: each type gets a hanja sigil + romanization +
-// English meaning. The hanja column matches the Korean term's actual etymology
-// where one exists (광=光, 피=皮); kkeut has no standard hanja, so we leave a
-// placeholder (—). This trio (Korean / Hanja / Romanization / English) lets
+// English meaning. The hanja column follows the Terms table in CLAUDE.md
+// (광=光, 열=動, 피=皮). This trio (Korean / Hanja / Romanization / English) lets
 // non-Korean readers anchor on the English while still showing cultural roots.
 const TYPE_OVERVIEW: Record<
   HwatuType,
@@ -119,9 +119,8 @@ const TYPE_OVERVIEW: Record<
     sample: ['01-tti', '02-tti', '06-tti', '10-tti', '12-tti'],
   },
   kkeut: {
-    // No standard hanja — "끗" is a native Korean counter-word for points.
-    hanja: '—',
-    roman: 'Kkeut',
+    hanja: '動',
+    roman: 'Yeol',
     english: 'Animals',
     perMonth: 1,
     formula: '9 × 1 = 9',
@@ -131,7 +130,7 @@ const TYPE_OVERVIEW: Record<
   pi: {
     hanja: '皮',
     roman: 'Pi',
-    english: 'Pips',
+    english: 'Junk',
     perMonth: 2,
     formula: 'Mostly 2 each = 24',
     accent: 'border-zinc-500/40 bg-zinc-500/[0.06] dark:bg-zinc-500/[0.08]',
@@ -149,7 +148,7 @@ const TYPE_BLURB_DETAIL: Record<HwatuType, { ko: string; en: string }> = {
     en: 'One per month, in 10 months. Red, blue, or grass-colored — three of a color = combo (Hongdan / Cheongdan / Chodan).',
   },
   kkeut: {
-    ko: '9개 달에 각 1장씩 — 동물·새·풍경. 새 3종 (매조·두견·기러기)을 모으면 고도리.',
+    ko: '9개 달에 각 1장씩 — 동물·새·풍경. 새 3종 (꾀꼬리·두견새·기러기)을 모으면 고도리.',
     en: 'One per month, in 9 months — animals, birds, scenery. Three songbirds (warbler, cuckoo, geese) = godori combo.',
   },
   pi: {
@@ -202,7 +201,7 @@ export function SectionCards() {
               : '12 months × 4 cards = 48 in total. Each card belongs to one of four types. Filter by type, then click any card to see details appear on the right.'}
           </FadeInOnView>
 
-          {/* Type overview blocks (광 · 띠 · 끗 · 피) */}
+          {/* Type overview blocks (광 · 띠 · 열 · 피) */}
           <TypeOverview typeCounts={typeCounts} />
 
           {/* Filter chips */}
@@ -377,7 +376,7 @@ function TypeOverview({ typeCounts }: { typeCounts: Record<HwatuType, number> })
                 <div className="flex items-baseline gap-2 flex-wrap">
                   {/* Mahjong-guide-style trio: native term first, with the
                    * "other side" + romanization as a small subtitle so EN
-                   * readers always see what 광/띠/끗/피 mean. */}
+                   * readers always see what 광/띠/열/피 mean. */}
                   <h3 className="text-2xl font-semibold tracking-tight">
                     {locale === 'ko' ? meta.labelKo : ov.english}
                   </h3>
@@ -504,7 +503,6 @@ function DetailPanel({
     );
   }
 
-  const month = MONTHS[card.month - 1];
   const typeMeta = HWATU_TYPES[card.type];
 
   return (
@@ -546,20 +544,12 @@ function DetailPanel({
             <span
               className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm font-semibold ${TYPE_BADGE[card.type]}`}
             >
-              {locale === 'ko' ? typeMeta.labelKo : typeMeta.label}
-            </span>
-            <span className="text-xs text-foreground/50 tabular-nums">
-              {card.month}월 · {locale === 'ko' ? month.motifKo : month.motif}
+              {locale === 'ko'
+                ? (card.typeLabelKo ?? typeMeta.labelKo)
+                : (card.typeLabel ?? typeMeta.label)}
             </span>
           </div>
-          <h3 className="text-xl font-semibold tracking-tight">
-            {locale === 'ko' ? card.nameKo : card.name}
-          </h3>
-          {card.tag && (
-            <div className="mt-1 text-sm text-foreground/60">
-              {locale === 'ko' ? card.tagKo : card.tag}
-            </div>
-          )}
+          <CardCaption card={card} />
           <p className="mt-3 text-sm text-foreground/70 leading-relaxed">
             {locale === 'ko' ? typeMeta.blurbKo : typeMeta.blurb}
           </p>

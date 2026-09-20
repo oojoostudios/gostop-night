@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useLocale } from '@/contexts/locale-context';
+import { CardCaption } from '@/components/card-caption';
 import { HwatuCardImage } from '@/components/hwatu-card-image';
-import { HWATU_DECK, MONTHS } from '@/lib/hwatu';
+import { HWATU_DECK } from '@/lib/hwatu';
 
 const cardById = (id: string) => HWATU_DECK.find((c) => c.id === id);
 
@@ -69,7 +70,7 @@ const PATTERNS: ReadonlyArray<Pattern> = [
     accent: 'emerald',
     desc: "Three songbirds — warbler (February), cuckoo (April), and geese (August). The most famous combo in go-stop, named after 'go' (五, five) and 'tori' (鳥, birds).",
     descKo:
-      "새 3마리 — 매조(2월), 두견(4월), 기러기(8월). 고스톱에서 가장 유명한 콤보. 이름은 '고(5)' + '도리(새)'.",
+      "새 3마리 — 꾀꼬리(2월), 두견새(4월), 기러기(8월). 고스톱에서 가장 유명한 콤보. 이름은 '고(5)' + '도리(새)'.",
     cardIds: ['02-kkeut', '04-kkeut', '08-kkeut'],
   },
   {
@@ -247,20 +248,14 @@ export function WinningPatterns() {
             {active.cardIds.map((id) => {
               const card = cardById(id);
               if (!card) return null;
-              const month = MONTHS[card.month - 1];
               return (
-                <div key={id} className="flex flex-col items-center gap-1.5">
+                <div key={id} className="flex flex-col items-center gap-1.5 w-24">
                   <div
                     className={`relative aspect-[2/3] w-16 sm:w-20 rounded-md overflow-hidden ring-1 ring-black/10 bg-white outline outline-2 outline-offset-2 ${accent.ring}`}
                   >
                     <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
                   </div>
-                  <div className="text-[10px] tabular-nums text-foreground/55 text-center leading-tight">
-                    <div className="font-semibold text-foreground/75">{card.month}월</div>
-                    <div className="text-foreground/45">
-                      {locale === 'ko' ? month.motifKo : month.motif}
-                    </div>
-                  </div>
+                  <CardCaption card={card} compact className="text-center" />
                 </div>
               );
             })}

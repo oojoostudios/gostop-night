@@ -160,7 +160,7 @@ export function SectionDeal() {
             </div>
           </div>
 
-          {/* step pips */}
+          {/* step dots */}
           <div className="mt-6 flex items-center gap-2">
             {STEP_META.map((meta, i) => (
               <motion.button

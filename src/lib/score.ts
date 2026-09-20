@@ -68,7 +68,7 @@ export function computeScore(selectedIds: ReadonlySet<string>): Score {
   // 띠: 5장↑부터 점수 (5장 = 1점, 이후 +1)
   if (counts.tti >= 5) breakdown.tti = counts.tti - 4;
 
-  // 끗: 5장↑부터 점수 (5장 = 1점, 이후 +1)
+  // 열: 5장↑부터 점수 (5장 = 1점, 이후 +1)
   if (counts.kkeut >= 5) breakdown.kkeut = counts.kkeut - 4;
 
   // 피: 효과 점수 10↑부터 점수 (10 = 1점, 이후 +1)

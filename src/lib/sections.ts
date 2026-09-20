@@ -40,8 +40,8 @@ const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
     label: 'Scoring',
     labelKo: '점수 계산',
     blurb:
-      'Brights (광), ribbons (띠), animals (끗), and pip cards (피) — each scores differently.',
-    blurbKo: '광·띠·끗·피 — 카드 종류마다 점수 매기는 방식이 달라요.',
+      'Brights (광), ribbons (띠), animals (열), and junk cards (피) — each scores differently.',
+    blurbKo: '광·띠·열·피 — 카드 종류마다 점수 매기는 방식이 달라요.',
   },
   {
     id: 'section-special',

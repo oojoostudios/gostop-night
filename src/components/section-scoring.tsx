@@ -22,7 +22,7 @@ const TYPE_BADGE: Record<HwatuType, string> = {
 const HONGDAN = ['01-tti', '02-tti', '03-tti']; // 1 + 2 + 3월
 const CHEONGDAN = ['06-tti', '09-tti', '10-tti']; // 6 + 9 + 10월
 const CHODAN = ['04-tti', '05-tti', '07-tti']; // 4 + 5 + 7월
-const GODORI = ['02-kkeut', '04-kkeut', '08-kkeut']; // 매조 + 두견 + 기러기
+const GODORI = ['02-kkeut', '04-kkeut', '08-kkeut']; // 꾀꼬리 + 두견새 + 기러기
 
 const cardById = (id: string) => HWATU_DECK.find((c) => c.id === id);
 
@@ -52,8 +52,8 @@ export function SectionScoring() {
             className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-14"
           >
             {locale === 'ko'
-              ? '광·띠·끗·피 — 카드 종류마다 점수 계산이 달라요. 같은 색 띠 3장 같은 콤보가 추가 점수를 만들어요.'
-              : 'Brights, ribbons, animals, pips — each type scores differently. Special combos (three-of-a-color, three songbirds) earn bonus points.'}
+              ? '광·띠·열·피 — 카드 종류마다 점수 계산이 달라요. 같은 색 띠 3장 같은 콤보가 추가 점수를 만들어요.'
+              : 'Brights, ribbons, animals, junk — each type scores differently. Special combos (three-of-a-color, three songbirds) earn bonus points.'}
           </FadeInOnView>
 
           <div className="space-y-16">
@@ -99,7 +99,7 @@ function CategoryHeader({ type }: { type: HwatuType }) {
             : type === 'tti'
               ? '띠'
               : type === 'kkeut'
-                ? '끗 (열끗)'
+                ? '열'
                 : '피'
           : type === 'gwang'
             ? 'Brights'
@@ -107,7 +107,7 @@ function CategoryHeader({ type }: { type: HwatuType }) {
               ? 'Ribbons'
               : type === 'kkeut'
                 ? 'Animals'
-                : 'Pips'}
+                : 'Junk'}
       </h3>
     </div>
   );
@@ -356,7 +356,7 @@ function KkeutBlock() {
       <CategoryHeader type="kkeut" />
       <p className="text-sm text-foreground/65 max-w-2xl leading-relaxed mb-5">
         {locale === 'ko'
-          ? '끗(열끗) 5장이면 1점, 한 장 추가될 때마다 +1점. 새 3마리를 모으면 고도리 콤보.'
+          ? '열 5장이면 1점, 한 장 추가될 때마다 +1점. 새 3마리를 모으면 고도리 콤보.'
           : 'Five animals score 1 point, +1 per extra. Collecting all three songbirds forms godori — a separate combo.'}
       </p>
 
@@ -365,7 +365,7 @@ function KkeutBlock() {
         score={locale === 'ko' ? '+5점' : '+5 pts'}
         desc={
           locale === 'ko'
-            ? '새가 그려진 끗 3장 — 매조(2월) + 두견(4월) + 기러기(8월)'
+            ? '새가 그려진 열 3장 — 꾀꼬리(2월) + 두견새(4월) + 기러기(8월)'
             : 'Three bird animals — warbler (February), cuckoo (April), geese (August).'
         }
         cardIds={GODORI}
@@ -374,7 +374,7 @@ function KkeutBlock() {
       />
 
       <div className="text-[11px] uppercase tracking-[0.18em] text-foreground/50 mt-6 mb-2 font-semibold">
-        {locale === 'ko' ? '전체 끗 (9장)' : 'All animals (9)'}
+        {locale === 'ko' ? '전체 열 (9장)' : 'All animals (9)'}
       </div>
       <div className="flex flex-wrap gap-1.5">
         {kkeuts.map((k, i) => (
@@ -409,11 +409,11 @@ function PiBlock() {
       <p className="text-sm text-foreground/65 max-w-2xl leading-relaxed mb-5">
         {locale === 'ko'
           ? '피 10장이면 1점, 한 장 추가될 때마다 +1점. 쌍피는 한 장이 두 장의 효과를 가져요.'
-          : 'Ten pips score 1 point, +1 per extra. Double pips (쌍피) count as two each.'}
+          : 'Ten junk score 1 point, +1 per extra. Double junk (쌍피) count as two each.'}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start">
-        <Block label={locale === 'ko' ? '일반 피' : 'Regular pips'} count={regularPi.length}>
+        <Block label={locale === 'ko' ? '일반 피' : 'Regular junk'} count={regularPi.length}>
           <div className="flex flex-wrap gap-1.5">
             {regularPi.slice(0, 8).map((p, i) => (
               <motion.div
@@ -441,7 +441,7 @@ function PiBlock() {
         </Block>
 
         <Block
-          label={locale === 'ko' ? '쌍피 (×2)' : 'Double pips (×2)'}
+          label={locale === 'ko' ? '쌍피 (×2)' : 'Double junk (×2)'}
           count={ssangPi.length}
           accent="purple"
         >

@@ -49,7 +49,11 @@ export function EtymologyBand() {
                 ) : (
                   <>
                     In the late 16th century, Portuguese missionaries brought playing cards called{' '}
-                    <em className="not-italic font-medium text-foreground/90">carta</em> to Japan.
+                    <em className="not-italic font-medium text-foreground/90">carta</em>
+                    {/* Space kept inside a string literal: a bare JSX space here gets collapsed
+                     * by the formatter and then dropped by the server renderer, which desyncs
+                     * SSR from hydration. */}
+                    {' to Japan. '}
                     To skirt the Edo shogunate&apos;s gambling bans, they mutated into floral
                     picture cards called{' '}
                     <em className="not-italic font-medium text-foreground/90">hanafuda (花札)</em>,

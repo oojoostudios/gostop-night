@@ -1,4 +1,4 @@
-import type { HwatuCard as HwatuCardData } from '@/lib/hwatu';
+import { cardLabel, type HwatuCard as HwatuCardData } from '@/lib/hwatu';
 
 /**
  * Renders a single hwatu card image.
@@ -15,18 +15,19 @@ import type { HwatuCard as HwatuCardData } from '@/lib/hwatu';
 
 type Props = {
   className?: string;
-  /** Optional accessible label. Falls back to the card's Korean name. */
+  /** Optional accessible label. Falls back to the card's full caption (both languages). */
   ariaLabel?: string;
 } & ({ card: HwatuCardData; path?: never } | { path: string; card?: never });
 
 export function HwatuCardImage(props: Props) {
   const { className, ariaLabel } = props;
   const src = 'card' in props && props.card ? props.card.image : props.path;
-  const label = ariaLabel ?? ('card' in props && props.card ? props.card.nameKo : '');
+  const label = ariaLabel ?? ('card' in props && props.card ? cardLabel(props.card) : '');
   return (
     <img
       src={src}
       alt={label}
+      title={label || undefined}
       className={className}
       loading="lazy"
       decoding="async"

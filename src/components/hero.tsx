@@ -12,21 +12,21 @@ const STATS = [
   { num: '12', labelKo: '달 × 4장', labelEn: 'months × 4 cards' },
   {
     num: '4',
-    labelKo: '종류 (광·띠·끗·피)',
-    labelEn: 'types (brights · ribbons · animals · pips)',
+    labelKo: '종류 (광·띠·열·피)',
+    labelEn: 'types (brights · ribbons · animals · junk)',
   },
   { num: '7', labelKo: '점에서 고/스톱', labelEn: 'points to call go/stop' },
 ] as const;
 
 // Cards used for the right-side fan sigil
 const FAN_CARDS = [
-  '/cards/cell-r5-c4.png', // 12월 비광
-  '/cards/cell-r4-c4.png', // 11월 오동광
-  '/cards/cell-r3-c4.png', // 10월 사슴
-  '/cards/cell-r2-c0.png', // 3월 벚꽃광
-  '/cards/cell-r1-c4.png', // 8월 공산광
-  '/cards/cell-r0-c0.png', // 1월 송학광
-  '/cards/cell-r0-c4.png', // 7월 멧돼지
+  '/cards/m12-bright.webp', // 12월 비광
+  '/cards/m11-bright.webp', // 11월 오동광
+  '/cards/m10-animal.webp', // 10월 사슴
+  '/cards/m03-bright.webp', // 3월 벚꽃광
+  '/cards/m08-bright.webp', // 8월 공산광
+  '/cards/m01-bright.webp', // 1월 송학광
+  '/cards/m07-animal.webp', // 7월 멧돼지
 ] as const;
 
 export function Hero({

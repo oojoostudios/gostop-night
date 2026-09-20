@@ -28,7 +28,7 @@ type StageState = {
     hand?: string | string[];
     floor?: string[];
     taken?: string[];
-    /** Floor cards that are locked (뻑) — rendered with rose styling. */
+    /** Floor cards that are locked (뻑) — rendered dimmed with a lock badge. */
     locked?: string[];
   };
   /** "+N pi from each opponent" badge (쪽/따닥/폭탄). */
@@ -718,26 +718,21 @@ export function SectionFlow() {
   const goNext = () => setStepIndex((i) => Math.min(scenario.steps.length - 1, i + 1));
 
   return (
-    <section
-      id="section-flow"
-      className="relative py-24 border-t border-foreground/10 section-flow-bg"
-    >
+    <section id="section-flow" className="relative py-24 border-t border-hairline section-flow-bg">
       <div className="lg:ml-72">
         <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
-          <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
-            SECTION 03
-          </FadeInOnView>
           <FadeInOnView
             as="h2"
             delay={0.05}
-            className="text-4xl md:text-5xl font-semibold tracking-tight mb-6"
+            className="font-display text-4xl md:text-5xl leading-tight mb-6"
           >
-            {locale === 'ko' ? '한 판은 이렇게' : 'How a round works'}
+            <span className="text-plum">03</span>
+            <span className="ml-4">{locale === 'ko' ? '한 판은 이렇게' : 'How a round works'}</span>
           </FadeInOnView>
           <FadeInOnView
             as="p"
             delay={0.12}
-            className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-8"
+            className="text-lg text-ink-soft max-w-[65ch] leading-relaxed mb-8"
           >
             {locale === 'ko'
               ? '한 턴의 흐름을 따라가 봐요. 기본 흐름부터 보고, 그 다음에 쪽·따닥·뻑 같은 변주들을 차례대로 클릭해보세요.'
@@ -761,16 +756,13 @@ export function SectionFlow() {
                     mass: 0.6,
                   }}
                   className={`relative px-3.5 py-1.5 rounded-full text-sm transition-colors ${
-                    isActive
-                      ? 'text-white font-medium'
-                      : 'bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground'
+                    isActive ? 'text-surface font-medium' : 'bg-surface text-ink'
                   }`}
                 >
                   {isActive && (
                     <motion.span
                       layoutId="flow-scenario-pill"
-                      className="absolute inset-0 rounded-full"
-                      style={{ backgroundColor: 'var(--mat)' }}
+                      className="absolute inset-0 rounded-full bg-plum"
                       transition={{
                         type: 'spring',
                         stiffness: 480,
@@ -792,7 +784,7 @@ export function SectionFlow() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.18 }}
-              className="text-sm text-foreground/55 mb-8 max-w-2xl leading-relaxed"
+              className="text-sm text-ink-soft mb-8 max-w-[65ch] leading-relaxed"
             >
               {locale === 'ko' ? scenario.blurbKo : scenario.blurb}
             </motion.p>
@@ -809,10 +801,10 @@ export function SectionFlow() {
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.18 }}
               >
-                <h3 className="text-xl font-semibold tracking-tight mb-2">
+                <h3 className="font-display text-xl mb-2">
                   {locale === 'ko' ? step.titleKo : step.title}
                 </h3>
-                <p className="text-sm text-foreground/70 leading-relaxed max-w-2xl">
+                <p className="text-sm text-ink-soft leading-relaxed max-w-[65ch]">
                   {locale === 'ko' ? step.descKo : step.desc}
                 </p>
               </motion.div>
@@ -844,15 +836,11 @@ export function SectionFlow() {
                 whileTap={{ scale: 0.85 }}
                 aria-label={`Go to step ${i + 1}`}
                 className={`h-1.5 rounded-full transition-all ${
-                  i === stepIndex
-                    ? 'w-8 bg-[var(--mat)]'
-                    : i < stepIndex
-                      ? 'w-4 bg-[var(--mat)]/40'
-                      : 'w-4 bg-foreground/15 hover:bg-foreground/30'
+                  i === stepIndex ? 'w-8 bg-plum' : i < stepIndex ? 'w-4 bg-plum' : 'w-4 bg-ink/20'
                 }`}
               />
             ))}
-            <span className="ml-3 text-xs tabular-nums text-foreground/50">
+            <span className="ml-3 text-xs tabular-nums text-ink-soft">
               {stepIndex + 1} / {scenario.steps.length}
             </span>
           </div>
@@ -869,7 +857,7 @@ export function SectionFlow() {
 function Stage({ state }: { state: StageState }) {
   const { locale } = useLocale();
   return (
-    <div className="rounded-xl border border-foreground/10 bg-foreground/[0.02] p-6 md:p-8 space-y-6">
+    <div className="club-card p-6 md:p-8 space-y-8">
       <Zone
         labelKo="바닥"
         labelEn="Floor"
@@ -934,24 +922,32 @@ function Zone({
   const { locale } = useLocale();
   const isHighlighted = (id: string) => highlightedIds?.includes(id) ?? false;
   const isLocked = (id: string) => lockedIds?.includes(id) ?? false;
+  // When some cards in a zone are highlighted, the rest step back.
+  const hasHighlight = (highlightedIds?.length ?? 0) > 0;
 
   return (
     <div>
-      <div className="flex items-baseline justify-between mb-2">
-        <div className="text-[11px] uppercase tracking-[0.18em] font-semibold text-foreground/70">
+      <div className="flex items-baseline justify-between gap-3 mb-2">
+        <div className="text-xs uppercase tracking-[0.18em] font-semibold text-ink-soft">
           {locale === 'ko' ? labelKo : labelEn}
         </div>
-        <div className="text-[11px] text-foreground/45">{locale === 'ko' ? helpKo : helpEn}</div>
+        <div className="text-xs text-ink-soft">{locale === 'ko' ? helpKo : helpEn}</div>
       </div>
       {cardIds.length === 0 ? (
-        <div className="rounded-md border border-dashed border-foreground/15 px-3 py-6 text-center text-xs text-foreground/40">
+        <div className="rounded-md bg-ink/5 px-3 py-6 text-center text-xs text-ink-soft">
           {empty}
         </div>
       ) : (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-x-1.5 gap-y-4">
           <AnimatePresence mode="popLayout">
             {cardIds.map((id) => (
-              <MiniCard key={id} id={id} highlighted={isHighlighted(id)} locked={isLocked(id)} />
+              <MiniCard
+                key={id}
+                id={id}
+                highlighted={isHighlighted(id)}
+                dimmed={hasHighlight && !isHighlighted(id)}
+                locked={isLocked(id)}
+              />
             ))}
           </AnimatePresence>
         </div>
@@ -963,10 +959,12 @@ function Zone({
 function MiniCard({
   id,
   highlighted,
+  dimmed,
   locked,
 }: {
   id: string;
   highlighted?: boolean;
+  dimmed?: boolean;
   locked?: boolean;
 }) {
   const card = cardById(id);
@@ -975,22 +973,22 @@ function MiniCard({
       layout
       layoutId={`flow-${id}`}
       initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: locked ? 0.6 : 1, y: 0 }}
+      animate={{ opacity: locked ? 0.6 : dimmed ? 0.5 : 1, y: 0 }}
       exit={{ opacity: 0, y: -6 }}
       transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-      className={`relative aspect-[2/3] w-14 sm:w-16 rounded-md overflow-hidden ring-1 bg-white ${
-        locked
-          ? 'ring-rose-400 outline outline-2 outline-offset-2 outline-rose-500'
-          : highlighted
-            ? 'ring-black/10 outline outline-2 outline-offset-2 outline-amber-500'
-            : 'ring-black/10'
-      }`}
+      className="relative aspect-[2/3] w-14 sm:w-16"
     >
       <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
       {locked && (
-        <div className="absolute top-0.5 right-0.5 bg-rose-500 text-white rounded-full p-0.5">
+        <div className="absolute top-0.5 right-0.5 bg-plum text-surface rounded-full p-0.5">
           <Lock className="size-2.5" />
         </div>
+      )}
+      {highlighted && (
+        <span
+          aria-hidden
+          className="absolute -bottom-3 left-1/2 size-2 -translate-x-1/2 rounded-full bg-plum"
+        />
       )}
     </motion.div>
   );
@@ -1002,17 +1000,14 @@ function DeckPile({ count, flipped }: { count: number; flipped?: string }) {
 
   return (
     <div className="flex flex-col items-start gap-2">
-      <div className="text-[11px] uppercase tracking-[0.18em] font-semibold text-foreground/70">
+      <div className="text-xs uppercase tracking-[0.18em] font-semibold text-ink-soft">
         {locale === 'ko' ? '더미' : 'Deck'}
       </div>
       <div className="relative h-24 w-16 sm:w-[72px]">
-        <div
-          className="absolute inset-0 rounded-md overflow-hidden ring-1 ring-black/20 shadow-sm"
-          aria-hidden
-        >
+        <div className="absolute inset-0 rounded-md overflow-hidden" aria-hidden>
           <HwatuCardBack className="absolute inset-0 w-full h-full" />
         </div>
-        <div className="absolute inset-x-0 -bottom-5 text-center text-[10px] tabular-nums text-foreground/50">
+        <div className="absolute inset-x-0 -bottom-5 text-center text-xs tabular-nums text-ink-soft">
           ×{count}
         </div>
         <AnimatePresence>
@@ -1029,7 +1024,7 @@ function DeckPile({ count, flipped }: { count: number; flipped?: string }) {
                 damping: 22,
               }}
               style={{ zIndex: 50 }}
-              className="absolute inset-0 rounded-md overflow-hidden ring-2 ring-amber-500 ring-offset-2 bg-white shadow-lg"
+              className="absolute inset-0"
             >
               <HwatuCardImage card={flippedCard} className="absolute inset-0 w-full h-full" />
             </motion.div>
@@ -1050,12 +1045,12 @@ function BonusPiBadge({ count }: { count?: number }) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 360, damping: 22 }}
-          className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400 self-center"
+          className="rounded-md bg-gold px-3 py-2 text-xs text-on-fill self-center"
         >
-          <div className="font-semibold">
+          <div className="font-semibold tabular-nums">
             +{count} {locale === 'ko' ? '피 (보너스)' : 'pi (bonus)'}
           </div>
-          <div className="text-[10px] opacity-80 mt-0.5">
+          <div className="text-xs mt-0.5">
             {locale === 'ko' ? '상대 한 명당 한 장씩' : 'from each opponent'}
           </div>
         </motion.div>

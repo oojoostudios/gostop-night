@@ -11,11 +11,11 @@ import { HWATU_DECK, HWATU_TYPES, type HwatuType } from '@/lib/hwatu';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-const TYPE_BADGE: Record<HwatuType, string> = {
-  gwang: 'bg-amber-500 text-white',
-  tti: 'bg-rose-500 text-white',
-  kkeut: 'bg-emerald-600 text-white',
-  pi: 'bg-zinc-600 text-white',
+const TYPE_DOT: Record<HwatuType, string> = {
+  gwang: 'bg-gold',
+  tti: 'bg-plum',
+  kkeut: 'bg-ink',
+  pi: 'bg-sage',
 };
 
 // Combos
@@ -32,24 +32,22 @@ export function SectionScoring() {
   return (
     <section
       id="section-scoring"
-      className="relative py-24 border-t border-foreground/10 section-scoring-bg"
+      className="relative py-24 border-t border-hairline section-scoring-bg"
     >
       <div className="lg:ml-72">
         <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
-          <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
-            SECTION 04
-          </FadeInOnView>
           <FadeInOnView
             as="h2"
             delay={0.05}
-            className="text-4xl md:text-5xl font-semibold tracking-tight mb-6"
+            className="font-display text-4xl md:text-5xl leading-tight mb-6"
           >
-            {locale === 'ko' ? '점수 계산' : 'Scoring'}
+            <span className="text-plum">04</span>
+            <span className="ml-4">{locale === 'ko' ? '점수 계산' : 'Scoring'}</span>
           </FadeInOnView>
           <FadeInOnView
             as="p"
             delay={0.12}
-            className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-14"
+            className="text-lg text-ink-soft max-w-2xl leading-relaxed mb-14"
           >
             {locale === 'ko'
               ? '광·띠·열·피 — 카드 종류마다 점수 계산이 달라요. 같은 색 띠 3장 같은 콤보가 추가 점수를 만들어요.'
@@ -71,7 +69,7 @@ export function SectionScoring() {
             </FadeInOnView>
           </div>
 
-          <div className="border-t border-foreground/10 pt-14 mt-16">
+          <div className="border-t border-hairline pt-14 mt-16">
             <WinningPatterns />
           </div>
 
@@ -86,13 +84,12 @@ function CategoryHeader({ type }: { type: HwatuType }) {
   const { locale } = useLocale();
   const meta = HWATU_TYPES[type];
   return (
-    <div className="flex items-center gap-3 mb-3">
-      <span
-        className={`text-[10px] px-2 py-0.5 rounded-sm font-semibold uppercase tracking-wider ${TYPE_BADGE[type]}`}
-      >
+    <div className="flex items-center gap-3 mb-4">
+      <span className={`size-3 rounded-full shrink-0 ${TYPE_DOT[type]}`} aria-hidden />
+      <span className="text-xs uppercase tracking-wider font-semibold text-ink-soft">
         {locale === 'ko' ? meta.labelKo : meta.label}
       </span>
-      <h3 className="text-2xl font-semibold tracking-tight">
+      <h3 className="font-display text-2xl">
         {locale === 'ko'
           ? type === 'gwang'
             ? '광'
@@ -113,21 +110,13 @@ function CategoryHeader({ type }: { type: HwatuType }) {
   );
 }
 
-function MiniCard({
-  id,
-  highlighted,
-  ringColor = 'outline-amber-500',
-}: {
-  id: string;
-  highlighted?: boolean;
-  ringColor?: string;
-}) {
+function MiniCard({ id, dimmed }: { id: string; dimmed?: boolean }) {
   const card = cardById(id);
   if (!card) return null;
   return (
     <div
-      className={`relative aspect-[2/3] w-14 sm:w-16 rounded-md overflow-hidden ring-1 ring-black/10 bg-white ${
-        highlighted ? `outline outline-2 outline-offset-2 ${ringColor}` : ''
+      className={`relative aspect-[2/3] w-14 sm:w-16 transition-opacity duration-200 ${
+        dimmed ? 'opacity-40' : ''
       }`}
     >
       <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
@@ -154,17 +143,11 @@ function ScoreCell({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-30px' }}
       transition={{ duration: 0.36, ease: EASE, delay }}
-      className={`relative rounded-md border px-3 py-2.5 ${
-        emphasis ? 'border-amber-500 bg-amber-500/5 score-cell-emphasis' : 'border-foreground/15'
-      }`}
+      className={`club-card relative px-4 py-3 ${emphasis ? 'score-cell-emphasis' : ''}`}
     >
-      <div className="text-[11px] uppercase tracking-wider font-semibold text-foreground/60">
-        {label}
-      </div>
-      <div className="text-lg font-semibold tabular-nums mt-0.5">{score}</div>
-      {detail && (
-        <div className="text-[10px] text-foreground/50 leading-tight mt-0.5">{detail}</div>
-      )}
+      <div className="text-xs uppercase tracking-wider font-semibold text-ink-soft">{label}</div>
+      <div className="text-lg font-bold tabular-nums mt-1">{score}</div>
+      {detail && <div className="text-xs text-ink-soft leading-tight mt-1">{detail}</div>}
     </motion.div>
   );
 }
@@ -174,15 +157,13 @@ function ComboCallout({
   score,
   desc,
   cardIds,
-  ringColor,
-  borderClass,
+  dotClass,
 }: {
   title: string;
   score: string;
   desc: string;
   cardIds: ReadonlyArray<string>;
-  ringColor: string;
-  borderClass: string;
+  dotClass: string;
 }) {
   return (
     <motion.div
@@ -191,19 +172,20 @@ function ComboCallout({
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.45, ease: EASE }}
       whileHover="lift"
-      className={`group rounded-lg border ${borderClass} p-4 transition-shadow hover:shadow-md`}
+      className="group club-card p-5"
     >
-      <div className="flex items-baseline gap-2 mb-2">
+      <div className="flex items-center gap-2 mb-2">
+        <span className={`size-3 rounded-full shrink-0 ${dotClass}`} aria-hidden />
         <span className="font-semibold">{title}</span>
         <motion.span
           variants={{ lift: { scale: 1.08 } }}
           transition={{ type: 'spring', stiffness: 360, damping: 22 }}
-          className="text-sm font-semibold tabular-nums text-foreground/70 inline-block origin-left"
+          className="text-sm font-bold tabular-nums text-ink-soft inline-block origin-left"
         >
           {score}
         </motion.span>
       </div>
-      <p className="text-sm text-foreground/70 leading-relaxed mb-3">{desc}</p>
+      <p className="text-sm text-ink-soft leading-relaxed mb-3">{desc}</p>
       <div className="flex gap-2">
         {cardIds.map((id, i) => (
           <motion.div
@@ -216,7 +198,7 @@ function ComboCallout({
               delay: i * 0.04,
             }}
           >
-            <MiniCard id={id} highlighted ringColor={ringColor} />
+            <MiniCard id={id} />
           </motion.div>
         ))}
       </div>
@@ -232,7 +214,7 @@ function GwangBlock() {
   return (
     <div>
       <CategoryHeader type="gwang" />
-      <p className="text-sm text-foreground/65 max-w-2xl leading-relaxed mb-5">
+      <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
         {locale === 'ko'
           ? '광은 다섯 장. 3장부터 점수가 들어와요. 하지만 12월 비광은 차감 효과가 있어서 비광 포함 3광은 2점.'
           : "There are five brights. Three or more begin to score — but the December Rain bright (비광 · Bigwang) discounts the score by one when it's part of the count."}
@@ -275,13 +257,11 @@ function GwangBlock() {
             whileHover={{ y: -3 }}
             className="flex flex-col items-center gap-1.5"
           >
-            <MiniCard id={g.id} highlighted={g.id === biggang} ringColor="outline-rose-500" />
-            <div className="text-[10px] text-foreground/60 tabular-nums">
+            <MiniCard id={g.id} />
+            <div className="text-xs text-ink-soft tabular-nums">
               {g.month}월
               {g.id === biggang && (
-                <span className="ml-1 text-rose-600 font-semibold">
-                  {locale === 'ko' ? '비광' : 'Rain'}
-                </span>
+                <span className="ml-1 text-ink font-bold">{locale === 'ko' ? '비광' : 'Rain'}</span>
               )}
             </div>
           </motion.div>
@@ -297,7 +277,7 @@ function TtiBlock() {
   return (
     <div>
       <CategoryHeader type="tti" />
-      <p className="text-sm text-foreground/65 max-w-2xl leading-relaxed mb-5">
+      <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
         {locale === 'ko'
           ? '띠 5장이면 1점, 한 장 추가될 때마다 +1점. 추가로 같은 색 띠 3장이 모이면 콤보 점수가 따로 들어와요.'
           : 'Five ribbons score 1 point, +1 per extra. Three of the same color form a separate combo bonus.'}
@@ -313,8 +293,7 @@ function TtiBlock() {
               : 'Red ribbons of January, February, March — poetry-inscribed.'
           }
           cardIds={HONGDAN}
-          ringColor="outline-rose-500"
-          borderClass="border-rose-300 bg-rose-500/5"
+          dotClass="bg-plum"
         />
         <ComboCallout
           title={locale === 'ko' ? '청단 (6·9·10월)' : 'Cheongdan · Blue ribbons'}
@@ -323,8 +302,7 @@ function TtiBlock() {
             locale === 'ko' ? '6월·9월·10월의 파란 띠' : 'Blue ribbons of June, September, October.'
           }
           cardIds={CHEONGDAN}
-          ringColor="outline-blue-500"
-          borderClass="border-blue-300 bg-blue-500/5"
+          dotClass="bg-sky"
         />
         <ComboCallout
           title={locale === 'ko' ? '초단 (4·5·7월)' : 'Chodan · Grass ribbons'}
@@ -333,12 +311,11 @@ function TtiBlock() {
             locale === 'ko' ? '4월·5월·7월의 초록 띠' : 'Grass-colored ribbons of April, May, July.'
           }
           cardIds={CHODAN}
-          ringColor="outline-green-600"
-          borderClass="border-green-300 bg-green-500/5"
+          dotClass="bg-sage"
         />
       </div>
 
-      <p className="text-xs text-foreground/50 mt-4 italic">
+      <p className="text-xs text-ink-soft mt-4">
         {locale === 'ko'
           ? '* 12월 띠는 콤보에 들어가지 않아요. 띠 카운트엔 포함.'
           : "* The December ribbon doesn't count toward any combo, but does add to total ribbon count."}
@@ -354,7 +331,7 @@ function KkeutBlock() {
   return (
     <div>
       <CategoryHeader type="kkeut" />
-      <p className="text-sm text-foreground/65 max-w-2xl leading-relaxed mb-5">
+      <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
         {locale === 'ko'
           ? '열 5장이면 1점, 한 장 추가될 때마다 +1점. 새 3마리를 모으면 고도리 콤보.'
           : 'Five animals score 1 point, +1 per extra. Collecting all three songbirds forms godori — a separate combo.'}
@@ -369,11 +346,10 @@ function KkeutBlock() {
             : 'Three bird animals — warbler (February), cuckoo (April), geese (August).'
         }
         cardIds={GODORI}
-        ringColor="outline-emerald-500"
-        borderClass="border-emerald-300 bg-emerald-500/5"
+        dotClass="bg-ink"
       />
 
-      <div className="text-[11px] uppercase tracking-[0.18em] text-foreground/50 mt-6 mb-2 font-semibold">
+      <div className="text-xs uppercase tracking-[0.18em] text-ink-soft mt-6 mb-2 font-semibold">
         {locale === 'ko' ? '전체 열 (9장)' : 'All animals (9)'}
       </div>
       <div className="flex flex-wrap gap-1.5">
@@ -385,11 +361,7 @@ function KkeutBlock() {
             viewport={{ once: true, margin: '-30px' }}
             transition={{ duration: 0.32, ease: EASE, delay: i * 0.04 }}
           >
-            <MiniCard
-              id={k.id}
-              highlighted={GODORI.includes(k.id)}
-              ringColor="outline-emerald-500"
-            />
+            <MiniCard id={k.id} dimmed={!GODORI.includes(k.id)} />
           </motion.div>
         ))}
       </div>
@@ -406,7 +378,7 @@ function PiBlock() {
   return (
     <div>
       <CategoryHeader type="pi" />
-      <p className="text-sm text-foreground/65 max-w-2xl leading-relaxed mb-5">
+      <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
         {locale === 'ko'
           ? '피 10장이면 1점, 한 장 추가될 때마다 +1점. 쌍피는 한 장이 두 장의 효과를 가져요.'
           : 'Ten junk score 1 point, +1 per extra. Double junk (쌍피) count as two each.'}
@@ -432,7 +404,7 @@ function PiBlock() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-30px' }}
                 transition={{ duration: 0.3, ease: EASE, delay: 8 * 0.03 }}
-                className="aspect-[2/3] w-14 sm:w-16 rounded-md bg-foreground/5 ring-1 ring-foreground/10 flex items-center justify-center text-[11px] text-foreground/50 tabular-nums"
+                className="aspect-[2/3] w-14 sm:w-16 flex items-center justify-center text-xs text-ink-soft tabular-nums"
               >
                 +{regularPi.length - 8}
               </motion.div>
@@ -440,11 +412,7 @@ function PiBlock() {
           </div>
         </Block>
 
-        <Block
-          label={locale === 'ko' ? '쌍피 (×2)' : 'Double junk (×2)'}
-          count={ssangPi.length}
-          accent="purple"
-        >
+        <Block label={locale === 'ko' ? '쌍피 (×2)' : 'Double junk (×2)'} count={ssangPi.length}>
           <div className="flex gap-1.5">
             {ssangPi.map((p, i) => (
               <motion.div
@@ -461,8 +429,8 @@ function PiBlock() {
                 whileHover={{ y: -3, scale: 1.04 }}
                 className="relative"
               >
-                <MiniCard id={p.id} highlighted ringColor="outline-purple-500" />
-                <span className="absolute -top-1 -right-1 text-[9px] font-bold bg-purple-600 text-white px-1 rounded-full leading-none py-0.5">
+                <MiniCard id={p.id} />
+                <span className="absolute -top-1 -right-1 text-xs font-bold bg-sage text-on-fill px-1.5 rounded-full leading-none py-0.5">
                   ×2
                 </span>
               </motion.div>
@@ -471,7 +439,7 @@ function PiBlock() {
         </Block>
       </div>
 
-      <p className="text-xs text-foreground/50 mt-4 italic">
+      <p className="text-xs text-ink-soft mt-4">
         {locale === 'ko'
           ? '* 보너스피(맞고 룰)는 같은 방식으로 ×2.'
           : '* Bonus pi (matgo only) similarly counts as 2.'}
@@ -480,28 +448,14 @@ function PiBlock() {
   );
 }
 
-function Block({
-  label,
-  count,
-  accent,
-  children,
-}: {
-  label: string;
-  count: number;
-  accent?: 'purple';
-  children: ReactNode;
-}) {
+function Block({ label, count, children }: { label: string; count: number; children: ReactNode }) {
   return (
     <div>
       <div className="flex items-baseline gap-2 mb-2">
-        <span
-          className={`text-[11px] uppercase tracking-[0.18em] font-semibold ${
-            accent === 'purple' ? 'text-purple-600 dark:text-purple-400' : 'text-foreground/60'
-          }`}
-        >
+        <span className="text-xs uppercase tracking-[0.18em] font-semibold text-ink-soft">
           {label}
         </span>
-        <span className="text-[11px] text-foreground/40 tabular-nums">({count})</span>
+        <span className="text-xs text-ink-soft tabular-nums">({count})</span>
       </div>
       {children}
     </div>

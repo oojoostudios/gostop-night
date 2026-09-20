@@ -194,6 +194,11 @@
 @utility text-ink-soft {
   color: var(--color-ink-soft);
 }
+/* Text on a gold or sage fill: the dark green that stays dark in BOTH modes
+ * (cream on gold fails contrast). Text on plum or ink uses `text-surface`. */
+@utility text-on-fill {
+  color: var(--palette-ink-light);
+}
 @utility border-hairline {
   border-color: var(--color-hairline);
 }
@@ -247,8 +252,8 @@
   background-image: linear-gradient(
     120deg,
     transparent 0%,
-    var(--sweep-color, oklch(0.85 0.18 80 / 0.55)) 25%,
-    var(--sweep-color, oklch(0.85 0.18 80 / 0.55)) 75%,
+    var(--sweep-color, color-mix(in oklab, var(--color-gold) 45%, transparent)) 25%,
+    var(--sweep-color, color-mix(in oklab, var(--color-gold) 45%, transparent)) 75%,
     transparent 100%
   );
   background-size: 0% 100%;
@@ -262,13 +267,13 @@
 }
 
 .sweep-mark-rose {
-  --sweep-color: oklch(0.78 0.18 18 / 0.4);
+  --sweep-color: color-mix(in oklab, var(--color-plum) 28%, transparent);
 }
 .sweep-mark-violet {
-  --sweep-color: oklch(0.78 0.18 295 / 0.4);
+  --sweep-color: color-mix(in oklab, var(--color-sky) 28%, transparent);
 }
 .sweep-mark-emerald {
-  --sweep-color: oklch(0.82 0.16 155 / 0.4);
+  --sweep-color: color-mix(in oklab, var(--color-sage) 40%, transparent);
 }
 
 /* live-dot breath: 게임 진행 인디케이터 — 점이 천천히 호흡 */
@@ -334,12 +339,11 @@
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
-/* 섹션별 배경 톤 — Mahjong 가이드 처럼 분위기 차등화                            */
-/* 한지 베이지 → 따뜻한 크림 → 세이지 → 짙은 녹색 매트 → 따뜻한 갈색 → 적색 톤   */
+/* Section backgrounds. "Vintage print" is flat paper: no tinted washes. The   */
+/* class names stay so the sections keep working; each one is just a marker.   */
+/* Content sits inside `lg:ml-72` + `max-w-5xl` (the fixed sidebar covers the   */
+/* left 288px on large screens).                                               */
 /* ────────────────────────────────────────────────────────────────────────── */
-/* IMPORTANT: layout.tsx에서 max-w 래퍼를 제거했기 때문에 section 자체가         */
-/* viewport full-width. bg는 section에 직접 적용. content는 section 내부에서   */
-/* `lg:ml-72` + `max-w-5xl mx-auto`로 제약. 사이드바는 fixed라 그 위를 덮음.    */
 
 .section-cards-bg,
 .section-flow-bg,
@@ -347,63 +351,6 @@
 .section-special-bg,
 .section-gostop-bg {
   position: relative;
-  background: var(--section-bg);
-}
-
-/* 섹션 01 화투 카드 — 따뜻한 한지 톤 */
-.section-cards-bg {
-  --section-bg: radial-gradient(ellipse 80% 60% at 50% 0%, var(--paper-deep) 0%, transparent 70%);
-}
-
-/* 섹션 02 분배 + 03 흐름 — 부드러운 펠트 (게임판 느낌) */
-.section-flow-bg {
-  --section-bg: radial-gradient(ellipse 70% 50% at 50% 30%, var(--felt-soft) 0%, transparent 75%);
-}
-.dark .section-flow-bg {
-  --section-bg: radial-gradient(ellipse 70% 50% at 50% 30%, var(--felt-soft) 0%, transparent 75%);
-}
-
-/* 섹션 04 점수 — 짙은 펠트 그린 (도박판 / 매트) */
-.section-scoring-bg {
-  --section-bg: linear-gradient(
-    180deg,
-    transparent 0%,
-    color-mix(in oklch, var(--felt) 12%, transparent) 8%,
-    color-mix(in oklch, var(--felt) 16%, transparent) 50%,
-    color-mix(in oklch, var(--felt) 12%, transparent) 92%,
-    transparent 100%
-  );
-}
-.dark .section-scoring-bg {
-  --section-bg: linear-gradient(
-    180deg,
-    transparent 0%,
-    color-mix(in oklch, var(--felt-deep) 55%, transparent) 8%,
-    color-mix(in oklch, var(--felt-deep) 65%, transparent) 50%,
-    color-mix(in oklch, var(--felt-deep) 55%, transparent) 92%,
-    transparent 100%
-  );
-}
-
-/* 섹션 05 특수 룰 — 따뜻한 매트 분위기 (살짝 적빛) */
-.section-special-bg {
-  --section-bg: radial-gradient(ellipse 70% 50% at 30% 30%, var(--mat-soft) 0%, transparent 75%);
-}
-
-/* 섹션 06 고/스톱 — 강렬한 화투 매트 빨강 (결정의 순간) */
-.section-gostop-bg {
-  --section-bg: radial-gradient(
-    ellipse 80% 55% at 50% 40%,
-    color-mix(in oklch, var(--mat) 18%, var(--paper)) 0%,
-    transparent 80%
-  );
-}
-.dark .section-gostop-bg {
-  --section-bg: radial-gradient(
-    ellipse 80% 55% at 50% 40%,
-    color-mix(in oklch, var(--mat-deep) 60%, transparent) 0%,
-    transparent 80%
-  );
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ */
@@ -535,6 +482,13 @@ body::before {
     background: var(--color-plum-deep);
   }
 
+  /* Inside a card, quiet chips and buttons take the paper color, so they still
+   * stand out from the surface. (Surface on surface would have no edge.) */
+  .club-card .club-chip:not([aria-pressed='true']),
+  .club-card .club-btn:not(.club-btn--primary) {
+    background: var(--color-paper);
+  }
+
   /* Keyboard focus only. A focus ring is an accessibility need, not decoration. */
   .club-chip:focus-visible,
   .club-btn:focus-visible,
@@ -573,21 +527,12 @@ body::before {
   }
 }
 
-/* score-cell-emphasis: 5광 / 최고 점수 셀의 펄싱 글로우 */
-@keyframes score-cell-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 oklch(0.78 0.18 75 / 0);
-  }
-  50% {
-    box-shadow: 0 0 0 6px oklch(0.78 0.18 75 / 0.18);
-  }
-}
+/* score-cell-emphasis: the top score cell (5 Brights etc.). A gold-tinted fill.
+ * No glow: shadows are not part of this design. */
 .score-cell-emphasis {
-  animation: score-cell-glow 2.6s ease-in-out infinite;
+  background: color-mix(in oklab, var(--color-gold) 22%, var(--color-surface));
 }
 @media (prefers-reduced-motion: reduce) {
-  .score-cell-emphasis,
   .card-fade-in {
     animation: none !important;
   }

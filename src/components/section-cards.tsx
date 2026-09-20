@@ -73,11 +73,13 @@ const MONTH_NOTE: Record<number, { ko: string; en: string }> = {
   },
 };
 
+// Type colors by meaning: Bright = gold, Ribbon = plum, Animal = ink, Junk = sage.
+// Label color follows the fill (dark on gold/sage, surface on plum/ink).
 const TYPE_BADGE: Record<HwatuType, string> = {
-  gwang: 'bg-amber-500 text-white',
-  tti: 'bg-rose-500 text-white',
-  kkeut: 'bg-emerald-600 text-white',
-  pi: 'bg-zinc-600 text-white',
+  gwang: 'bg-gold text-on-fill',
+  tti: 'bg-plum text-surface',
+  kkeut: 'bg-ink text-surface',
+  pi: 'bg-sage text-on-fill',
 };
 
 // Mahjong-guide-style overview: each type gets a hanja sigil + romanization +
@@ -93,7 +95,8 @@ const TYPE_OVERVIEW: Record<
     english: string;
     perMonth: number;
     formula: string;
-    accent: string;
+    /** Fill color of the small type dot */
+    dot: string;
     sample: ReadonlyArray<string>; // representative card ids
   }
 > = {
@@ -103,7 +106,7 @@ const TYPE_OVERVIEW: Record<
     english: 'Brights',
     perMonth: 1,
     formula: '5 × 1 = 5',
-    accent: 'border-amber-500/40 bg-amber-500/[0.06] dark:bg-amber-500/[0.08]',
+    dot: 'bg-gold',
     sample: ['01-gwang', '03-gwang', '08-gwang', '11-gwang', '12-gwang'],
   },
   tti: {
@@ -112,7 +115,7 @@ const TYPE_OVERVIEW: Record<
     english: 'Ribbons',
     perMonth: 1,
     formula: '10 × 1 = 10',
-    accent: 'border-rose-500/40 bg-rose-500/[0.06] dark:bg-rose-500/[0.08]',
+    dot: 'bg-plum',
     sample: ['01-tti', '02-tti', '06-tti', '10-tti', '12-tti'],
   },
   kkeut: {
@@ -121,7 +124,7 @@ const TYPE_OVERVIEW: Record<
     english: 'Animals',
     perMonth: 1,
     formula: '9 × 1 = 9',
-    accent: 'border-emerald-500/40 bg-emerald-500/[0.06] dark:bg-emerald-500/[0.08]',
+    dot: 'bg-ink',
     sample: ['02-kkeut', '04-kkeut', '08-kkeut', '09-kkeut', '10-kkeut'],
   },
   pi: {
@@ -130,7 +133,7 @@ const TYPE_OVERVIEW: Record<
     english: 'Junk',
     perMonth: 2,
     formula: 'Mostly 2 each = 24',
-    accent: 'border-zinc-500/40 bg-zinc-500/[0.06] dark:bg-zinc-500/[0.08]',
+    dot: 'bg-sage',
     sample: ['01-pi-1', '04-pi-1', '07-pi-1', '11-pi-1', '12-pi'],
   },
 };
@@ -174,24 +177,24 @@ export function SectionCards() {
   return (
     <section
       id="section-cards"
-      className="relative py-24 border-t border-foreground/10 section-cards-bg"
+      className="relative py-24 border-t border-hairline section-cards-bg"
     >
       <div className="lg:ml-72">
         <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
-          <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
-            SECTION 01
-          </FadeInOnView>
           <FadeInOnView
             as="h2"
             delay={0.05}
-            className="text-4xl md:text-5xl font-semibold tracking-tight mb-6"
+            className="font-display text-4xl md:text-5xl leading-tight mb-6"
           >
-            {locale === 'ko' ? '화투 카드란?' : 'What are hwatu cards?'}
+            <span className="text-plum">01</span>
+            <span className="ml-4">
+              {locale === 'ko' ? '화투 카드란?' : 'What are hwatu cards?'}
+            </span>
           </FadeInOnView>
           <FadeInOnView
             as="p"
             delay={0.12}
-            className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-10"
+            className="text-lg text-ink-soft max-w-2xl leading-relaxed mb-10"
           >
             {locale === 'ko'
               ? '12달 × 4장 = 48장. 각 카드는 4가지 종류 중 하나에 속해요. 필터로 종류를 골라보고, 카드를 클릭하면 자세한 정보가 옆에 떠요.'
@@ -233,23 +236,23 @@ export function SectionCards() {
                 return (
                   <div
                     key={month.num}
-                    className="grid grid-cols-1 sm:grid-cols-[minmax(0,170px)_1fr] gap-3 sm:gap-5 items-start py-2 border-t border-foreground/[0.06] first:border-t-0"
+                    className="grid grid-cols-1 sm:grid-cols-[minmax(0,170px)_1fr] gap-3 sm:gap-5 items-start py-2 border-t border-hairline first:border-t-0"
                   >
                     {/* Info column (left) — month number, motif Ko/En, lore */}
                     <div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-semibold tabular-nums leading-none">
+                        <span className="text-2xl font-bold tabular-nums leading-none">
                           {month.num.toString().padStart(2, '0')}
                         </span>
-                        <span className="text-sm font-semibold text-foreground/85">
+                        <span className="text-sm font-semibold text-ink">
                           {locale === 'ko' ? month.motifKo : month.motif}
                         </span>
                       </div>
-                      <div className="text-[11px] text-foreground/50 mt-0.5">
+                      <div className="text-xs text-ink-soft mt-0.5">
                         {locale === 'ko' ? month.motif : month.motifKo}
                       </div>
                       {note && (
-                        <p className="text-[11px] text-foreground/65 mt-2 leading-snug max-w-[16rem]">
+                        <p className="text-xs text-ink-soft mt-2 leading-snug max-w-[16rem]">
                           {locale === 'ko' ? note.ko : note.en}
                         </p>
                       )}
@@ -297,7 +300,7 @@ export function SectionCards() {
  *
  * Uses HeroUI v3 `Drawer` with `placement="bottom"`. (HeroUI's `Sheet` with
  * snap-points exists in their staging docs but isn't shipped in 3.0.3 yet —
- * Drawer covers our needs: drag handle, swipe-to-dismiss, blurred backdrop,
+ * Drawer covers our needs: drag handle, swipe-to-dismiss, dimmed backdrop,
  * focus trap, body scroll lock.)
  *
  * The desktop sticky panel takes over on lg+ via `lg:hidden` on the dialog,
@@ -316,15 +319,13 @@ function MobileCardSheet({ card, onClose }: { card: HwatuCardData | null; onClos
         if (!open) onClose();
       }}
     >
-      {/* Backdrop — warm dark overlay (not generic black) so it reads as
-       * "the room dimmed around the card" rather than a modal wash. */}
-      <Drawer.Backdrop variant="blur" className="bg-[oklch(0.18_0.02_60_/_0.45)]">
+      {/* Backdrop — flat ink tint so it reads as "the room dimmed around the card". */}
+      <Drawer.Backdrop variant="opaque" className="bg-ink/40">
         <Drawer.Content placement="bottom">
-          {/* Dialog — paper surface with warm hairline border + soft shadow.
-           * Larger top radius so it visually "lifts" from the floor edge. */}
-          <Drawer.Dialog className="max-h-[90vh] !rounded-t-2xl border-t border-x border-[var(--line)] bg-[var(--card)] shadow-[0_-12px_40px_-8px_rgba(75,54,24,0.18)]">
-            <Drawer.Handle className="[&_*]:bg-[var(--ink)]/25" />
-            <Drawer.CloseTrigger className="text-[var(--muted-ink)] hover:text-[var(--ink)]" />
+          {/* Dialog — a flat surface sheet, separated from the page by color. */}
+          <Drawer.Dialog className="max-h-[90vh] !rounded-t-card bg-surface">
+            <Drawer.Handle className="[&_*]:bg-ink/25" />
+            <Drawer.CloseTrigger className="text-ink-soft hover:text-ink" />
             <Drawer.Body className="pb-8">
               {card && <DetailPanel card={card} onClear={onClose} framed={false} />}
             </Drawer.Body>
@@ -338,7 +339,7 @@ function MobileCardSheet({ card, onClose }: { card: HwatuCardData | null; onClos
 function TypeOverview({ typeCounts }: { typeCounts: Record<HwatuType, number> }) {
   const { locale } = useLocale();
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-12">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
       {TYPE_ORDER.map((t, i) => {
         const meta = HWATU_TYPES[t];
         const ov = TYPE_OVERVIEW[t];
@@ -354,18 +355,14 @@ function TypeOverview({ typeCounts }: { typeCounts: Record<HwatuType, number> })
               ease: [0.16, 1, 0.3, 1],
               delay: i * 0.06,
             }}
-            className={`relative rounded-lg border ${ov.accent} p-5`}
+            className="club-card relative p-6"
           >
             <div className="flex items-start gap-4 mb-3">
               <div className="flex flex-col items-center min-w-[3rem]">
-                <span
-                  className="text-4xl leading-none font-normal text-foreground/85"
-                  style={{ fontFamily: 'var(--font-accent)' }}
-                  aria-hidden
-                >
+                <span className="font-display text-4xl leading-none text-ink" aria-hidden>
                   {ov.hanja}
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.18em] text-foreground/50 mt-1 tabular-nums">
+                <span className="text-xs uppercase tracking-[0.18em] text-ink-soft mt-1 tabular-nums">
                   {ov.roman}
                 </span>
               </div>
@@ -374,23 +371,24 @@ function TypeOverview({ typeCounts }: { typeCounts: Record<HwatuType, number> })
                   {/* Mahjong-guide-style trio: native term first, with the
                    * "other side" + romanization as a small subtitle so EN
                    * readers always see what 광/띠/열/피 mean. */}
-                  <h3 className="text-2xl font-semibold tracking-tight">
+                  <span className={`size-2.5 rounded-full self-center ${ov.dot}`} aria-hidden />
+                  <h3 className="font-display text-2xl">
                     {locale === 'ko' ? meta.labelKo : ov.english}
                   </h3>
-                  <span className="text-xs text-foreground/50">
+                  <span className="text-xs text-ink-soft">
                     {locale === 'ko'
                       ? `${ov.english} · ${ov.roman}`
                       : `${meta.labelKo} · ${ov.roman}`}
                   </span>
                 </div>
-                <div className="text-[11px] uppercase tracking-wider text-foreground/55 tabular-nums mt-0.5">
-                  {ov.formula} <span className="text-foreground/35 mx-1">·</span> {count}{' '}
+                <div className="text-xs uppercase tracking-wider text-ink-soft tabular-nums mt-0.5">
+                  {ov.formula} <span className="text-ink-soft mx-1">·</span> {count}{' '}
                   {locale === 'ko' ? '장' : 'cards'}
                 </div>
               </div>
             </div>
 
-            <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+            <p className="text-sm text-ink-soft leading-relaxed mb-4">
               {locale === 'ko' ? TYPE_BLURB_DETAIL[t].ko : TYPE_BLURB_DETAIL[t].en}
             </p>
 
@@ -410,7 +408,7 @@ function TypeOverview({ typeCounts }: { typeCounts: Record<HwatuType, number> })
                       delay: 0.15 + idx * 0.04,
                     }}
                     whileHover={{ y: -3 }}
-                    className="relative aspect-[2/3] w-12 sm:w-14 rounded-md overflow-hidden ring-1 ring-black/10 bg-white shrink-0"
+                    className="relative aspect-[2/3] w-12 sm:w-14 shrink-0"
                   >
                     <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
                   </motion.div>
@@ -441,35 +439,20 @@ function FilterChip({
     <motion.button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       whileTap={{ scale: 0.94 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 0.6 }}
-      className={`relative flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm transition-colors ${
-        active
-          ? 'text-white'
-          : 'text-foreground/70 hover:bg-foreground/10 hover:text-foreground bg-foreground/5'
-      }`}
+      className="club-chip gap-2 px-3.5 py-1.5"
     >
-      {active && (
-        <motion.span
-          layoutId="cards-filter-pill"
-          className="absolute inset-0 rounded-full"
-          style={{ backgroundColor: 'var(--mat)' }}
-          transition={{
-            type: 'spring',
-            stiffness: 480,
-            damping: 28,
-            mass: 0.7,
-          }}
+      {badgeClassName && (
+        <span
+          className={`size-2 rounded-full ${active ? 'bg-surface' : badgeClassName.split(' ')[0]}`}
+          aria-hidden
         />
       )}
-      <span className="relative flex items-center gap-2 z-10">
-        {badgeClassName && (
-          <span className={`size-1.5 rounded-full ${badgeClassName.split(' ')[0]}`} aria-hidden />
-        )}
-        <span className="font-medium">{label}</span>
-        <span className={`text-xs tabular-nums ${active ? 'text-white/70' : 'text-foreground/40'}`}>
-          {count}
-        </span>
+      <span className="font-medium">{label}</span>
+      <span className={active ? 'text-xs tabular-nums' : 'text-xs tabular-nums text-ink-soft'}>
+        {count}
       </span>
     </motion.button>
   );
@@ -482,7 +465,7 @@ function DetailPanel({
 }: {
   card: HwatuCardData | null;
   onClear: () => void;
-  /** Wrap the content in a border+bg frame. Off when shown inside a Drawer
+  /** Wrap the content in a club-card frame. Off when shown inside a Drawer
    *  (the Drawer surface itself acts as the frame — double frames look bad). */
   framed?: boolean;
 }) {
@@ -490,8 +473,8 @@ function DetailPanel({
 
   if (!card) {
     return (
-      <div className="rounded-lg border border-dashed border-foreground/15 p-6 text-center">
-        <div className="text-sm text-foreground/60">
+      <div className="club-card p-6 text-center">
+        <div className="text-sm text-ink-soft">
           {locale === 'ko'
             ? '카드를 클릭하면 여기에 자세한 정보가 떠요.'
             : 'Click any card to see details here.'}
@@ -511,9 +494,7 @@ function DetailPanel({
         exit={{ opacity: 0, scale: 0.98, y: -4 }}
         transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
         style={{ transformOrigin: 'center top' }}
-        className={`overflow-hidden ${
-          framed ? 'rounded-lg border border-foreground/15 bg-foreground/[0.02]' : ''
-        }`}
+        className={`overflow-hidden ${framed ? 'club-card' : ''}`}
       >
         {/* Inline close — desktop sticky panel only.
          * On mobile we render inside a Drawer which has its own CloseTrigger,
@@ -524,14 +505,14 @@ function DetailPanel({
             onClick={onClear}
             whileTap={{ scale: 0.88 }}
             aria-label="Close detail"
-            className="text-foreground/40 hover:text-foreground/80 text-sm leading-none p-1 -m-1"
+            className="text-ink-soft hover:text-ink text-sm leading-none p-1 -m-1"
           >
             ✕
           </motion.button>
         </div>
 
         <div className="px-5">
-          <div className="aspect-[2/3] relative max-w-[200px] mx-auto rounded-md overflow-hidden ring-1 ring-black/10 bg-white">
+          <div className="aspect-[2/3] relative max-w-[200px] mx-auto">
             <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
           </div>
         </div>
@@ -539,7 +520,7 @@ function DetailPanel({
         <div className="p-5">
           <div className="flex items-center gap-2 mb-2">
             <span
-              className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm font-semibold ${TYPE_BADGE[card.type]}`}
+              className={`text-xs uppercase tracking-wider px-2.5 py-0.5 rounded-full font-bold ${TYPE_BADGE[card.type]}`}
             >
               {locale === 'ko'
                 ? (card.typeLabelKo ?? typeMeta.labelKo)
@@ -547,16 +528,16 @@ function DetailPanel({
             </span>
           </div>
           <CardCaption card={card} />
-          <p className="mt-3 text-sm text-foreground/70 leading-relaxed">
+          <p className="mt-3 text-sm text-ink-soft leading-relaxed">
             {locale === 'ko' ? typeMeta.blurbKo : typeMeta.blurb}
           </p>
 
           {(card.lore || card.loreKo) && (
-            <div className="mt-4 pt-4 border-t border-foreground/10">
-              <div className="text-[10px] uppercase tracking-[0.18em] text-foreground/50 mb-1.5">
+            <div className="mt-4 pt-4 border-t border-hairline">
+              <div className="text-xs uppercase tracking-[0.18em] text-ink-soft mb-1.5">
                 {locale === 'ko' ? '이야기' : 'Lore'}
               </div>
-              <p className="text-sm text-foreground/70 leading-relaxed">
+              <p className="text-sm text-ink-soft leading-relaxed">
                 {locale === 'ko' ? card.loreKo : card.lore}
               </p>
             </div>

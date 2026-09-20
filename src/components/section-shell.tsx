@@ -36,9 +36,7 @@ export function SectionShell({
   return (
     <section
       id={id}
-      className={`relative ${
-        bordered ? 'border-t border-foreground/10' : ''
-      } ${className ?? ''}`.trim()}
+      className={`relative ${bordered ? 'border-t border-hairline' : ''} ${className ?? ''}`.trim()}
     >
       <div className="lg:ml-72">
         <div className={`max-w-5xl mx-auto px-6 sm:px-8 lg:px-16 ${innerClassName ?? ''}`.trim()}>

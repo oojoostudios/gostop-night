@@ -6,10 +6,10 @@ import { cardLabel, type HwatuCard as HwatuCardData } from '@/lib/hwatu';
 
 export function HwatuCard({
   card,
-  isActive,
   onSelect,
 }: {
   card: HwatuCardData;
+  /** Kept so callers can still pass it; a parent that wants to dim other cards does so itself. */
   isActive?: boolean;
   onSelect?: (card: HwatuCardData) => void;
 }) {
@@ -21,9 +21,7 @@ export function HwatuCard({
       whileTap={{ scale: 0.94, y: -2 }}
       transition={{ type: 'spring', stiffness: 600, damping: 22, mass: 0.5 }}
       aria-label={cardLabel(card)}
-      className={`relative w-full aspect-[2/3] rounded-md overflow-hidden bg-white shadow-sm ring-1 ring-black/10 transition-shadow hover:shadow-md ${
-        isActive ? 'outline outline-2 outline-offset-2 outline-foreground' : ''
-      }`}
+      className="relative w-full aspect-[2/3]"
     >
       <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
     </motion.button>

@@ -14,7 +14,7 @@ export function GameTabs() {
     <div
       role="tablist"
       aria-label={locale === 'ko' ? '게임 선택' : 'Pick a game'}
-      className="grid grid-cols-2 rounded-md border border-foreground/10 p-0.5 bg-foreground/[0.04]"
+      className="grid grid-cols-2 rounded-full p-0.5 bg-surface"
     >
       {VISIBLE_GAMES.map((game) => {
         const isActive = active === game.id;
@@ -24,16 +24,14 @@ export function GameTabs() {
             href={game.path}
             role="tab"
             aria-selected={isActive}
-            className={`flex flex-col items-center justify-center text-center py-2 rounded transition-colors ${
-              isActive
-                ? 'bg-background text-foreground shadow-sm ring-1 ring-foreground/[0.06]'
-                : 'text-foreground/55 hover:text-foreground'
+            className={`flex flex-col items-center justify-center text-center py-2 rounded-full transition-colors ${
+              isActive ? 'bg-plum text-surface' : 'text-ink-soft hover:text-ink'
             }`}
           >
-            <span className="text-sm font-semibold leading-tight">
+            <span className="text-sm font-bold leading-tight">
               {locale === 'ko' ? game.labelKo : game.labelEn}
             </span>
-            <span className="text-[10px] opacity-60 leading-tight mt-0.5">
+            <span className="text-xs leading-tight mt-0.5">
               {locale === 'ko' ? game.labelEn : game.labelKo}
             </span>
           </Link>

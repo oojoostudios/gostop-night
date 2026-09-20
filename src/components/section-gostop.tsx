@@ -102,24 +102,22 @@ export function SectionGoStop() {
   return (
     <section
       id="section-gostop"
-      className="relative py-24 border-t border-foreground/10 section-gostop-bg"
+      className="relative py-24 border-t border-hairline section-gostop-bg"
     >
       <div className="lg:ml-72">
         <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
-          <FadeInOnView className="text-xs tabular-nums text-foreground/50 mb-4">
-            SECTION 06
-          </FadeInOnView>
           <FadeInOnView
             as="h2"
             delay={0.05}
-            className="text-4xl md:text-5xl font-semibold tracking-tight mb-6"
+            className="font-display text-4xl md:text-5xl leading-tight mb-6"
           >
-            {locale === 'ko' ? '고냐 스톱이냐' : 'Go or Stop?'}
+            <span className="text-plum">06</span>
+            <span className="ml-4">{locale === 'ko' ? '고냐 스톱이냐' : 'Go or Stop?'}</span>
           </FadeInOnView>
           <FadeInOnView
             as="p"
             delay={0.12}
-            className="text-lg text-foreground/60 max-w-2xl leading-relaxed mb-12"
+            className="text-lg text-ink-soft max-w-2xl leading-relaxed mb-12"
           >
             {locale === 'ko'
               ? '게임 이름에 들어간 그 결정. 7점에 도달하는 순간, 멈출지 더 갈지를 직접 골라야 해요. 욕심과 리스크 사이의 줄타기.'
@@ -129,11 +127,11 @@ export function SectionGoStop() {
           <DecisionMoment />
 
           <div className="mt-16">
-            <h3 className="text-sm uppercase tracking-[0.18em] font-semibold text-foreground/70 mb-5">
+            <h3 className="text-sm uppercase tracking-[0.18em] font-semibold text-ink-soft mb-5">
               {locale === 'ko' ? '고 진행 — 배수표' : 'Go progression — multipliers'}
             </h3>
             <MultiplierTable />
-            <p className="text-xs text-foreground/55 mt-3 italic max-w-2xl">
+            <p className="text-xs text-ink-soft mt-4 max-w-[65ch]">
               {locale === 'ko'
                 ? '* 고할 때마다 점수를 1점 이상 더 올려야 다시 고할 수 있어요. 못 올리면 라운드 자체가 무효 (낙장 / 나가리).'
                 : '* Each go requires you to score at least one more point before calling again. Fall short and the round can be voided.'}
@@ -141,7 +139,7 @@ export function SectionGoStop() {
           </div>
 
           <div className="mt-16">
-            <h3 className="text-sm uppercase tracking-[0.18em] font-semibold text-foreground/70 mb-5">
+            <h3 className="text-sm uppercase tracking-[0.18em] font-semibold text-ink-soft mb-5">
               {locale === 'ko' ? '직접 골라보기' : 'Try the call'}
             </h3>
             <div className="space-y-4">
@@ -163,13 +161,13 @@ function DecisionMoment() {
   const [hover, setHover] = useState<Choice | null>(null);
 
   return (
-    <div className="rounded-xl border border-foreground/15 bg-foreground/[0.02] p-6 md:p-10">
+    <div className="club-card p-6 md:p-10">
       <div className="text-center mb-6">
-        <div className="text-[10px] uppercase tracking-[0.22em] text-foreground/50 mb-2">
+        <div className="text-xs uppercase tracking-[0.22em] text-ink-soft mb-2">
           {locale === 'ko' ? '내 점수' : 'Your score'}
         </div>
-        <div className="text-7xl md:text-8xl font-semibold tabular-nums tracking-tight">7</div>
-        <div className="text-sm text-foreground/55 mt-1">
+        <div className="text-7xl md:text-8xl font-bold tabular-nums">7</div>
+        <div className="text-sm text-ink-soft mt-1">
           {locale === 'ko' ? '결정해야 해요' : 'Time to decide'}
         </div>
       </div>
@@ -179,7 +177,7 @@ function DecisionMoment() {
           choice="stop"
           active={hover === 'stop'}
           onHover={(b) => setHover(b ? 'stop' : null)}
-          accent="emerald"
+          accent="sage"
           icon={<ShieldCheck className="size-4" />}
           label={locale === 'ko' ? '스톱' : 'Stop'}
           subtitle={locale === 'ko' ? '라운드 종료' : 'End the round'}
@@ -193,7 +191,7 @@ function DecisionMoment() {
           choice="go"
           active={hover === 'go'}
           onHover={(b) => setHover(b ? 'go' : null)}
-          accent="amber"
+          accent="gold"
           icon={<Zap className="size-4" />}
           label={locale === 'ko' ? '고' : 'Go'}
           subtitle={locale === 'ko' ? '한 번 더 노려요' : 'Push for more'}
@@ -221,41 +219,36 @@ function PathCard({
   choice: Choice;
   active: boolean;
   onHover: (h: boolean) => void;
-  accent: 'emerald' | 'amber';
+  accent: 'sage' | 'gold';
   icon: React.ReactNode;
   label: string;
   subtitle: string;
   desc: string;
 }) {
   void choice;
+  // Fill colors by meaning: sage = safe (Stop), gold = risky push (Go).
   const cls =
-    accent === 'emerald'
-      ? {
-          bg: 'bg-emerald-500/5',
-          border: 'border-emerald-500/40',
-          text: 'text-emerald-700 dark:text-emerald-400',
-          hover: 'hover:border-emerald-500/70 hover:bg-emerald-500/10',
-        }
-      : {
-          bg: 'bg-amber-500/5',
-          border: 'border-amber-500/40',
-          text: 'text-amber-700 dark:text-amber-400',
-          hover: 'hover:border-amber-500/70 hover:bg-amber-500/10',
-        };
+    accent === 'sage'
+      ? { dot: 'bg-sage', hover: 'hover:bg-sage/15' }
+      : { dot: 'bg-gold', hover: 'hover:bg-gold/20' };
   return (
     <motion.div
       onMouseEnter={() => onHover(true)}
       onMouseLeave={() => onHover(false)}
       animate={{ scale: active ? 1.015 : 1 }}
       transition={{ type: 'spring', stiffness: 360, damping: 26 }}
-      className={`rounded-lg border p-5 transition-colors cursor-default ${cls.bg} ${cls.border} ${cls.hover}`}
+      className={`rounded-card bg-paper p-6 transition-colors cursor-default ${cls.hover}`}
     >
-      <div className={`flex items-center gap-2 mb-1.5 ${cls.text}`}>
-        {icon}
-        <span className="text-xl font-semibold tracking-tight">{label}</span>
+      <div className="flex items-center gap-3 mb-2">
+        <span
+          className={`inline-flex size-8 shrink-0 items-center justify-center rounded-full text-on-fill ${cls.dot}`}
+        >
+          {icon}
+        </span>
+        <span className="font-display text-2xl">{label}</span>
       </div>
-      <div className="text-sm text-foreground/60 mb-3">{subtitle}</div>
-      <p className="text-sm text-foreground/75 leading-relaxed">{desc}</p>
+      <div className="text-sm text-ink-soft mb-3">{subtitle}</div>
+      <p className="text-sm text-ink leading-relaxed">{desc}</p>
     </motion.div>
   );
 }
@@ -310,19 +303,17 @@ function MultiplierTable() {
     },
   ];
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
       {rows.map((r) => (
         <div
           key={r.label}
-          className={`rounded-md border p-3 ${
-            r.emphasis ? 'border-amber-500/60 bg-amber-500/5' : 'border-foreground/15'
-          }`}
+          className={`rounded-card p-4 ${r.emphasis ? 'bg-gold/30' : 'bg-surface'}`}
         >
-          <div className="text-[11px] uppercase tracking-wider font-semibold text-foreground/60 mb-0.5">
+          <div className="text-xs uppercase tracking-wider font-semibold text-ink-soft mb-1">
             {locale === 'ko' ? r.labelKo : r.label}
           </div>
-          <div className="text-xl font-semibold tabular-nums">{r.mult}</div>
-          <div className="text-[11px] text-foreground/55 leading-snug mt-1">
+          <div className="text-xl font-bold tabular-nums">{r.mult}</div>
+          <div className="text-xs text-ink-soft leading-snug mt-1">
             {locale === 'ko' ? r.noteKo : r.note}
           </div>
         </div>
@@ -341,21 +332,19 @@ function ScenarioCard({ scenario }: { scenario: Scenario }) {
   const reset = () => setState({});
 
   return (
-    <div className="rounded-lg border border-foreground/15 bg-foreground/[0.02] p-5">
-      <h4 className="text-base font-semibold tracking-tight mb-1">
+    <div className="club-card p-6">
+      <h4 className="font-display text-xl mb-2">
         {locale === 'ko' ? scenario.titleKo : scenario.title}
       </h4>
-      <p className="text-sm text-foreground/70 leading-relaxed mb-4">
+      <p className="text-sm text-ink-soft leading-relaxed mb-4">
         {locale === 'ko' ? scenario.setupKo : scenario.setup}
       </p>
 
       <div className="flex flex-wrap gap-2 mb-5">
         {scenario.facts.map((f) => (
-          <div key={f.label} className="rounded-md bg-foreground/5 px-2.5 py-1 text-xs">
-            <span className="text-foreground/50 mr-1.5">
-              {locale === 'ko' ? f.labelKo : f.label}
-            </span>
-            <span className="font-semibold tabular-nums">{f.value}</span>
+          <div key={f.label} className="rounded-md bg-paper px-3 py-1.5 text-xs">
+            <span className="text-ink-soft mr-1.5">{locale === 'ko' ? f.labelKo : f.label}</span>
+            <span className="font-bold tabular-nums">{f.value}</span>
           </div>
         ))}
       </div>
@@ -367,24 +356,20 @@ function ScenarioCard({ scenario }: { scenario: Scenario }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="grid grid-cols-2 gap-2 max-w-sm"
+            className="grid grid-cols-2 gap-3 max-w-sm"
           >
-            <Button
-              variant="outline"
-              onPress={() => pick('stop')}
-              className="justify-center gap-1.5 border-emerald-500/50 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10"
+            <button
+              type="button"
+              onClick={() => pick('stop')}
+              className="club-btn club-btn--primary"
             >
               <ShieldCheck className="size-4" />
               {locale === 'ko' ? '스톱' : 'Stop'}
-            </Button>
-            <Button
-              variant="outline"
-              onPress={() => pick('go')}
-              className="justify-center gap-1.5 border-amber-500/50 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10"
-            >
+            </button>
+            <button type="button" onClick={() => pick('go')} className="club-btn">
               <Zap className="size-4" />
               {locale === 'ko' ? '고' : 'Go'}
-            </Button>
+            </button>
           </motion.div>
         ) : (
           <motion.div
@@ -422,16 +407,12 @@ function Verdict({ choice, best, reasoning }: { choice: Choice; best: Choice; re
   const { locale } = useLocale();
   const correct = choice === best;
   return (
-    <div
-      className={`rounded-md border px-4 py-3 ${
-        correct ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-rose-500/40 bg-rose-500/5'
-      }`}
-    >
-      <div
-        className={`text-xs font-semibold uppercase tracking-wider mb-1.5 flex items-center gap-1.5 ${
-          correct ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'
-        }`}
-      >
+    <div className={`rounded-card px-5 py-4 ${correct ? 'bg-sage/25' : 'bg-plum/15'}`}>
+      <div className="text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2 text-ink">
+        <span
+          className={`size-2.5 shrink-0 rounded-full ${correct ? 'bg-sage' : 'bg-plum'}`}
+          aria-hidden
+        />
         {correct
           ? locale === 'ko'
             ? '좋은 선택'
@@ -440,7 +421,7 @@ function Verdict({ choice, best, reasoning }: { choice: Choice; best: Choice; re
             ? '위험한 선택'
             : 'Risky pick'}
         <ArrowRight className="size-3.5" />
-        <span className="font-normal normal-case tracking-normal text-foreground/60">
+        <span className="font-normal normal-case tracking-normal text-ink-soft">
           {locale === 'ko'
             ? choice === 'stop'
               ? '스톱했어요'
@@ -450,7 +431,7 @@ function Verdict({ choice, best, reasoning }: { choice: Choice; best: Choice; re
               : 'you chose go'}
         </span>
       </div>
-      <p className="text-sm text-foreground/75 leading-relaxed">{reasoning}</p>
+      <p className="text-sm text-ink leading-relaxed max-w-[65ch]">{reasoning}</p>
     </div>
   );
 }

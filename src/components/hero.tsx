@@ -64,8 +64,6 @@ export function Hero({
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center py-20 overflow-hidden">
-      <FloatingShapes />
-
       <div className="lg:ml-72 relative z-10 w-full">
         <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl px-6 sm:px-8 grid grid-cols-1 xl:grid-cols-[auto_auto] gap-10 xl:gap-2 items-center">
           {/* LEFT — title block */}
@@ -75,17 +73,12 @@ export function Hero({
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
-              className="text-xs uppercase tracking-[0.2em] text-foreground/55 mb-6 flex items-center gap-2 flex-wrap"
+              className="text-xs uppercase tracking-[0.2em] text-ink-soft mb-6 flex items-center gap-2 flex-wrap"
             >
-              <span
-                className="live-dot size-1.5 rounded-full bg-rose-500/70 text-rose-500/70"
-                aria-hidden
-              />
+              <span className="live-dot size-1.5 rounded-full bg-plum text-plum" aria-hidden />
               <span>{eyebrowMain}</span>
-              <span className="text-foreground/30">·</span>
-              <span className="font-[var(--font-accent)] not-italic text-sm tracking-normal text-foreground/70">
-                {eyebrowAccent}
-              </span>
+              <span className="text-ink-soft">·</span>
+              <span className="text-sm tracking-normal text-ink-soft">{eyebrowAccent}</span>
             </motion.div>
 
             <motion.h1
@@ -93,27 +86,17 @@ export function Hero({
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.55, ease: EASE }}
-              className="text-5xl sm:text-6xl md:text-7xl font-semibold tracking-tight leading-[1.05] mb-3"
+              className="font-display text-5xl sm:text-6xl md:text-7xl leading-[1.05] mb-3"
             >
               {locale === 'ko' ? (
                 <>
                   <span>고스톱을 </span>
-                  <span
-                    className="italic font-normal text-rose-700 dark:text-rose-400"
-                    style={{ fontFamily: 'var(--font-accent)' }}
-                  >
-                    배워봐요
-                  </span>
+                  <span className="text-plum">배워봐요</span>
                 </>
               ) : (
                 <>
                   <span>{learn} </span>
-                  <span
-                    className="italic font-normal text-rose-700 dark:text-rose-400"
-                    style={{ fontFamily: 'var(--font-accent)' }}
-                  >
-                    {accentWord}
-                  </span>
+                  <span className="text-plum">{accentWord}</span>
                 </>
               )}
             </motion.h1>
@@ -123,11 +106,9 @@ export function Hero({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.55, ease: EASE }}
-              className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-[1.05] text-foreground/45 mb-3"
+              className="font-display text-3xl sm:text-4xl md:text-5xl leading-[1.05] text-ink-soft mb-3"
             >
-              <span className="italic font-normal" style={{ fontFamily: 'var(--font-accent)' }}>
-                {subhead}
-              </span>
+              <span>{subhead}</span>
             </motion.div>
 
             {/* Explicit deck-relationship tagline — clarifies that go-stop
@@ -137,7 +118,7 @@ export function Hero({
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.28, duration: 0.55, ease: EASE }}
-              className="text-base sm:text-lg text-foreground/55 mb-7"
+              className="text-base sm:text-lg text-ink-soft mb-7"
             >
               {deckLine}
             </motion.div>
@@ -147,7 +128,7 @@ export function Hero({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.55, ease: EASE }}
-              className="text-base md:text-lg text-foreground/70 max-w-xl leading-relaxed mb-10"
+              className="text-base md:text-lg text-ink-soft max-w-xl leading-relaxed mb-10"
             >
               {blurb}
             </motion.p>
@@ -182,12 +163,12 @@ function StatsRow({ locale }: { locale: 'ko' | 'en' }) {
             visible: { opacity: 1, y: 0 },
           }}
           transition={{ duration: 0.4, ease: EASE }}
-          className="border-l-2 border-foreground/15 pl-3"
+          className="border-l border-hairline pl-3"
         >
-          <div className="text-3xl md:text-4xl font-semibold tabular-nums tracking-tight leading-none">
+          <div className="text-3xl md:text-4xl font-bold tabular-nums text-ink leading-none">
             {s.num}
           </div>
-          <div className="text-[11px] sm:text-xs text-foreground/55 mt-1.5 leading-snug">
+          <div className="text-sm text-ink-soft mt-1.5 leading-snug">
             {locale === 'ko' ? s.labelKo : s.labelEn}
           </div>
         </motion.div>
@@ -215,16 +196,6 @@ function CardFan() {
        * card distances and sizes still line up. On lg+ it renders at full size.
        */}
       <div className="absolute left-1/2 top-1/2 w-[400px] h-[400px] -ml-[200px] -mt-[200px] origin-center scale-[0.65] xl:scale-100">
-        {/* Concentric ambient rings — decorative, must not block card hover */}
-        <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-amber-500/[0.06] via-rose-500/[0.04] to-transparent blur-2xl" />
-
-        {/* Slow rotation halo — rendered UNDER cards, pointer-events-none */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-          className="pointer-events-none absolute inset-8 rounded-full border border-dashed border-foreground/10"
-        />
-
         {FAN_CARDS.map((src, i) => {
           // Fan geometry — each card rotated around its bottom anchor
           const angle = (i - middle) * 14; // degrees
@@ -265,14 +236,10 @@ function CardFan() {
                 delay: hoveredIdx === null ? 0.4 + i * 0.06 : 0,
               }}
               whileTap={{ y: y - 14, scale: 1.02 }}
-              className="absolute left-1/2 top-1/2 w-32 h-48 -ml-16 -mt-24 rounded-md overflow-hidden bg-white cursor-pointer ring-1 ring-black/15"
+              className="absolute left-1/2 top-1/2 w-32 h-48 -ml-16 -mt-24 cursor-pointer"
               style={{
                 transformOrigin: 'center bottom',
                 zIndex: isHovered ? 50 : baseZ,
-                boxShadow: isHovered
-                  ? '0 18px 30px -12px rgba(0,0,0,0.28), 0 6px 12px -6px rgba(0,0,0,0.14)'
-                  : '0 8px 18px -8px rgba(0,0,0,0.16), 0 3px 6px -3px rgba(0,0,0,0.08)',
-                transition: 'box-shadow 320ms cubic-bezier(0.32, 0.72, 0, 1)',
               }}
             >
               <HwatuCardImage
@@ -284,37 +251,5 @@ function CardFan() {
         })}
       </div>
     </motion.div>
-  );
-}
-
-function FloatingShapes() {
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      <motion.div
-        className="absolute -top-20 -right-20 size-[480px] rounded-full bg-amber-500/[0.05] blur-3xl"
-        animate={{ y: [0, -24, 0], x: [0, 12, 0] }}
-        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <motion.div
-        className="absolute top-1/3 -left-32 size-[420px] rounded-full bg-rose-500/[0.04] blur-3xl"
-        animate={{ y: [0, 20, 0], x: [0, -16, 0] }}
-        transition={{
-          duration: 11,
-          repeat: Infinity,
-          ease: 'easeInOut',
-          delay: 1,
-        }}
-      />
-      <motion.div
-        className="absolute bottom-0 right-1/4 size-[360px] rounded-full bg-emerald-500/[0.03] blur-3xl"
-        animate={{ y: [0, -14, 0] }}
-        transition={{
-          duration: 13,
-          repeat: Infinity,
-          ease: 'easeInOut',
-          delay: 2,
-        }}
-      />
-    </div>
   );
 }

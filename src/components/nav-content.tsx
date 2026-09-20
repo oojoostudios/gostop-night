@@ -69,16 +69,14 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                 event.preventDefault();
                 scrollTo(section.id);
               }}
-              className={`relative flex items-baseline gap-3 py-2 px-3 -mx-3 rounded-md transition-colors ${
-                isActive
-                  ? 'text-foreground'
-                  : 'text-foreground/60 hover:text-foreground hover:bg-foreground/5'
+              className={`relative flex items-baseline gap-3 py-2 px-3 -mx-3 rounded-full transition-colors ${
+                isActive ? 'text-surface' : 'text-ink-soft hover:text-ink hover:bg-surface'
               }`}
             >
               {isActive && (
                 <motion.span
                   layoutId={`sidebar-active-${game}`}
-                  className="absolute inset-0 rounded-md bg-foreground/10"
+                  className="absolute inset-0 rounded-full bg-plum"
                   transition={{
                     type: 'spring',
                     stiffness: 480,
@@ -87,7 +85,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                   }}
                 />
               )}
-              <span className="relative z-10 text-xs tabular-nums opacity-70">{section.num}</span>
+              <span className="relative z-10 text-xs tabular-nums">{section.num}</span>
               <span className="relative z-10 text-sm leading-snug">
                 {locale === 'ko' ? section.labelKo : section.label}
               </span>
@@ -98,15 +96,16 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
 
       {game === 'gostop' && visibleVariants.length > 0 && (
         <div className="flex flex-col gap-2">
-          <div className="text-[10px] uppercase tracking-[0.18em] text-foreground/50">
+          <div className="text-xs uppercase tracking-[0.18em] text-ink-soft">
             {locale === 'ko' ? '룰셋' : 'Ruleset'}
           </div>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-2">
             {visibleVariants.map((v) => (
               <motion.button
                 key={v.id}
                 type="button"
                 onClick={() => setVariant(v.id)}
+                aria-pressed={variant === v.id}
                 whileTap={{ scale: 0.93 }}
                 transition={{
                   type: 'spring',
@@ -114,11 +113,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                   damping: 30,
                   mass: 0.6,
                 }}
-                className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
-                  variant === v.id
-                    ? 'bg-[var(--mat)] text-white border-[var(--mat)]'
-                    : 'border-foreground/20 text-foreground/60 hover:text-foreground hover:bg-foreground/5'
-                }`}
+                className="club-chip"
               >
                 {locale === 'ko' ? v.labelKo : v.label}
               </motion.button>
@@ -128,15 +123,16 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
       )}
 
       <div className="flex flex-col gap-2">
-        <div className="text-[10px] uppercase tracking-[0.18em] text-foreground/50">
+        <div className="text-xs uppercase tracking-[0.18em] text-ink-soft">
           {locale === 'ko' ? '언어' : 'Language'}
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-2">
           {(['en', 'ko'] as const).map((l) => (
             <motion.button
               key={l}
               type="button"
               onClick={() => setLocale(l)}
+              aria-pressed={locale === l}
               whileTap={{ scale: 0.93 }}
               transition={{
                 type: 'spring',
@@ -144,11 +140,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                 damping: 30,
                 mass: 0.6,
               }}
-              className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
-                locale === l
-                  ? 'bg-[var(--felt)] text-white border-[var(--felt)]'
-                  : 'border-foreground/20 text-foreground/60 hover:text-foreground hover:bg-foreground/5'
-              }`}
+              className="club-chip"
             >
               {l === 'en' ? 'English' : '한국어'}
             </motion.button>
@@ -187,14 +179,11 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
 function BrandBlock({ locale }: { locale: 'ko' | 'en' }) {
   return (
     <Link href="/gostop" className="group block">
-      <div className="text-xl font-semibold tracking-tight leading-tight text-foreground group-hover:text-foreground transition-colors">
+      <div className="font-display text-2xl leading-tight text-ink">
         {locale === 'ko' ? '고스톱' : 'Go-Stop'}
       </div>
       {/* Same game in the other script — like Mahjong's English/中文 pair. */}
-      <div
-        className="text-base text-foreground/55 leading-tight mt-0.5"
-        style={{ fontFamily: 'var(--font-accent)' }}
-      >
+      <div className="text-sm text-ink-soft leading-tight mt-0.5">
         {locale === 'ko' ? 'Go-Stop' : '고스톱'}
       </div>
     </Link>

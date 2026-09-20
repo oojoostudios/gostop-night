@@ -25,12 +25,12 @@ export function CardCaption({
   return (
     <div className={`leading-snug ${className}`}>
       <div
-        className={`tabular-nums text-foreground/55 ${compact ? 'text-[10px] font-semibold' : 'text-xs'}`}
+        className={`tabular-nums text-ink-soft ${compact ? 'text-xs font-semibold' : 'text-xs'}`}
       >
         {line1}
       </div>
-      <div className={`font-medium ${compact ? 'text-[10px]' : 'text-base'}`}>{line2}</div>
-      <div className={`text-foreground/60 ${compact ? 'text-[10px]' : 'text-sm'}`}>{line3}</div>
+      <div className={`font-medium ${compact ? 'text-xs' : 'text-base'}`}>{line2}</div>
+      <div className={`text-ink-soft ${compact ? 'text-xs' : 'text-sm'}`}>{line3}</div>
     </div>
   );
 }

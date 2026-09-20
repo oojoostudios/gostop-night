@@ -18,17 +18,17 @@ import { computeScore } from '@/lib/score';
 const TYPE_ORDER: ReadonlyArray<HwatuType> = ['gwang', 'tti', 'kkeut', 'pi'];
 
 const TYPE_BADGE: Record<HwatuType, string> = {
-  gwang: 'bg-amber-500 text-white',
-  tti: 'bg-rose-500 text-white',
-  kkeut: 'bg-emerald-600 text-white',
-  pi: 'bg-zinc-600 text-white',
+  gwang: 'bg-gold text-on-fill',
+  tti: 'bg-plum text-surface',
+  kkeut: 'bg-ink text-surface',
+  pi: 'bg-sage text-on-fill',
 };
 
 const TYPE_DOT: Record<HwatuType, string> = {
-  gwang: 'bg-amber-500',
-  tti: 'bg-rose-500',
-  kkeut: 'bg-emerald-600',
-  pi: 'bg-zinc-600',
+  gwang: 'bg-gold',
+  tti: 'bg-plum',
+  kkeut: 'bg-ink',
+  pi: 'bg-sage',
 };
 
 export function ScoreCalculator() {
@@ -48,14 +48,14 @@ export function ScoreCalculator() {
   const score = useMemo(() => computeScore(selectedIds), [selectedIds]);
 
   return (
-    <div className="border-t border-foreground/10 pt-14 mt-4">
-      <div className="text-[10px] uppercase tracking-[0.2em] text-foreground/50 mb-3">
+    <div className="border-t border-hairline pt-14 mt-4">
+      <div className="text-xs uppercase tracking-[0.2em] text-ink-soft mb-3">
         {locale === 'ko' ? '직접 해보기' : 'Try it'}
       </div>
-      <h3 className="text-2xl font-semibold tracking-tight mb-2">
+      <h3 className="font-display text-2xl mb-2">
         {locale === 'ko' ? '점수 계산기' : 'Score calculator'}
       </h3>
-      <p className="text-sm text-foreground/60 max-w-2xl leading-relaxed mb-8">
+      <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-8">
         {locale === 'ko'
           ? '카드를 클릭해서 가지고 있는 카드를 선택해보세요. 옆 패널에 점수가 실시간으로 계산되고, 콤보가 완성되면 자동으로 잡혀요.'
           : 'Click any card to add it to your collection. Total score and active combos update live in the panel on the right.'}
@@ -94,11 +94,11 @@ function ToggleGroup({
     <div>
       <div className="flex items-baseline gap-2 mb-2.5">
         <span
-          className={`text-[10px] px-2 py-0.5 rounded-sm font-semibold uppercase tracking-wider ${TYPE_BADGE[type]}`}
+          className={`text-xs px-2 py-0.5 rounded-sm font-semibold uppercase tracking-wider ${TYPE_BADGE[type]}`}
         >
           {locale === 'ko' ? meta.labelKo : meta.label}
         </span>
-        <span className="text-sm text-foreground/60">
+        <span className="text-sm text-ink-soft">
           {selectedCount} / {cards.length}
         </span>
       </div>
@@ -133,15 +133,13 @@ function ToggleCard({
       transition={{ type: 'spring', stiffness: 380, damping: 28 }}
       aria-pressed={selected}
       aria-label={cardLabel(card)}
-      className={`relative aspect-[2/3] w-14 sm:w-16 rounded-md overflow-hidden ring-1 ring-black/10 bg-white transition-all ${
-        selected
-          ? 'outline outline-2 outline-offset-2 outline-foreground shadow'
-          : 'opacity-40 hover:opacity-80 grayscale-[40%] hover:grayscale-0'
+      className={`relative aspect-[2/3] w-14 sm:w-16 transition-all ${
+        selected ? '' : 'opacity-40 grayscale hover:opacity-80 hover:grayscale-0'
       }`}
     >
       <HwatuCardImage card={card} className="absolute inset-0 w-full h-full pointer-events-none" />
       {card.tag === '쌍피' && (
-        <span className="absolute bottom-1 right-1 text-[8px] font-bold bg-purple-600 text-white px-1 rounded-sm">
+        <span className="absolute bottom-1 right-1 text-xs font-bold bg-sage text-on-fill px-1 rounded-sm">
           ×2
         </span>
       )}
@@ -162,22 +160,18 @@ function ScorePanel({
   const canStop = score.total >= 7;
 
   return (
-    <div
-      className={`rounded-lg border bg-foreground/[0.02] p-5 transition-colors ${
-        canStop ? 'border-amber-500/60 bg-amber-500/5' : 'border-foreground/15'
-      }`}
-    >
+    <div className={`club-card p-6 transition-colors ${canStop ? 'bg-gold/25' : ''}`}>
       <div className="flex items-baseline justify-between mb-1">
-        <div className="text-[10px] uppercase tracking-[0.18em] font-semibold text-foreground/50">
+        <div className="text-xs uppercase tracking-[0.18em] font-semibold text-ink-soft">
           {locale === 'ko' ? '총점' : 'Total'}
         </div>
-        <div className="text-[10px] tabular-nums text-foreground/40">
+        <div className="text-xs tabular-nums text-ink-soft">
           {selectedCount} {locale === 'ko' ? '장 선택' : 'selected'}
         </div>
       </div>
 
       <div className="flex items-baseline gap-2 mb-3">
-        <div className="relative h-[1em] text-5xl font-semibold tabular-nums tracking-tight overflow-hidden">
+        <div className="relative h-[1em] text-5xl font-bold tabular-nums overflow-hidden">
           {/* invisible spacer to reserve width — keeps layout stable */}
           <span aria-hidden className="invisible">
             {score.total}
@@ -196,7 +190,7 @@ function ScorePanel({
             </motion.span>
           </AnimatePresence>
         </div>
-        <div className="text-foreground/50 text-sm">{locale === 'ko' ? '점' : 'pts'}</div>
+        <div className="text-ink-soft text-sm">{locale === 'ko' ? '점' : 'pts'}</div>
       </div>
 
       <AnimatePresence>
@@ -206,7 +200,7 @@ function ScorePanel({
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 mb-4"
+            className="flex items-center gap-1.5 text-xs font-semibold text-ink mb-4"
           >
             <Trophy className="size-3.5" />
             <span className="sweep-mark" style={{ ['--sweep-delay' as string]: '120ms' }}>
@@ -216,7 +210,7 @@ function ScorePanel({
         )}
       </AnimatePresence>
 
-      <div className="space-y-1 mb-4 pt-4 border-t border-foreground/10">
+      <div className="space-y-1 mb-4 pt-4 border-t border-hairline">
         {(['gwang', 'tti', 'kkeut', 'pi'] as const).map((type) => {
           const points = score.breakdown[type];
           const count = type === 'pi' ? score.piEffective : score.counts[type];
@@ -225,13 +219,13 @@ function ScorePanel({
             <div key={type} className="flex items-baseline justify-between gap-3 text-sm">
               <div className="flex items-center gap-2">
                 <span className={`size-1.5 rounded-full ${TYPE_DOT[type]}`} aria-hidden />
-                <span className={points > 0 ? 'text-foreground' : 'text-foreground/45'}>
+                <span className={points > 0 ? 'text-ink' : 'text-ink-soft'}>
                   {locale === 'ko' ? meta.labelKo : meta.label}
                 </span>
-                <span className="text-[11px] text-foreground/40 tabular-nums">
+                <span className="text-xs text-ink-soft tabular-nums">
                   {count}
                   {type === 'pi' && score.piEffective !== score.counts.pi && (
-                    <span className="text-purple-600">
+                    <span className="text-ink">
                       {' '}
                       ({locale === 'ko' ? '쌍피 포함' : 'w/ doubles'})
                     </span>
@@ -239,8 +233,8 @@ function ScorePanel({
                 </span>
               </div>
               <span
-                className={`relative tabular-nums font-semibold inline-block min-w-[1.5ch] text-right overflow-hidden ${
-                  points > 0 ? 'text-foreground' : 'text-foreground/30'
+                className={`relative tabular-nums font-bold inline-block min-w-[1.5ch] text-right overflow-hidden ${
+                  points > 0 ? 'text-ink' : 'text-ink-soft'
                 }`}
               >
                 <AnimatePresence mode="sync" initial={false}>
@@ -267,9 +261,9 @@ function ScorePanel({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-t border-foreground/10 pt-4 mb-4"
+            className="overflow-hidden border-t border-hairline pt-4 mb-4"
           >
-            <div className="text-[10px] uppercase tracking-[0.18em] font-semibold text-foreground/50 mb-2">
+            <div className="text-xs uppercase tracking-[0.18em] font-semibold text-ink-soft mb-2">
               {locale === 'ko' ? '콤보' : 'Combos'}
             </div>
             <div className="space-y-1">
@@ -282,10 +276,10 @@ function ScorePanel({
                   exit={{ opacity: 0, x: -6 }}
                   className="flex items-baseline justify-between text-sm"
                 >
-                  <span className="font-semibold text-amber-700 dark:text-amber-400">
+                  <span className="font-semibold text-ink">
                     {locale === 'ko' ? combo.labelKo : combo.label}
                   </span>
-                  <span className="tabular-nums font-semibold">+{combo.points}</span>
+                  <span className="tabular-nums font-bold">+{combo.points}</span>
                 </motion.div>
               ))}
             </div>

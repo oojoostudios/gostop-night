@@ -10,7 +10,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { SECTIONS_BY_GAME } from '@/lib/sections';
 
 export const metadata: Metadata = {
-  title: 'Yutnori · A Visual Guide to Korean Games',
+  title: 'Yutnori rules · 윷놀이 룰',
   description:
     'Learn how to play 윷놀이 (Yutnori) — the Korean board game families play during Lunar New Year.',
 };

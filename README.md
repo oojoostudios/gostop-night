@@ -1,12 +1,10 @@
 <div align="center">
 
-![Go-Stop: A Visual Guide](./src/app/opengraph-image.png)
+![Club Go Stop](./src/app/opengraph-image.png)
 
-# Go-Stop: A Visual Guide
+# Club Go Stop · 클럽 고스톱
 
-A visual guide to Korean go-stop (고스톱), for first-time players.
-
-[Live demo → gostopguide.com](https://gostopguide.com)  ·  [Source on GitHub](https://github.com/k-culture-play/gostop-guide)
+A phone-first Go-Stop guide for our game nights. 고스톱 게임 나이트를 위한 모바일 가이드.
 
 </div>
 
@@ -14,11 +12,9 @@ A visual guide to Korean go-stop (고스톱), for first-time players.
 
 ## About
 
-Go-stop is the most popular card game in Korea — played at every family gathering, every Lunar New Year, every Chuseok. But the rules look brutal on Wikipedia: **48 cards, 12 monthly suits, four card tiers, special calls, scoring multipliers, and a decision every turn.**
+Go-stop is the most popular card game in Korea, but the rules look brutal on paper: **48 cards, 12 monthly suits, four card types, special calls, scoring multipliers, and a decision every turn.** Club Go Stop walks a first-timer through them visually, in about five minutes, in English and Korean. Guests open a link on their phone: no login, no app.
 
-This site walks you through them visually, in about five minutes. It's the guide I wished existed when I tried to teach friends and they bounced off "what's a 쌍피".
-
-Inspired by [themahjong.guide](https://themahjong.guide) — the structure, paper-and-mat tone, and tile-by-tile teaching approach all came from there.
+The look is "Vintage print": warm paper, fine ink lines, no shadows, with a plum-blossom mascot. All colors, fonts, corners and press effects live in one place, `src/app/globals.css` (colors) and `src/lib/fonts.ts` (fonts).
 
 ## Sections
 
@@ -55,26 +51,22 @@ pnpm lint:ox        # oxlint
 pnpm build          # production build
 ```
 
-## Contributing
+## Design pages
 
-Issues and PRs welcome. Easiest places to help:
+Two unlinked pages for checking the design while you work: `/stylecheck` (colors with contrast ratios, type, cards, chips, buttons, paper grain) and `/brandcheck` (the mascot and wordmark on light and dark).
 
-- **Translations** — the site has an `en` / `ko` toggle. If a phrase reads awkwardly in either language, that's a one-line fix.
-- **Rule clarifications** — go-stop has many regional variants. If something's wrong or oversimplified for your region, open an issue.
-- **A11y / mobile polish** — the site is responsive but rough edges welcome.
+## Regenerating images
+
+- `node scripts/export-mascot.mjs` makes the web mascot images in `public/brand/`.
+- `node scripts/export-brand-images.mjs` makes the favicon, app icons and share image (needs Chrome).
 
 ## Credits
 
-- Inspired by [themahjong.guide](https://themahjong.guide) — the structure, paper-and-mat tone, and tile-by-tile teaching approach all came from there.
-- **Hwatu card illustrations** are PNG slices of a Wikimedia Commons SVG by **huzinger827** and **pk0001** (2021, updated 2023-12-02), distributed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Source: [File:Hwatu012.svg on Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hwatu012.svg). Full attribution in [`NOTICE.md`](./NOTICE.md).
+- Based on [gostopguide.com](https://gostopguide.com) by jaeha (MIT).
+- That site was inspired by [themahjong.guide](https://themahjong.guide): the structure, paper tone, and step-by-step teaching approach.
+- Fonts: Fraunces, Gowun Batang and IBM Plex Sans KR, from Google Fonts (SIL Open Font License).
 
 ## License
 
-This project uses two licenses:
-
-- **Source code:** [MIT](./LICENSE) — fork and reuse freely.
-- **Card images** in `public/cards/`: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) inherited from the upstream Wikimedia source. If you redistribute the images, you must preserve attribution and license derivatives under the same terms — see [`NOTICE.md`](./NOTICE.md).
-
----
-
-Built by [jaeha](https://github.com/jaehafe) · [@miniapp223](https://x.com/miniapp223)
+- **Source code:** [MIT](./LICENSE). The original copyright notice is kept.
+- **Card and mascot artwork:** original artwork for this project. See [`NOTICE.md`](./NOTICE.md).

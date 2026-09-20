@@ -10,7 +10,7 @@ import { SectionSpecial } from '@/components/section-special';
 import { SiteFooter } from '@/components/site-footer';
 
 export const metadata: Metadata = {
-  title: 'Go-Stop · A Visual Guide to Korean Games',
+  title: 'Go-Stop rules · 고스톱 룰',
   description:
     'Learn how to play 고스톱 (Go-Stop) — the Korean card game families gather around — in five minutes.',
 };

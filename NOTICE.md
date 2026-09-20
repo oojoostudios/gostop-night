@@ -13,3 +13,9 @@ the rest of the codebase.
 _This section previously credited PNG slices of a Wikimedia Commons SVG by
 huzinger827 and pk0001, used under CC BY-SA 4.0. Those images have been
 fully replaced and are no longer part of this project._
+
+## Club Go Stop mascot and brand images — `assets-source/brand/`, `public/brand/`, `src/app/*icon*`
+
+The plum-blossom mascot, the wordmark, the icons, and the share image are original
+artwork for this project, not derived from any third-party source. They are covered
+by this project's own copyright.

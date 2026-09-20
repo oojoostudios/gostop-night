@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { useLocale } from '@/contexts/locale-context';
 import { HwatuCardImage } from '@/components/hwatu-card-image';
+import { Mascot } from '@/components/mascot';
+import { Wordmark } from '@/components/wordmark';
 
 const EASE = [0.32, 0.72, 0, 1] as const;
 
@@ -67,7 +69,19 @@ export function Hero({
       <div className="lg:ml-72 relative z-10 w-full">
         <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl px-6 sm:px-8 grid grid-cols-1 xl:grid-cols-[auto_auto] gap-10 xl:gap-2 items-center">
           {/* LEFT — title block */}
-          <div className="max-w-md">
+          <div className="max-w-lg">
+            {/* Mascot large, next to the wordmark */}
+            <motion.div
+              key={`brand-${animKey}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              className="flex items-center gap-5 sm:gap-7 mb-12"
+            >
+              <Mascot className="w-28 sm:w-36 md:w-40" />
+              <Wordmark size="lg" />
+            </motion.div>
+
             <motion.div
               key={`eyebrow-${animKey}`}
               initial={{ opacity: 0, y: 8 }}

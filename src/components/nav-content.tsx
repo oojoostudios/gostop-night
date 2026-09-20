@@ -11,6 +11,8 @@ import { getActiveGame } from '@/lib/games';
 import { useLocale } from '@/contexts/locale-context';
 import { useVariant, VARIANTS } from '@/contexts/variant-context';
 import { useTheme } from '@/contexts/theme-context';
+import { Mascot } from '@/components/mascot';
+import { Wordmark } from '@/components/wordmark';
 
 export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   const { locale, setLocale } = useLocale();
@@ -56,7 +58,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <>
-      <BrandBlock locale={locale} />
+      <BrandBlock />
 
       <nav className="flex flex-col gap-0.5">
         {sections.map((section) => {
@@ -167,25 +169,12 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-/**
- * Brand block — replaces the previous 2-column GameTabs since yutnori is
- * still WIP. Shows the GAME name (고스톱 / Go-Stop) in both scripts.
- *
- * Why no `花鬪` here: hwatu (花鬪) is the CARDS, not the game. Mixing the
- * two as a brand mark — `Go-Stop / 花鬪` — reads as if they're the same
- * thing. Hero handles the cards-game relationship explicitly with a
- * tagline; the sidebar only needs the game's name.
- */
-function BrandBlock({ locale }: { locale: 'ko' | 'en' }) {
+/** Brand block: the mascot and the Club Go Stop wordmark, linking home. */
+function BrandBlock() {
   return (
-    <Link href="/gostop" className="group block">
-      <div className="font-display text-2xl leading-tight text-ink">
-        {locale === 'ko' ? '고스톱' : 'Go-Stop'}
-      </div>
-      {/* Same game in the other script — like Mahjong's English/中文 pair. */}
-      <div className="text-sm text-ink-soft leading-tight mt-0.5">
-        {locale === 'ko' ? 'Go-Stop' : '고스톱'}
-      </div>
+    <Link href="/gostop" className="flex items-center gap-3">
+      <Mascot size="sm" className="w-14" />
+      <Wordmark size="sm" />
     </Link>
   );
 }

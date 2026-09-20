@@ -18,61 +18,34 @@ export function SiteFooter() {
         <div className="max-w-2xl mx-auto px-6 sm:px-8 lg:px-16 space-y-2">
           <p>
             {locale === 'ko'
-              ? '처음 화투를 잡아보는 분을 위한 비주얼 가이드.'
-              : 'A visual guide to Korean go-stop, for first-time players.'}
+              ? '클럽 고스톱 — 우리 고스톱 게임 나이트를 위한 가이드.'
+              : 'Club Go Stop — a guide for our Go-Stop game nights.'}
           </p>
           <p className="text-xs text-ink-soft">
-            {locale === 'ko' ? '만든 사람 ' : 'Built by '}
-            <a
-              href="https://github.com/jaehafe"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-ink-soft hover:text-ink underline-offset-2 hover:underline"
-            >
-              jaeha
-            </a>
-            <span className="mx-1.5 text-ink-soft">·</span>
-            <a
-              href="https://github.com/k-culture-play/gostop-guide"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-ink-soft hover:text-ink underline-offset-2 hover:underline"
-            >
-              {locale === 'ko' ? '소스' : 'Source'}
-            </a>
-            <span className="mx-1.5 text-ink-soft">·</span>
-            <a
-              href="https://x.com/miniapp223"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-ink-soft hover:text-ink underline-offset-2 hover:underline"
-            >
-              @miniapp223
-            </a>
-            <span className="mx-1.5 text-ink-soft">·</span>
             {locale === 'ko' ? (
               <>
                 <a
-                  href="https://themahjong.guide"
+                  href="https://gostopguide.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-ink-soft hover:text-ink underline-offset-2 hover:underline"
+                  className="underline-offset-2 hover:text-ink hover:underline"
                 >
-                  themahjong.guide
-                </a>
-                {' 에서 영감'}
+                  gostopguide.com
+                </a>{' '}
+                by jaeha (MIT) 기반
               </>
             ) : (
               <>
-                {'inspired by '}
+                Based on{' '}
                 <a
-                  href="https://themahjong.guide"
+                  href="https://gostopguide.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-ink-soft hover:text-ink underline-offset-2 hover:underline"
+                  className="underline-offset-2 hover:text-ink hover:underline"
                 >
-                  themahjong.guide
-                </a>
+                  gostopguide.com
+                </a>{' '}
+                by jaeha (MIT)
               </>
             )}
           </p>

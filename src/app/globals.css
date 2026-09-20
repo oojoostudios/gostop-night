@@ -94,7 +94,8 @@
 :root,
 .light,
 [data-theme='light'],
-.mascot-badge {
+.mascot-badge,
+.dark .mascot-frame {
   --color-paper: var(--palette-paper-light);
   --color-surface: var(--palette-surface-light);
   --color-ink: var(--palette-ink-light);
@@ -131,7 +132,8 @@
 [data-theme='light'],
 .dark,
 [data-theme='dark'],
-.mascot-badge {
+.mascot-badge,
+.dark .mascot-frame {
   /* Secondary text and lines are ink at a set strength. */
   --color-ink-soft: color-mix(in oklab, var(--color-ink) var(--ink-soft-strength), transparent);
   --color-hairline: color-mix(in oklab, var(--color-ink) var(--hairline-strength), transparent);
@@ -509,9 +511,29 @@ body::before {
     background: var(--color-paper);
     border-radius: 9999px;
   }
+  /* Mascot frame: the square the site puts the mascot in (the <Mascot> component).
+   * Light mode: the mascot sits straight on the page. Dark mode: the frame turns into
+   * the round light-paper badge, because the mascot's outlines are the same dark green
+   * as the dark page and would disappear. Same size in both modes, so nothing shifts. */
+  .mascot-frame {
+    position: relative;
+    display: block;
+    flex: none;
+    aspect-ratio: 1;
+  }
+  .dark .mascot-frame {
+    overflow: hidden;
+    background: var(--color-paper);
+    border-radius: 9999px;
+  }
+  .mascot-frame > img {
+    width: 78%;
+  }
+
   /* The mascot is taller than the circle, so it is centered explicitly.
    * Set its width on the image (about 78% of the badge). */
-  .mascot-badge > img {
+  .mascot-badge > img,
+  .mascot-frame > img {
     position: absolute;
     top: 50%;
     left: 50%;

@@ -5,10 +5,12 @@ import { Providers } from '@/components/providers';
 import { ScrollProgress } from '@/components/scroll-progress';
 import { bodyFont, displayKoreanFont, displayLatinFont } from '@/lib/fonts';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://gostopguide.com';
-const SITE_NAME = 'Go-Stop: A Visual Guide';
+// Set NEXT_PUBLIC_SITE_URL to the real address when the site has one. Until then links in
+// the share preview point at localhost.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const SITE_NAME = 'Club Go Stop · 클럽 고스톱';
 const SITE_DESCRIPTION =
-  'Learn how to play 고스톱 (Go-Stop), the Korean card game, in five minutes — a visual guide for first-time players.';
+  'A phone-first Go-Stop guide for our game nights: learn the rules in five minutes. 고스톱 게임 나이트를 위한 모바일 가이드, 5분이면 룰을 익혀요.';
 const OG_IMAGE = {
   url: '/opengraph-image.png',
   width: 1200,
@@ -20,13 +22,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: SITE_NAME,
-    template: '%s · Go-Stop',
+    template: '%s · Club Go Stop',
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
-  authors: [{ name: 'jaeha', url: 'https://github.com/jaehafe' }],
-  creator: 'jaeha',
-  keywords: ['go-stop', '고스톱', '화투', 'hwatu', 'Korean card game', 'visual guide'],
+  keywords: ['Club Go Stop', '클럽 고스톱', 'go-stop', '고스톱', '화투', 'hwatu', 'game night'],
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
@@ -41,7 +41,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    creator: '@miniapp223',
     images: [OG_IMAGE.url],
   },
 };

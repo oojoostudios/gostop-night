@@ -1,26 +1,21 @@
 'use client';
 
 import { Menu } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { Drawer, useOverlayState } from '@heroui/react';
 import { NavContent } from '@/components/nav-content';
-import { GAMES, getActiveGame } from '@/lib/games';
-import { useLocale } from '@/contexts/locale-context';
+import { Mascot } from '@/components/mascot';
+import { Wordmark } from '@/components/wordmark';
 
 export function MobileTopbar() {
   const drawer = useOverlayState();
-  const pathname = usePathname();
-  const game = GAMES.find((g) => g.id === getActiveGame(pathname));
-  const { locale } = useLocale();
 
   return (
     <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between px-5 h-14 border-b border-hairline bg-paper">
-      <div className="flex items-baseline gap-2 font-display text-xl">
-        <span>{locale === 'ko' ? game?.labelKo : game?.labelEn}</span>
-        <span className="font-sans text-ink-soft text-sm">
-          {locale === 'ko' ? game?.labelEn : game?.labelKo}
-        </span>
-      </div>
+      <Link href="/gostop" className="flex min-w-0 items-center gap-3">
+        <Mascot size="sm" className="w-10" />
+        <Wordmark size="sm" />
+      </Link>
       <Drawer state={drawer}>
         <Drawer.Trigger
           aria-label="Open menu"

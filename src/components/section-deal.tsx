@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { useLayoutEffect, useRef, useState, type RefObject } from 'react';
+import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from 'motion/react';
 import { ChevronRight, RotateCcw, Shuffle } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { useLocale } from '@/contexts/locale-context';
@@ -31,11 +31,23 @@ const YOUR_HAND = [
   '05-tti',
   '07-pi-1',
   '07-pi-2',
-  '11-tti',
+  '11-pi-1',
   '01-gwang',
 ] as const;
 
 const REMAINING_COUNT = 48 - STARTING_FLOOR.length - YOUR_HAND.length * 3; // 19
+
+// Deal animation timing (CLAUDE.md, micro-interactions): ~0.3s per card, 60ms stagger,
+// then the face-up cards turn over (the same ~0.45s low-bounce spring as the card flip).
+const SLIDE_SECONDS = 0.3;
+const STAGGER_SECONDS = 0.06;
+const FLIP_PAUSE_SECONDS = 0.1; // a beat between the last card landing and the first one turning
+const PLAYERS_AT_TABLE = 3; // the demo deals to three hands, one card at a time in turn
+const landedAt = (order: number) => order * STAGGER_SECONDS + SLIDE_SECONDS;
+/** When the floor cards start turning over: once all eight have landed. */
+const FLOOR_FLIP_START = landedAt(STARTING_FLOOR.length - 1) + FLIP_PAUSE_SECONDS;
+/** When your own cards start turning over: once every hand has been dealt. */
+const HAND_FLIP_START = landedAt(YOUR_HAND.length * PLAYERS_AT_TABLE - 1) + FLIP_PAUSE_SECONDS;
 
 type Step = 0 | 1 | 2 | 3;
 
@@ -187,6 +199,8 @@ export function SectionDeal() {
 
 function DealStage({ step }: { step: Step }) {
   const { locale } = useLocale();
+  // The dealt cards slide out of the deck pile, so they need to know where it is.
+  const deckRef = useRef<HTMLDivElement>(null);
 
   // Visual state per step
   const showFloor = step >= 1;
@@ -210,11 +224,12 @@ function DealStage({ step }: { step: Step }) {
           <AnimatePresence>
             {showFloor &&
               STARTING_FLOOR.map((id, i) => (
-                <FaceUpCard
+                <DealtCard
                   key={`floor-${id}`}
-                  id={id}
-                  delay={i * 0.05}
-                  layoutId={`deal-floor-${id}`}
+                  card={cardById(id)}
+                  order={i}
+                  flipAt={FLOOR_FLIP_START + i * STAGGER_SECONDS}
+                  deckRef={deckRef}
                 />
               ))}
           </AnimatePresence>
@@ -230,7 +245,7 @@ function DealStage({ step }: { step: Step }) {
 
       {/* Deck + 3 hands grid */}
       <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-8 items-start">
-        <DeckPile count={deckCount} />
+        <DeckPile count={deckCount} pileRef={deckRef} />
 
         <div className="space-y-5">
           <PlayerHand
@@ -238,18 +253,24 @@ function DealStage({ step }: { step: Step }) {
             help={locale === 'ko' ? '다른 사람에겐 안 보여요' : 'Hidden from others'}
             visibleHand={showHands ? YOUR_HAND : undefined}
             faceUp
+            seat={0}
+            deckRef={deckRef}
           />
           <PlayerHand
             who={locale === 'ko' ? '상대 1' : 'Opponent 1'}
             help={locale === 'ko' ? '카드 뒷면만 보여요' : 'Face-down (concealed)'}
             visibleHand={showHands ? Array.from({ length: 7 }, () => '') : undefined}
             faceUp={false}
+            seat={1}
+            deckRef={deckRef}
           />
           <PlayerHand
             who={locale === 'ko' ? '상대 2' : 'Opponent 2'}
             help={locale === 'ko' ? '카드 뒷면만 보여요' : 'Face-down (concealed)'}
             visibleHand={showHands ? Array.from({ length: 7 }, () => '') : undefined}
             faceUp={false}
+            seat={2}
+            deckRef={deckRef}
           />
         </div>
       </div>
@@ -284,64 +305,143 @@ function Zone({
   );
 }
 
-function FaceUpCard({
-  id,
-  delay = 0,
-  layoutId,
+/**
+ * One dealt card. It starts face down on the deck pile, slides to its spot, and (if it has a face
+ * to show) turns over. `order` is its place in the dealing, so cards leave the deck one after another.
+ * With reduced motion: no sliding, no turning, no stagger. The card fades in and the two sides cross-fade.
+ */
+function DealtCard({
+  card,
+  order,
+  flipAt,
+  deckRef,
 }: {
-  id: string;
-  delay?: number;
-  layoutId?: string;
+  /** Leave out for a hand you can't see: it stays face down. */
+  card?: HwatuCardData;
+  order: number;
+  /** Seconds from when the card appears until it starts turning face up. */
+  flipAt?: number;
+  deckRef: RefObject<HTMLDivElement | null>;
 }) {
-  const card = cardById(id);
-  if (!card) return null;
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  // Before the first paint: put the card on the deck pile, then slide it home.
+  // (Stopping in the cleanup keeps this correct when React runs effects twice in development.)
+  useLayoutEffect(() => {
+    const el = ref.current;
+    const deck = deckRef.current;
+    if (reduce || !el || !deck) return;
+    const to = el.getBoundingClientRect();
+    const from = deck.getBoundingClientRect();
+    const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+    const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+    x.set(dx);
+    y.set(dy);
+    const timing = {
+      duration: SLIDE_SECONDS,
+      delay: order * STAGGER_SECONDS,
+      ease: 'easeOut',
+    } as const;
+    const slideX = animate(x, [dx, 0], timing);
+    const slideY = animate(y, [dy, 0], timing);
+    return () => {
+      slideX.stop();
+      slideY.stop();
+    };
+  }, [deckRef, order, reduce, x, y]);
+
+  const back = (
+    <div className="absolute inset-0 overflow-hidden rounded-md" aria-hidden>
+      <HwatuCardBack className="absolute inset-0 h-full w-full" />
+    </div>
+  );
+
+  let faces: React.ReactNode = back;
+  if (card && flipAt !== undefined) {
+    const front = <HwatuCardImage card={card} className="absolute inset-0 h-full w-full" />;
+    faces = reduce ? (
+      // Less motion: the back fades out while the front fades in.
+      <>
+        <motion.div
+          className="absolute inset-0"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.2, delay: 0.25 }}
+        >
+          {back}
+        </motion.div>
+        <motion.div
+          className="absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, delay: 0.25 }}
+        >
+          {front}
+        </motion.div>
+      </>
+    ) : (
+      // Turns on the vertical axis with a slight scale-up; each side hides when it faces away.
+      <motion.div
+        className="absolute inset-0"
+        style={{ perspective: 1200 }}
+        animate={{ scale: [1, 1.06, 1] }}
+        transition={{ duration: 0.45, ease: 'easeInOut', delay: flipAt }}
+      >
+        <motion.div
+          className="relative h-full w-full"
+          style={{ transformStyle: 'preserve-3d' }}
+          initial={{ rotateY: 0 }}
+          animate={{ rotateY: 180 }}
+          transition={{ type: 'spring', duration: 0.45, bounce: 0.12, delay: flipAt }}
+        >
+          <div className="absolute inset-0" style={{ backfaceVisibility: 'hidden' }}>
+            {back}
+          </div>
+          <div
+            className="absolute inset-0"
+            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+          >
+            {front}
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
-      layout
-      layoutId={layoutId}
-      initial={{ opacity: 0, scale: 0.7, y: -30, rotateY: 180 }}
-      animate={{ opacity: 1, scale: 1, y: 0, rotateY: 0 }}
+      ref={ref}
+      style={{ x, y }}
+      initial={{ opacity: reduce ? 0 : 1 }}
+      animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 0.7 }}
-      transition={{
-        type: 'spring',
-        stiffness: 280,
-        damping: 22,
-        delay,
-      }}
-      className="relative aspect-[2/3] w-14 sm:w-16"
+      transition={{ duration: 0.2 }}
+      // Above the deck pile, so a card is never hidden behind it while it slides out.
+      className="relative z-[5] aspect-[2/3] w-14 sm:w-16"
+      aria-hidden={!card}
     >
-      <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
+      {faces}
     </motion.div>
   );
 }
 
-function FaceDownCard({ delay = 0 }: { delay?: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.7, y: -10 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: 280,
-        damping: 22,
-        delay,
-      }}
-      className="relative aspect-[2/3] w-14 sm:w-16 rounded-md overflow-hidden"
-      aria-hidden
-    >
-      <HwatuCardBack className="absolute inset-0 w-full h-full" />
-    </motion.div>
-  );
-}
-
-function DeckPile({ count }: { count: number }) {
+function DeckPile({
+  count,
+  pileRef,
+}: {
+  count: number;
+  pileRef: RefObject<HTMLDivElement | null>;
+}) {
   const { locale } = useLocale();
   return (
     <div className="flex flex-col items-start gap-2">
       <div className="text-xs uppercase tracking-[0.18em] font-semibold text-ink-soft">
         {locale === 'ko' ? '더미' : 'Deck'}
       </div>
-      <div className="relative h-24 w-16 sm:w-[72px]">
+      <div ref={pileRef} className="relative h-24 w-16 sm:w-[72px]">
         {/* Stacked card backs (depth illusion) */}
         {[2, 1, 0].map((offset) => (
           <div
@@ -383,11 +483,16 @@ function PlayerHand({
   help,
   visibleHand,
   faceUp,
+  seat,
+  deckRef,
 }: {
   who: string;
   help: string;
   visibleHand?: ReadonlyArray<string>;
   faceUp: boolean;
+  /** Where this player sits (0, 1, 2). Cards are dealt one at a time around the table. */
+  seat: number;
+  deckRef: RefObject<HTMLDivElement | null>;
 }) {
   const { locale } = useLocale();
   return (
@@ -398,15 +503,19 @@ function PlayerHand({
       </div>
       <div className="flex flex-wrap gap-1.5 min-h-[5rem]">
         <AnimatePresence>
-          {visibleHand?.map((id, i) =>
-            faceUp ? (
-              // eslint-disable-next-line react/no-array-index-key -- hand position IS identity
-              <FaceUpCard key={`fu-${id}-${i}`} id={id} delay={i * 0.06} />
-            ) : (
-              // eslint-disable-next-line react/no-array-index-key -- 7 identical face-down cards
-              <FaceDownCard key={`fd-${i}`} delay={i * 0.04} />
-            ),
-          )}
+          {visibleHand?.map((id, i) => {
+            const card = faceUp ? cardById(id) : undefined;
+            if (faceUp && !card) return null; // never show a face-up slot as a card back
+            return (
+              <DealtCard
+                key={`${seat}-${id}-${i}`}
+                card={card}
+                order={i * PLAYERS_AT_TABLE + seat}
+                flipAt={faceUp ? HAND_FLIP_START + i * STAGGER_SECONDS : undefined}
+                deckRef={deckRef}
+              />
+            );
+          })}
         </AnimatePresence>
         {!visibleHand && (
           <div className="text-xs text-ink-soft self-center">

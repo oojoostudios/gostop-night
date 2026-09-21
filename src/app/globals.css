@@ -201,6 +201,12 @@
 @utility text-on-fill {
   color: var(--palette-ink-light);
 }
+
+/* Scrim: what dims the page behind a popup. The dark green in BOTH modes, so it always
+ * darkens (`ink` is cream in dark mode, which would lighten the page instead). */
+@utility bg-scrim {
+  background-color: color-mix(in oklab, var(--palette-ink-light) 55%, transparent);
+}
 @utility border-hairline {
   border-color: var(--color-hairline);
 }

@@ -58,31 +58,47 @@ export const MONTHS: ReadonlyArray<Month> = [
   { num: 12, abbr: 'Dec', motif: 'Rain Willow', motifKo: '비' },
 ];
 
+// Terms table (CLAUDE.md): hanja, Korean, romanized, English label.
 export const HWATU_TYPES: Record<
   HwatuType,
-  { label: string; labelKo: string; blurb: string; blurbKo: string }
+  {
+    label: string;
+    labelKo: string;
+    hanja: string;
+    roman: string;
+    blurb: string;
+    blurbKo: string;
+  }
 > = {
   gwang: {
     label: 'Bright',
     labelKo: '광',
+    hanja: '光',
+    roman: 'Gwang',
     blurb: 'The five most prestigious cards. Collect three or more to score.',
     blurbKo: '다섯 장의 가장 귀한 카드. 3장 이상 모으면 점수가 됩니다.',
   },
   tti: {
     label: 'Ribbon',
     labelKo: '띠',
+    hanja: '紅',
+    roman: 'Tti',
     blurb: 'Cards with red, blue, or grass-colored ribbons. Sets of three score extra.',
     blurbKo: '빨강·파랑·초록 띠가 있는 카드. 세 장 한 세트로 점수가 됩니다.',
   },
   kkeut: {
     label: 'Animal',
     labelKo: '열',
+    hanja: '動',
+    roman: 'Yeol',
     blurb: 'Cards depicting animals. Five of these score one point.',
     blurbKo: '동물이 그려진 카드. 5장부터 1점.',
   },
   pi: {
     label: 'Junk',
     labelKo: '피',
+    hanja: '皮',
+    roman: 'Pi',
     blurb: 'Plain cards. Ten score one point; doubles (쌍피) count as two.',
     blurbKo: '일반 카드. 10장에 1점, 쌍피는 두 장으로 셉니다.',
   },
@@ -142,6 +158,40 @@ export function cardLabel(card: HwatuCard): string {
 export function cardCombo(card: HwatuCard, locale: 'en' | 'ko' = 'en'): string | undefined {
   return locale === 'ko' ? (card.comboKo ?? card.combo) : card.combo;
 }
+
+/** Double junk (쌍피): the fifth term in the Terms table. It has no hanja. */
+export const DOUBLE_JUNK = {
+  label: 'Double junk ×2',
+  labelKo: '쌍피 ×2',
+  termKo: '쌍피',
+  roman: 'Ssangpi',
+} as const;
+
+/** True for the two double-junk cards (Nov and Dec). The scoring code relies on the same tag. */
+export const isDoubleJunk = (card: HwatuCard): boolean => card.tag === '쌍피';
+
+/** Columns of the month-by-type grid in Section 01. Double junk gets its own column. */
+export type DeckColumn = HwatuType | 'double';
+export const DECK_COLUMNS: ReadonlyArray<DeckColumn> = ['gwang', 'kkeut', 'tti', 'pi', 'double'];
+export const deckColumn = (card: HwatuCard): DeckColumn =>
+  isDoubleJunk(card) ? 'double' : card.type;
+
+/** The months (in order) in which at least one card matches. */
+export function monthsWhere(match: (card: HwatuCard) => boolean): ReadonlyArray<Month> {
+  return MONTHS.filter((m) => HWATU_DECK.some((c) => c.month === m.num && match(c)));
+}
+
+/** Months in which a column of the grid has a card. Junk means regular junk; double junk is its own column. */
+export const monthsForColumn = (column: DeckColumn): ReadonlyArray<Month> =>
+  monthsWhere((c) => deckColumn(c) === column);
+
+/** A month group header, e.g. `08 · 공산 · PAMPAS GRASS`. */
+export const monthHeader = (month: Month): string =>
+  `${String(month.num).padStart(2, '0')} · ${month.motifKo} · ${month.motif.toUpperCase()}`;
+
+/** Months as a list for the given language: "Jan · Mar · Aug" or "1월 · 3월 · 8월". */
+export const monthList = (months: ReadonlyArray<Month>, locale: 'en' | 'ko'): string =>
+  months.map((m) => (locale === 'ko' ? `${m.num}월` : m.abbr)).join(' · ');
 
 /**
  * Standard 48-card hwatu deck. 5 광, 10 띠, 9 열, 24 피.

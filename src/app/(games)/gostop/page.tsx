@@ -7,6 +7,7 @@ import { SectionFlow } from '@/components/section-flow';
 import { SectionGoStop } from '@/components/section-gostop';
 import { SectionScoring } from '@/components/section-scoring';
 import { SectionSpecial } from '@/components/section-special';
+import { SectionTonight } from '@/components/section-tonight';
 import { SiteFooter } from '@/components/site-footer';
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function GoStopPage() {
       <SectionScoring />
       <SectionSpecial />
       <SectionGoStop />
+      <SectionTonight />
       <SiteFooter />
     </>
   );

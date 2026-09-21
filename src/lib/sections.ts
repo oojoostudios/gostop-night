@@ -61,6 +61,14 @@ const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
     blurb: `Reach ${callThresholdBoth()} points (3 / 2 players) and you choose: stop and score, or call Go for more.`,
     blurbKo: `${callThresholdBoth()}점(3인 / 2인)이 되면 결정해요 — 여기서 멈출 것인가, 고를 외칠 것인가.`,
   },
+  {
+    id: 'section-tonight',
+    num: '07',
+    label: 'Tonight',
+    labelKo: '오늘 밤',
+    blurb: 'Buy-ins, hands and a running scorecard for your table. Saved on this phone.',
+    blurbKo: '바이인, 판 기록, 실시간 점수판. 이 폰에 저장돼요.',
+  },
 ];
 
 const YUTNORI_SECTIONS: ReadonlyArray<Section> = [

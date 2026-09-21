@@ -1,17 +1,22 @@
 // Pure scoring logic for Go-Stop. Given a set of card IDs the player has
 // collected, compute the points and active combos.
 //
-// Standard 3-player ruleset.
+// What each card type is worth comes from src/config/rules.ts (SCORING), so a
+// scoring change is made in one place.
+//
 // Side effects (피박/광박/멍박/흔들기/고배수) are NOT modeled here — those
 // require knowing the round outcome and other players' state.
 
 import { HWATU_DECK, type HwatuType } from '@/lib/hwatu';
+import { SCORING } from '@/config/rules';
 
 export const HONGDAN_IDS = ['01-tti', '02-tti', '03-tti'] as const;
 export const CHEONGDAN_IDS = ['06-tti', '09-tti', '10-tti'] as const;
 export const CHODAN_IDS = ['04-tti', '05-tti', '07-tti'] as const;
 export const GODORI_IDS = ['02-kkeut', '04-kkeut', '08-kkeut'] as const;
 export const BIGWANG_ID = '12-gwang';
+/** September's sake cup (국진 술잔): an Animal OR two junk. The player picks when scoring. */
+export const SAKE_CUP_ID = '09-kkeut';
 
 export type Combo = {
   id: 'hongdan' | 'cheongdan' | 'chodan' | 'godori';
@@ -39,13 +44,42 @@ const COMBOS: ReadonlyArray<{
   ids: ReadonlyArray<string>;
   points: number;
 }> = [
-  { id: 'hongdan', label: 'Hongdan', labelKo: '홍단', ids: HONGDAN_IDS, points: 3 },
-  { id: 'cheongdan', label: 'Cheongdan', labelKo: '청단', ids: CHEONGDAN_IDS, points: 3 },
-  { id: 'chodan', label: 'Chodan', labelKo: '초단', ids: CHODAN_IDS, points: 3 },
-  { id: 'godori', label: 'Godori', labelKo: '고도리', ids: GODORI_IDS, points: 5 },
+  {
+    id: 'hongdan',
+    label: 'Hongdan',
+    labelKo: '홍단',
+    ids: HONGDAN_IDS,
+    points: SCORING.combos.hongdan,
+  },
+  {
+    id: 'cheongdan',
+    label: 'Cheongdan',
+    labelKo: '청단',
+    ids: CHEONGDAN_IDS,
+    points: SCORING.combos.cheongdan,
+  },
+  {
+    id: 'chodan',
+    label: 'Chodan',
+    labelKo: '초단',
+    ids: CHODAN_IDS,
+    points: SCORING.combos.chodan,
+  },
+  {
+    id: 'godori',
+    label: 'Godori',
+    labelKo: '고도리',
+    ids: GODORI_IDS,
+    points: SCORING.combos.godori,
+  },
 ];
 
-export function computeScore(selectedIds: ReadonlySet<string>): Score {
+export type ScoreOptions = {
+  /** Count the September sake cup as two junk instead of an Animal. */
+  sakeCupAsJunk?: boolean;
+};
+
+export function computeScore(selectedIds: ReadonlySet<string>, options: ScoreOptions = {}): Score {
   const breakdown: Record<HwatuType, number> = { gwang: 0, tti: 0, kkeut: 0, pi: 0 };
   const counts: Record<HwatuType, number> = { gwang: 0, tti: 0, kkeut: 0, pi: 0 };
   let piEffective = 0;
@@ -53,6 +87,12 @@ export function computeScore(selectedIds: ReadonlySet<string>): Score {
 
   for (const card of HWATU_DECK) {
     if (!selectedIds.has(card.id)) continue;
+    if (card.id === SAKE_CUP_ID && options.sakeCupAsJunk) {
+      // Counted as a double junk: one card, worth two.
+      counts.pi += 1;
+      piEffective += 2;
+      continue;
+    }
     counts[card.type] += 1;
     if (card.type === 'pi') {
       piEffective += card.tag === '쌍피' ? 2 : 1;
@@ -60,19 +100,24 @@ export function computeScore(selectedIds: ReadonlySet<string>): Score {
     if (card.id === BIGWANG_ID) hasBigwang = true;
   }
 
-  // 광: 3↑부터 점수, 비광 포함 3광은 2점
-  if (counts.gwang === 5) breakdown.gwang = 15;
-  else if (counts.gwang === 4) breakdown.gwang = 4;
-  else if (counts.gwang === 3) breakdown.gwang = hasBigwang ? 2 : 3;
+  // 광: 3↑부터 점수, 비광 포함 3광은 2점 (숫자는 rules.ts)
+  if (counts.gwang === 5) breakdown.gwang = SCORING.brights.five;
+  else if (counts.gwang === 4) breakdown.gwang = SCORING.brights.four;
+  else if (counts.gwang === 3) {
+    breakdown.gwang = hasBigwang ? SCORING.brights.threeWithRain : SCORING.brights.three;
+  }
 
-  // 띠: 5장↑부터 점수 (5장 = 1점, 이후 +1)
-  if (counts.tti >= 5) breakdown.tti = counts.tti - 4;
+  // 띠: 정해진 장수부터 1점, 이후 장마다 +1 (12월 띠도 장수에 포함)
+  if (counts.tti >= SCORING.ribbonsStartAt)
+    breakdown.tti = counts.tti - (SCORING.ribbonsStartAt - 1);
 
-  // 열: 5장↑부터 점수 (5장 = 1점, 이후 +1)
-  if (counts.kkeut >= 5) breakdown.kkeut = counts.kkeut - 4;
+  // 열: 정해진 장수부터 1점, 이후 장마다 +1
+  if (counts.kkeut >= SCORING.animalsStartAt) {
+    breakdown.kkeut = counts.kkeut - (SCORING.animalsStartAt - 1);
+  }
 
-  // 피: 효과 점수 10↑부터 점수 (10 = 1점, 이후 +1)
-  if (piEffective >= 10) breakdown.pi = piEffective - 9;
+  // 피: 효과 점수(쌍피 = 2)가 정해진 수부터 1점, 이후 +1
+  if (piEffective >= SCORING.junkStartAt) breakdown.pi = piEffective - (SCORING.junkStartAt - 1);
 
   // 콤보: 별도 카운트
   const combos: Combo[] = [];

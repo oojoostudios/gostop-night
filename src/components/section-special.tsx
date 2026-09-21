@@ -7,6 +7,7 @@ import { useLocale } from '@/contexts/locale-context';
 import { FadeInOnView } from '@/components/fade-in-on-view';
 import { HwatuCardImage } from '@/components/hwatu-card-image';
 import { HWATU_DECK } from '@/lib/hwatu';
+import { RULES, SCORING, bakRules } from '@/config/rules';
 
 const cardById = (id: string) => HWATU_DECK.find((c) => c.id === id);
 
@@ -34,8 +35,8 @@ export function SectionSpecial() {
             className="text-lg text-ink-soft max-w-2xl leading-relaxed mb-12"
           >
             {locale === 'ko'
-              ? '고스톱이 단순히 카드 매칭이 아닌 이유. 보너스 피를 부르는 콤보, 카드를 묶어버리는 함정, 점수를 두 배로 만드는 배수까지.'
-              : "Why go-stop isn't just card matching: bonus moves that earn pi from opponents, stuck-card traps, and multipliers that double the round."}
+              ? '고스톱이 단순히 카드 매칭이 아닌 이유. 보너스 피를 부르는 콤보, 카드를 묶어버리는 함정, 점수를 곱해주는 흔들기까지.'
+              : "Why go-stop isn't just card matching: bonus moves that earn pi from opponents, stuck-card traps, and shakes that multiply the round's score."}
           </FadeInOnView>
 
           <SubsectionHeader
@@ -66,7 +67,11 @@ export function SectionSpecial() {
 
           <SubsectionHeader
             icon={<Zap className="size-4" />}
-            title={locale === 'ko' ? '배수 — 점수가 두 배로' : 'Multipliers — score doubles'}
+            title={
+              locale === 'ko'
+                ? `배수 — 흔들 때마다 ×${RULES.shakeMultiplier}`
+                : `Multipliers — ×${RULES.shakeMultiplier} per shake`
+            }
             accent="ink"
           />
 
@@ -281,8 +286,16 @@ function Pokdan() {
     >
       <p className="text-sm text-ink-soft leading-relaxed mb-5 max-w-[65ch]">
         {locale === 'ko'
-          ? '내 손에 같은 월 카드가 3장이고 바닥에 그 월의 마지막 1장이 있을 때, 한꺼번에 던져 4장 모두 가져가요. 상대 한 명당 피 한 장씩.'
-          : 'If you hold three cards of the same month and the fourth is on the floor, drop all three at once and take all four. Plus one pi from each opponent.'}
+          ? `내 손에 같은 월 카드가 3장이고 바닥에 그 월의 마지막 1장이 있을 때, 한꺼번에 던져 4장 모두 가져가요. 상대 한 명당 피 한 장씩. ${
+              RULES.bombMultiplier > 1
+                ? `폭탄을 쓰면 점수가 ${RULES.bombMultiplier}배가 돼요.`
+                : '폭탄으로는 점수가 곱해지지 않아요.'
+            }`
+          : `If you hold three cards of the same month and the fourth is on the floor, drop all three at once and take all four. Plus one pi from each opponent. ${
+              RULES.bombMultiplier > 1
+                ? `A bomb multiplies the score by ×${RULES.bombMultiplier}.`
+                : "A bomb doesn't multiply the score."
+            }`}
       </p>
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex flex-col items-start gap-1.5">
@@ -363,15 +376,15 @@ function Heunduki() {
       titleEn="Heunduki — declared shake"
       badge={
         <span className="text-xs font-bold tabular-nums px-2.5 py-0.5 rounded-full bg-ink text-surface">
-          ×2
+          ×{RULES.shakeMultiplier}
         </span>
       }
       accent="ink"
     >
       <p className="text-sm text-ink-soft leading-relaxed mb-5 max-w-[65ch]">
         {locale === 'ko'
-          ? "처음 패를 받았을 때 내 손에 같은 월 카드가 3장 있으면, '흔들었다'고 선언할 수 있어요. 그 라운드의 점수가 2배가 돼요."
-          : "If your starting hand contains three cards of the same month, you can declare 'shake' — the round's score doubles."}
+          ? `처음 패를 받았을 때 내 손에 같은 월 카드가 3장 있으면, '흔들었다'고 선언할 수 있어요. 흔들 때마다 그 라운드의 점수가 ${RULES.shakeMultiplier}배가 돼요.`
+          : `If your starting hand contains three cards of the same month, you can declare 'shake' — the round's score is multiplied by ×${RULES.shakeMultiplier} for each shake.`}
       </p>
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex flex-col items-start gap-1.5">
@@ -386,13 +399,17 @@ function Heunduki() {
         </div>
         <span className="text-ink-soft text-lg">→</span>
         <span className="text-xs font-semibold text-ink">
-          {locale === 'ko' ? '라운드 점수 ×2' : 'Round score ×2'}
+          {locale === 'ko'
+            ? `라운드 점수 ×${RULES.shakeMultiplier}`
+            : `Round score ×${RULES.shakeMultiplier}`}
         </span>
       </div>
       <p className="text-xs text-ink-soft mt-3 max-w-[65ch]">
         {locale === 'ko'
-          ? "* 4장이면 '폭탄 흔들기' — ×2가 누적될 수도 있어요 (룰셋에 따라 다름)."
-          : '* Four-of-a-month is sometimes called bomb-shake — multipliers may stack depending on local rules.'}
+          ? `* 흔들 때마다 점수가 다시 ${RULES.shakeMultiplier}배가 돼요. 두 번 흔들면 ${
+              RULES.shakeMultiplier ** 2
+            }배.`
+          : `* Every shake multiplies the score again: two shakes make ×${RULES.shakeMultiplier ** 2}.`}
       </p>
     </RuleBlock>
   );
@@ -404,61 +421,81 @@ function Heunduki() {
 
 function BakBlock() {
   const { locale } = useLocale();
+  const ko = locale === 'ko';
+  // Which bak rules apply at our table, and their thresholds (src/config/rules.ts).
+  const rules = bakRules();
+  const threshold = (id: 'pi' | 'gwang' | 'meong') => rules.find((r) => r.id === id)?.threshold;
+
   const items: {
+    id: 'pi' | 'gwang' | 'meong';
     titleKo: string;
     titleEn: string;
     descKo: string;
     descEn: string;
   }[] = [
     {
+      id: 'pi',
       titleKo: '피박 (Pi-bak)',
       titleEn: 'Pi-bak',
-      descKo: '내가 스톱했을 때 누군가 피가 7장 미만이면, 그 사람의 부담이 2배.',
-      descEn: 'If you stop while an opponent has fewer than 7 pi, their payment doubles.',
+      descKo: `내가 스톱했을 때 누군가 피가 ${threshold('pi')}장 미만이면, 그 사람의 부담이 2배.`,
+      descEn: `If you stop while an opponent has fewer than ${threshold('pi')} junk, their payment doubles.`,
     },
     {
+      id: 'gwang',
       titleKo: '광박 (Gwang-bak)',
       titleEn: 'Gwang-bak',
       descKo: '내가 광 점수를 올렸는데 누군가 광이 0장이면, 그 사람의 부담이 2배.',
       descEn: 'If you score with brights but an opponent has zero brights, their payment doubles.',
     },
     {
+      id: 'meong',
       titleKo: '멍박 (Meong-bak)',
       titleEn: 'Meong-bak',
-      descKo: '내가 열 점수를 올렸는데 누군가 열이 5장 미만이면, 그 사람의 부담이 2배.',
-      descEn:
-        'If you score with animals but an opponent has fewer than 5 animals, their payment doubles.',
+      descKo: `내가 열 점수를 올렸는데 누군가 열이 ${SCORING.animalsStartAt}장 미만이면, 그 사람의 부담이 2배.`,
+      descEn: `If you score with animals but an opponent has fewer than ${SCORING.animalsStartAt} animals, their payment doubles.`,
     },
   ];
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {items.map((item, i) => (
-        <motion.div
-          key={item.titleKo}
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{
-            duration: 0.4,
-            ease: [0.16, 1, 0.3, 1],
-            delay: i * 0.08,
-          }}
-          className="club-card p-5"
-        >
-          <span
-            className={`inline-block text-xs font-bold tabular-nums px-2.5 py-0.5 rounded-full mb-3 ${ACCENT.plum.fill} ${ACCENT.plum.onFill}`}
-          >
-            ×2
-          </span>
-          <h4 className="font-display text-xl mb-2">
-            {locale === 'ko' ? item.titleKo : item.titleEn}
-          </h4>
-          <p className="text-sm text-ink-soft leading-relaxed">
-            {locale === 'ko' ? item.descKo : item.descEn}
-          </p>
-        </motion.div>
-      ))}
+    <div>
+      {!RULES.bakPenalties.enabled && (
+        <p className="mb-5 max-w-[65ch] text-sm leading-relaxed text-ink-soft">
+          {ko
+            ? '우리 테이블에서는 박을 쓰지 않아요. 쓰는 테이블도 있으니 방식을 알아두세요.'
+            : 'Bak is off at our table. Some tables play it, so here is how it works.'}
+        </p>
+      )}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {items.map((item, i) => {
+          const on = rules.find((r) => r.id === item.id)?.on ?? false;
+          return (
+            <motion.div
+              key={item.titleKo}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{
+                duration: 0.4,
+                ease: [0.16, 1, 0.3, 1],
+                delay: i * 0.08,
+              }}
+              className="club-card p-5"
+            >
+              {/* On: the ×2 badge in plum. Off: a plain "off" label. */}
+              <span
+                className={`mb-3 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold tabular-nums ${
+                  on ? `${ACCENT.plum.fill} ${ACCENT.plum.onFill}` : 'bg-ink/10 text-ink'
+                }`}
+              >
+                {on ? '×2' : ko ? '우리는 안 써요' : 'Off at our table'}
+              </span>
+              <h4 className="mb-2 font-display text-xl">{ko ? item.titleKo : item.titleEn}</h4>
+              <p className="text-sm leading-relaxed text-ink-soft">
+                {ko ? item.descKo : item.descEn}
+              </p>
+            </motion.div>
+          );
+        })}
+      </div>
     </div>
   );
 }

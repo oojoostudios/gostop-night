@@ -9,6 +9,7 @@ import { FadeInOnView } from '@/components/fade-in-on-view';
 import { HwatuCardImage } from '@/components/hwatu-card-image';
 import { HwatuCardBack } from '@/components/hwatu-card-back';
 import { HWATU_DECK, type HwatuCard as HwatuCardData } from '@/lib/hwatu';
+import { callThreshold } from '@/config/rules';
 
 const cardById = (id: string): HwatuCardData => {
   const c = HWATU_DECK.find((x) => x.id === id);
@@ -119,9 +120,8 @@ const NORMAL_STEPS: Step[] = [
     id: 'end',
     title: 'Turn ends',
     titleKo: '차례가 끝나요',
-    desc: "Your turn passes. Once you reach 7 points, you'll decide: 'go' (continue for more) or 'stop' (cash out and end the round).",
-    descKo:
-      '내 차례가 끝나고 다음 사람으로 넘어가요. 7점에 도달하면 결정해야 해요 — 고(계속) 또는 스톱(멈춤).',
+    desc: `Your turn passes. Once you reach ${callThreshold(3)} points (${callThreshold(2)} with two players), you'll decide: 'go' (continue for more) or 'stop' (end the round and score).`,
+    descKo: `내 차례가 끝나고 다음 사람으로 넘어가요. ${callThreshold(3)}점(2인은 ${callThreshold(2)}점)에 도달하면 결정해야 해요 — 고(계속) 또는 스톱(멈춤).`,
     state: {
       hand: ['03-tti', '07-pi-1', '09-kkeut'],
       floor: ['04-pi-1', '08-gwang', '11-pi-3', '05-pi-1'],

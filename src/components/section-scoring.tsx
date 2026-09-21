@@ -8,6 +8,7 @@ import { WinningPatterns } from '@/components/winning-patterns';
 import { FadeInOnView } from '@/components/fade-in-on-view';
 import { HwatuCardImage } from '@/components/hwatu-card-image';
 import { HWATU_DECK, HWATU_TYPES, type HwatuType } from '@/lib/hwatu';
+import { SCORING } from '@/config/rules';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -22,6 +23,9 @@ const TYPE_DOT: Record<HwatuType, string> = {
 const HONGDAN = ['01-tti', '02-tti', '03-tti']; // 1 + 2 + 3월
 const CHEONGDAN = ['06-tti', '09-tti', '10-tti']; // 6 + 9 + 10월
 const CHODAN = ['04-tti', '05-tti', '07-tti']; // 4 + 5 + 7월
+/** 5 -> "Five", 10 -> "Ten" (other numbers stay as digits). */
+const numberWord = (n: number) => ({ 5: 'Five', 10: 'Ten' })[n] ?? String(n);
+
 const GODORI = ['02-kkeut', '04-kkeut', '08-kkeut']; // 꾀꼬리 + 두견새 + 기러기
 
 const cardById = (id: string) => HWATU_DECK.find((c) => c.id === id);
@@ -216,30 +220,34 @@ function GwangBlock() {
       <CategoryHeader type="gwang" />
       <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
         {locale === 'ko'
-          ? '광은 다섯 장. 3장부터 점수가 들어와요. 하지만 12월 비광은 차감 효과가 있어서 비광 포함 3광은 2점.'
-          : "There are five brights. Three or more begin to score — but the December Rain bright (비광 · Bigwang) discounts the score by one when it's part of the count."}
+          ? `광은 다섯 장. 3장부터 점수가 들어와요. 12월 비광이 끼면 3광은 ${SCORING.brights.three}점이 아니라 ${SCORING.brights.threeWithRain}점이고, 4광은 항상 ${SCORING.brights.four}점, 5광은 ${SCORING.brights.five}점이에요.`
+          : `There are five brights. Three or more begin to score. With the December Rain bright (비광 · Bigwang), three brights are worth ${SCORING.brights.threeWithRain} instead of ${SCORING.brights.three}; four are always ${SCORING.brights.four}, and five are ${SCORING.brights.five}.`}
       </p>
 
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-w-xl mb-6">
         <ScoreCell
           label={locale === 'ko' ? '3광 (비광 X)' : '3 brights (no rain)'}
-          score={locale === 'ko' ? '3점' : '3 pts'}
+          score={locale === 'ko' ? `${SCORING.brights.three}점` : `${SCORING.brights.three} pts`}
           delay={0}
         />
         <ScoreCell
           label={locale === 'ko' ? '3광 (비광 O)' : '3 brights (w/ rain)'}
-          score={locale === 'ko' ? '2점' : '2 pts'}
+          score={
+            locale === 'ko'
+              ? `${SCORING.brights.threeWithRain}점`
+              : `${SCORING.brights.threeWithRain} pts`
+          }
           detail={locale === 'ko' ? '비광 차감' : 'rain penalty'}
           delay={0.06}
         />
         <ScoreCell
           label={locale === 'ko' ? '4광' : '4 brights'}
-          score={locale === 'ko' ? '4점' : '4 pts'}
+          score={locale === 'ko' ? `${SCORING.brights.four}점` : `${SCORING.brights.four} pts`}
           delay={0.12}
         />
         <ScoreCell
           label={locale === 'ko' ? '5광' : '5 brights'}
-          score={locale === 'ko' ? '15점' : '15 pts'}
+          score={locale === 'ko' ? `${SCORING.brights.five}점` : `${SCORING.brights.five} pts`}
           detail={locale === 'ko' ? '최고 점수' : 'max'}
           emphasis
           delay={0.18}
@@ -279,14 +287,16 @@ function TtiBlock() {
       <CategoryHeader type="tti" />
       <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
         {locale === 'ko'
-          ? '띠 5장이면 1점, 한 장 추가될 때마다 +1점. 추가로 같은 색 띠 3장이 모이면 콤보 점수가 따로 들어와요.'
-          : 'Five ribbons score 1 point, +1 per extra. Three of the same color form a separate combo bonus.'}
+          ? `띠 ${SCORING.ribbonsStartAt}장이면 1점, 한 장 추가될 때마다 +1점. 추가로 같은 색 띠 3장이 모이면 콤보 점수가 따로 들어와요.`
+          : `${numberWord(SCORING.ribbonsStartAt)} ribbons score 1 point, +1 per extra. Three of the same color form a separate combo bonus.`}
       </p>
 
       <div className="space-y-3">
         <ComboCallout
           title={locale === 'ko' ? '홍단 (1·2·3월)' : 'Hongdan · Red ribbons'}
-          score={locale === 'ko' ? '+3점' : '+3 pts'}
+          score={
+            locale === 'ko' ? `+${SCORING.combos.hongdan}점` : `+${SCORING.combos.hongdan} pts`
+          }
           desc={
             locale === 'ko'
               ? '1월·2월·3월의 빨간 띠 (시문이 적힌 홍색 띠)'
@@ -297,7 +307,9 @@ function TtiBlock() {
         />
         <ComboCallout
           title={locale === 'ko' ? '청단 (6·9·10월)' : 'Cheongdan · Blue ribbons'}
-          score={locale === 'ko' ? '+3점' : '+3 pts'}
+          score={
+            locale === 'ko' ? `+${SCORING.combos.cheongdan}점` : `+${SCORING.combos.cheongdan} pts`
+          }
           desc={
             locale === 'ko' ? '6월·9월·10월의 파란 띠' : 'Blue ribbons of June, September, October.'
           }
@@ -306,7 +318,7 @@ function TtiBlock() {
         />
         <ComboCallout
           title={locale === 'ko' ? '초단 (4·5·7월)' : 'Chodan · Grass ribbons'}
-          score={locale === 'ko' ? '+3점' : '+3 pts'}
+          score={locale === 'ko' ? `+${SCORING.combos.chodan}점` : `+${SCORING.combos.chodan} pts`}
           desc={
             locale === 'ko' ? '4월·5월·7월의 초록 띠' : 'Grass-colored ribbons of April, May, July.'
           }
@@ -333,13 +345,13 @@ function KkeutBlock() {
       <CategoryHeader type="kkeut" />
       <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
         {locale === 'ko'
-          ? '열 5장이면 1점, 한 장 추가될 때마다 +1점. 새 3마리를 모으면 고도리 콤보.'
-          : 'Five animals score 1 point, +1 per extra. Collecting all three songbirds forms godori — a separate combo.'}
+          ? `열 ${SCORING.animalsStartAt}장이면 1점, 한 장 추가될 때마다 +1점. 새 3마리를 모으면 고도리 콤보.`
+          : `${numberWord(SCORING.animalsStartAt)} animals score 1 point, +1 per extra. Collecting all three songbirds forms godori — a separate combo.`}
       </p>
 
       <ComboCallout
         title={locale === 'ko' ? '고도리' : 'Godori · Songbird trio'}
-        score={locale === 'ko' ? '+5점' : '+5 pts'}
+        score={locale === 'ko' ? `+${SCORING.combos.godori}점` : `+${SCORING.combos.godori} pts`}
         desc={
           locale === 'ko'
             ? '새가 그려진 열 3장 — 꾀꼬리(2월) + 두견새(4월) + 기러기(8월)'
@@ -352,6 +364,11 @@ function KkeutBlock() {
       <div className="text-xs uppercase tracking-[0.18em] text-ink-soft mt-6 mb-2 font-semibold">
         {locale === 'ko' ? '전체 열 (9장)' : 'All animals (9)'}
       </div>
+      <p className="mt-3 max-w-2xl text-xs leading-relaxed text-ink-soft">
+        {locale === 'ko'
+          ? '9월 술잔(국진)은 열로도, 쌍피(피 2장)로도 셀 수 있어요. 점수를 셈할 때 직접 골라요.'
+          : 'The September sake cup (국진) counts as an Animal or as 2 junk. You pick when you score.'}
+      </p>
       <div className="flex flex-wrap gap-1.5">
         {kkeuts.map((k, i) => (
           <motion.div
@@ -380,8 +397,8 @@ function PiBlock() {
       <CategoryHeader type="pi" />
       <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
         {locale === 'ko'
-          ? '피 10장이면 1점, 한 장 추가될 때마다 +1점. 쌍피는 한 장이 두 장의 효과를 가져요.'
-          : 'Ten junk score 1 point, +1 per extra. Double junk (쌍피) count as two each.'}
+          ? `피 ${SCORING.junkStartAt}장이면 1점, 한 장 추가될 때마다 +1점. 쌍피는 한 장이 두 장의 효과를 가져요.`
+          : `${numberWord(SCORING.junkStartAt)} junk score 1 point, +1 per extra. Double junk (쌍피) count as two each.`}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start">

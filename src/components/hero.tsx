@@ -6,6 +6,7 @@ import { useLocale } from '@/contexts/locale-context';
 import { HwatuCardImage } from '@/components/hwatu-card-image';
 import { Mascot } from '@/components/mascot';
 import { Wordmark } from '@/components/wordmark';
+import { callThresholdBoth } from '@/config/rules';
 
 const EASE = [0.32, 0.72, 0, 1] as const;
 
@@ -17,7 +18,11 @@ const STATS = [
     labelKo: '종류 (광·띠·열·피)',
     labelEn: 'types (brights · ribbons · animals · junk)',
   },
-  { num: '7', labelKo: '점에서 고/스톱', labelEn: 'points to call go/stop' },
+  {
+    num: callThresholdBoth(),
+    labelKo: '점에서 고/스톱 (3인 / 2인)',
+    labelEn: 'points to call go/stop (3 / 2 players)',
+  },
 ] as const;
 
 // Cards used for the right-side fan sigil

@@ -13,7 +13,10 @@ import {
   type HwatuCard as HwatuCardData,
   type HwatuType,
 } from '@/lib/hwatu';
-import { computeScore } from '@/lib/score';
+import { computeScore, SAKE_CUP_ID } from '@/lib/score';
+import { callThreshold } from '@/config/rules';
+import { usePlayers } from '@/lib/use-players';
+import { PlayersSwitch } from '@/components/players-switch';
 
 const TYPE_ORDER: ReadonlyArray<HwatuType> = ['gwang', 'tti', 'kkeut', 'pi'];
 
@@ -34,6 +37,8 @@ const TYPE_DOT: Record<HwatuType, string> = {
 export function ScoreCalculator() {
   const { locale } = useLocale();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  // September's sake cup counts as an Animal OR as two junk. The player picks.
+  const [sakeAsJunk, setSakeAsJunk] = useState(false);
 
   const toggle = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -45,7 +50,10 @@ export function ScoreCalculator() {
   }, []);
 
   const reset = useCallback(() => setSelectedIds(new Set()), []);
-  const score = useMemo(() => computeScore(selectedIds), [selectedIds]);
+  const score = useMemo(
+    () => computeScore(selectedIds, { sakeCupAsJunk: sakeAsJunk }),
+    [selectedIds, sakeAsJunk],
+  );
 
   return (
     <div className="border-t border-hairline pt-14 mt-4">
@@ -69,7 +77,14 @@ export function ScoreCalculator() {
         </div>
 
         <div className="lg:sticky lg:top-8 lg:self-start">
-          <ScorePanel score={score} selectedCount={selectedIds.size} onReset={reset} />
+          <ScorePanel
+            score={score}
+            selectedCount={selectedIds.size}
+            onReset={reset}
+            sakeSelected={selectedIds.has(SAKE_CUP_ID)}
+            sakeAsJunk={sakeAsJunk}
+            onSakeChange={setSakeAsJunk}
+          />
         </div>
       </div>
     </div>
@@ -151,16 +166,35 @@ function ScorePanel({
   score,
   selectedCount,
   onReset,
+  sakeSelected,
+  sakeAsJunk,
+  onSakeChange,
 }: {
   score: ReturnType<typeof computeScore>;
   selectedCount: number;
   onReset: () => void;
+  sakeSelected: boolean;
+  sakeAsJunk: boolean;
+  onSakeChange: (asJunk: boolean) => void;
 }) {
   const { locale } = useLocale();
-  const canStop = score.total >= 7;
+  const { players } = usePlayers();
+  // Points needed before Go or Stop, for this many players (src/config/rules.ts).
+  const threshold = callThreshold(players);
+  const canStop = score.total >= threshold;
 
   return (
     <div className={`club-card p-6 transition-colors ${canStop ? 'bg-gold/25' : ''}`}>
+      <div className="mb-5">
+        <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-ink-soft">
+          {locale === 'ko' ? '테이블' : 'Table'}
+        </div>
+        <PlayersSwitch />
+        <div className="mt-2 text-xs text-ink-soft">
+          {locale === 'ko' ? `${threshold}점부터 고/스톱` : `Go/Stop from ${threshold} points`}
+        </div>
+      </div>
+
       <div className="flex items-baseline justify-between mb-1">
         <div className="text-xs uppercase tracking-[0.18em] font-semibold text-ink-soft">
           {locale === 'ko' ? '총점' : 'Total'}
@@ -204,7 +238,9 @@ function ScorePanel({
           >
             <Trophy className="size-3.5" />
             <span className="sweep-mark" style={{ ['--sweep-delay' as string]: '120ms' }}>
-              {locale === 'ko' ? '고/스톱 결정 가능 (7점)' : 'Go/Stop available (7+)'}
+              {locale === 'ko'
+                ? `고/스톱 결정 가능 (${threshold}점)`
+                : `Go/Stop available (${threshold}+)`}
             </span>
           </motion.div>
         )}
@@ -254,6 +290,32 @@ function ScorePanel({
           );
         })}
       </div>
+
+      {sakeSelected && (
+        <div className="mb-4 border-t border-hairline pt-4">
+          <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-ink-soft">
+            {locale === 'ko' ? '9월 술잔은 이렇게 셈해요' : 'Sake cup (Sep) counts as'}
+          </div>
+          <div className="flex flex-wrap gap-2.5" role="group">
+            <button
+              type="button"
+              className="club-chip"
+              aria-pressed={!sakeAsJunk}
+              onClick={() => onSakeChange(false)}
+            >
+              {locale === 'ko' ? '열' : 'Animal'}
+            </button>
+            <button
+              type="button"
+              className="club-chip"
+              aria-pressed={sakeAsJunk}
+              onClick={() => onSakeChange(true)}
+            >
+              {locale === 'ko' ? '쌍피 (피 2장)' : 'Double junk (2)'}
+            </button>
+          </div>
+        </div>
+      )}
 
       <AnimatePresence>
         {score.combos.length > 0 && (

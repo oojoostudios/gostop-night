@@ -1,3 +1,5 @@
+import { SCORING } from '@/config/rules';
+
 export type HwatuType = 'gwang' | 'tti' | 'kkeut' | 'pi';
 
 export type HwatuCard = {
@@ -58,6 +60,11 @@ export const MONTHS: ReadonlyArray<Month> = [
   { num: 12, abbr: 'Dec', motif: 'Rain Willow', motifKo: '비' },
 ];
 
+/** 3 -> "three", 5 -> "five", 10 -> "ten" (other numbers stay as digits). */
+const word = (n: number) => ({ 3: 'three', 5: 'five', 10: 'ten' })[n] ?? String(n);
+
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+
 // Terms table (CLAUDE.md): hanja, Korean, romanized, English label.
 export const HWATU_TYPES: Record<
   HwatuType,
@@ -75,8 +82,8 @@ export const HWATU_TYPES: Record<
     labelKo: '광',
     hanja: '光',
     roman: 'Gwang',
-    blurb: 'The five most prestigious cards. Collect three or more to score.',
-    blurbKo: '다섯 장의 가장 귀한 카드. 3장 이상 모으면 점수가 됩니다.',
+    blurb: `The five most prestigious cards. Collect ${word(SCORING.brights.three)} or more to score.`,
+    blurbKo: `다섯 장의 가장 귀한 카드. ${SCORING.brights.three}장 이상 모으면 점수가 됩니다.`,
   },
   tti: {
     label: 'Ribbon',
@@ -91,16 +98,16 @@ export const HWATU_TYPES: Record<
     labelKo: '열',
     hanja: '動',
     roman: 'Yeol',
-    blurb: 'Cards depicting animals. Five of these score one point.',
-    blurbKo: '동물이 그려진 카드. 5장부터 1점.',
+    blurb: `Cards depicting animals. ${cap(word(SCORING.animalsStartAt))} of these score one point.`,
+    blurbKo: `동물이 그려진 카드. ${SCORING.animalsStartAt}장부터 1점.`,
   },
   pi: {
     label: 'Junk',
     labelKo: '피',
     hanja: '皮',
     roman: 'Pi',
-    blurb: 'Plain cards. Ten score one point; doubles (쌍피) count as two.',
-    blurbKo: '일반 카드. 10장에 1점, 쌍피는 두 장으로 셉니다.',
+    blurb: `Plain cards. ${cap(word(SCORING.junkStartAt))} score one point; doubles (쌍피) count as two.`,
+    blurbKo: `일반 카드. ${SCORING.junkStartAt}장에 1점, 쌍피는 두 장으로 셉니다.`,
   },
 };
 
@@ -112,8 +119,8 @@ const BLUE = { combo: '청단 Blue' };
 const GODORI = { combo: 'Godori 고도리' };
 const NO_COMBO = { combo: 'No combo · 조합 없음' };
 const RAIN_BRIGHT = {
-  combo: 'Brights (Rain: 3 Brights = 2 pts)',
-  comboKo: '삼광 · 사광 · 오광 (비광 포함 삼광 = 2점)',
+  combo: `Brights (Rain: ${SCORING.brights.three} Brights = ${SCORING.brights.threeWithRain} pts)`,
+  comboKo: `삼광 · 사광 · 오광 (비광 포함 삼광 = ${SCORING.brights.threeWithRain}점)`,
 };
 
 /** Short English name for a type label, then Korean. Used by the caption. */
@@ -520,9 +527,8 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     typeLabel: 'Animal or Double junk',
     typeLabelKo: '열 또는 쌍피',
     image: '/cards/m09-animal.webp',
-    lore: 'A sake cup beside chrysanthemums. In some matgo rules this card doubles as a 쌍피 — a hidden bonus that surprises new players.',
-    loreKo:
-      '국화 옆 술잔. 맞고 룰에서는 이 카드를 쌍피로도 쓸 수 있어요 — 처음 치는 사람이 깜짝 놀라는 숨겨진 룰이에요.',
+    lore: 'A sake cup beside chrysanthemums. It counts as an Animal or as two junk (쌍피) — the player picks when scoring.',
+    loreKo: '국화 옆 술잔. 열로도, 쌍피(피 2장)로도 셀 수 있고, 점수 셈할 때 플레이어가 골라요.',
   },
   {
     id: '09-tti',

@@ -1,4 +1,5 @@
 import type { GameId } from '@/lib/games';
+import { callThresholdBoth } from '@/config/rules';
 
 export type Section = {
   id: string;
@@ -48,16 +49,17 @@ const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
     num: '05',
     label: 'Special rules',
     labelKo: '특수 룰',
-    blurb: 'Bombs, ttadak, jjok, and the 박 penalty system — small moves with big consequences.',
-    blurbKo: '폭탄·따닥·쪽·박 시스템. 작은 움직임이 큰 결과로 이어지는 묘미.',
+    blurb:
+      'Bombs, ttadak, jjok, shakes, and the optional 박 penalty — small moves with big consequences.',
+    blurbKo: '폭탄·따닥·쪽·흔들기, 그리고 선택 규칙인 박. 작은 움직임이 큰 결과로 이어지는 묘미.',
   },
   {
     id: 'section-gostop',
     num: '06',
     label: 'Go or Stop?',
     labelKo: '고냐 스톱이냐',
-    blurb: 'Hit 7 points and you choose: cash out, or push for double the score.',
-    blurbKo: '7점이 되면 결정해요 — 멈출 것인가, 두 배를 노릴 것인가.',
+    blurb: `Reach ${callThresholdBoth()} points (3 / 2 players) and you choose: stop and score, or call Go for more.`,
+    blurbKo: `${callThresholdBoth()}점(3인 / 2인)이 되면 결정해요 — 여기서 멈출 것인가, 고를 외칠 것인가.`,
   },
 ];
 

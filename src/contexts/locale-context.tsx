@@ -46,6 +46,11 @@ export function LocaleProvider({
     }
   }, [locale, hydrated]);
 
+  // Screen readers and translation tools go by the page language, so keep it in step with the toggle.
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
+
   const value = useMemo(() => ({ locale, setLocale }), [locale]);
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }

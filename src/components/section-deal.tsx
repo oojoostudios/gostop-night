@@ -177,7 +177,7 @@ export function SectionDeal() {
                 type="button"
                 onClick={() => setStep(i as Step)}
                 whileTap={{ scale: 0.85 }}
-                aria-label={`Go to step ${i + 1}`}
+                aria-label={locale === 'ko' ? `${i + 1}단계로 이동` : `Go to step ${i + 1}`}
                 className={`h-1.5 rounded-full transition-all ${
                   i === step ? 'w-8 bg-plum' : i < step ? 'w-4 bg-plum' : 'w-4 bg-ink/20'
                 }`}

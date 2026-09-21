@@ -47,7 +47,10 @@ export function FlipCardModal({
             className="!w-auto !max-w-none !overflow-visible !bg-transparent !p-0 !shadow-none"
           >
             {/* Sits above the card, on the dimmed page, so it never disappears against the card. */}
-            <Modal.CloseTrigger className="!absolute !-top-14 !right-0 !flex !size-10 !items-center !justify-center !rounded-full !bg-surface !text-ink" />
+            <Modal.CloseTrigger
+              aria-label={locale === 'ko' ? '닫기' : 'Close'}
+              className="!absolute !-top-14 !right-0 !flex !size-10 !items-center !justify-center !rounded-full !bg-surface !text-ink"
+            />
             {card && <FlipCard key={card.id} card={card} />}
           </Modal.Dialog>
         </Modal.Container>

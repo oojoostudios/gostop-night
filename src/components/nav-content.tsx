@@ -52,7 +52,11 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   }, [sections]);
 
   const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Jump instead of gliding for visitors who asked their device for less motion.
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
     onNavigate?.();
   };
 

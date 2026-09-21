@@ -3,12 +3,14 @@
 import { Menu } from 'lucide-react';
 import Link from 'next/link';
 import { Drawer, useOverlayState } from '@heroui/react';
+import { useLocale } from '@/contexts/locale-context';
 import { NavContent } from '@/components/nav-content';
 import { Mascot } from '@/components/mascot';
 import { Wordmark } from '@/components/wordmark';
 
 export function MobileTopbar() {
   const drawer = useOverlayState();
+  const { locale } = useLocale();
 
   return (
     <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between px-5 h-14 border-b border-hairline bg-paper">
@@ -18,7 +20,7 @@ export function MobileTopbar() {
       </Link>
       <Drawer state={drawer}>
         <Drawer.Trigger
-          aria-label="Open menu"
+          aria-label={locale === 'ko' ? '메뉴 열기' : 'Open menu'}
           className="p-2 -mr-2 rounded-full text-ink-soft hover:text-ink hover:bg-surface"
         >
           <Menu className="size-5" />

@@ -88,7 +88,7 @@ export function computeScore(selectedIds: ReadonlySet<string>, options: ScoreOpt
   for (const card of HWATU_DECK) {
     if (!selectedIds.has(card.id)) continue;
     if (card.id === SAKE_CUP_ID && options.sakeCupAsJunk) {
-      // Counted as a double junk: one card, worth two.
+      // Counted as a Double Junk: one card, worth two.
       counts.pi += 1;
       piEffective += 2;
       continue;

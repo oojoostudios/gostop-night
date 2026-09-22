@@ -151,7 +151,7 @@ const SUMMARY: SummaryGroup[] = [
   {
     type: 'pi',
     rows: [
-      { en: 'Any 10 Junk (double junk counts as 2)', ko: '피 10장 (쌍피는 2장)', value: '1' },
+      { en: 'Any 10 Junk (Double Junk counts as 2)', ko: '피 10장 (쌍피는 2장)', value: '1' },
       { en: 'Each extra Junk', ko: '추가 피 1장마다', value: '+1' },
     ],
   },
@@ -339,7 +339,7 @@ const RULE: Record<HwatuType, { en: string; ko: string }> = {
     ko: `열은 ${SCORING.animalsStartAt}장부터 1점, 이후 한 장마다 +1점. 새 3마리를 모으면 고도리로 추가 점수.`,
   },
   pi: {
-    en: '10 Junk score 1 point, plus 1 for each extra. Double junk counts as 2.',
+    en: '10 Junk score 1 point, plus 1 for each extra. Double Junk counts as 2.',
     ko: `피는 ${SCORING.junkStartAt}장부터 1점, 이후 한 장마다 +1점. 쌍피는 두 장으로 셈해요.`,
   },
 };

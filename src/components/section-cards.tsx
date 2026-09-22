@@ -133,7 +133,7 @@ function TypeCard({ type }: { type: HwatuType }) {
         <div className="text-label font-medium">{monthList(monthsForColumn(type), locale)}</div>
       </div>
 
-      {/* Double junk is a Junk card worth two, so it is listed on the Junk card. */}
+      {/* Double Junk is a Junk card worth two, so it is listed on the Junk card. */}
       {type === 'pi' && (
         <div className="mt-1">
           <div className={smallLabel}>

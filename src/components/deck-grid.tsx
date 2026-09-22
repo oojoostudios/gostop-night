@@ -28,7 +28,7 @@ const COLUMN_DOT: Record<DeckColumn, string> = {
   double: 'type-dot bg-type-double',
 };
 
-// The grid has six card slots per row: Bright 1, Animal 1, Ribbon 1, Junk 2, Double junk 1.
+// The grid has six card slots per row: Bright 1, Animal 1, Ribbon 1, Junk 2, Double Junk 1.
 const FIRST_SLOT: Record<DeckColumn, number> = { gwang: 1, kkeut: 2, tti: 3, pi: 4, double: 6 };
 
 // Both the header and every row use this template, so the columns line up.
@@ -43,7 +43,7 @@ const slotClassWide =
 
 /**
  * Section 01's month-by-type grid: 12 rows (months) by 5 columns (Bright, Animal, Ribbon,
- * Junk, Double junk). Empty cells stay empty. A filter dims the cards that don't match
+ * Junk, Double Junk). Empty cells stay empty. A filter dims the cards that don't match
  * (25% opacity, 95% size) and the grid keeps its shape. Tapping a card opens it enlarged.
  */
 export function DeckGrid({

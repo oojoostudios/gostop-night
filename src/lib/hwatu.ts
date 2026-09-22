@@ -169,9 +169,9 @@ export function cardCombo(card: HwatuCard, locale: 'en' | 'ko' = 'en'): string |
   return locale === 'ko' ? (card.comboKo ?? card.combo) : card.combo;
 }
 
-/** Double junk (쌍피): the fifth term in the Terms table. It has no hanja. */
+/** Double Junk (쌍피): the fifth term in the Terms table. It has no hanja. */
 export const DOUBLE_JUNK = {
-  label: 'Double junk ×2',
+  label: 'Double Junk ×2',
   labelKo: '쌍피 ×2',
   termKo: '쌍피',
   roman: 'Ssangpi',
@@ -180,7 +180,7 @@ export const DOUBLE_JUNK = {
 /** True for the two double-junk cards (Nov and Dec). The scoring code relies on the same tag. */
 export const isDoubleJunk = (card: HwatuCard): boolean => card.tag === '쌍피';
 
-/** Columns of the month-by-type grid in Section 01. Double junk gets its own column. */
+/** Columns of the month-by-type grid in Section 01. Double Junk gets its own column. */
 export type DeckColumn = HwatuType | 'double';
 export const DECK_COLUMNS: ReadonlyArray<DeckColumn> = ['gwang', 'kkeut', 'tti', 'pi', 'double'];
 export const deckColumn = (card: HwatuCard): DeckColumn =>
@@ -191,7 +191,7 @@ export function monthsWhere(match: (card: HwatuCard) => boolean): ReadonlyArray<
   return MONTHS.filter((m) => HWATU_DECK.some((c) => c.month === m.num && match(c)));
 }
 
-/** Months in which a column of the grid has a card. Junk means regular junk; double junk is its own column. */
+/** Months in which a column of the grid has a card. Junk means regular junk; Double Junk is its own column. */
 export const monthsForColumn = (column: DeckColumn): ReadonlyArray<Month> =>
   monthsWhere((c) => deckColumn(c) === column);
 
@@ -531,7 +531,7 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     type: 'kkeut',
     name: 'Chrysanthemum + Sake Cup',
     nameKo: '국진 술잔',
-    typeLabel: 'Animal or Double junk',
+    typeLabel: 'Animal or Double Junk',
     typeLabelKo: '열 또는 쌍피',
     image: '/cards/m09-animal.webp',
     lore: 'A sake cup beside chrysanthemums. It counts as an Animal or as two Junk (쌍피) — the player picks when scoring.',
@@ -637,7 +637,7 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     nameKo: '오동 쌍피',
     tag: '쌍피',
     tagKo: '쌍피',
-    typeLabel: 'Double junk ×2',
+    typeLabel: 'Double Junk ×2',
     typeLabelKo: '쌍피 ×2',
     image: '/cards/m11-double.webp',
   },
@@ -682,7 +682,7 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     nameKo: '비 쌍피',
     tag: '쌍피',
     tagKo: '쌍피',
-    typeLabel: 'Double junk ×2',
+    typeLabel: 'Double Junk ×2',
     typeLabelKo: '쌍피 ×2',
     image: '/cards/m12-double.webp',
   },

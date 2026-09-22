@@ -72,7 +72,7 @@ export const SCORING = {
   ribbonsStartAt: 5,
   /** Animals (열): this many score 1 point, +1 for each extra. */
   animalsStartAt: 5,
-  /** Junk (피): this many score 1 point, +1 for each extra. Double junk (쌍피) counts as two. */
+  /** Junk (피): this many score 1 point, +1 for each extra. Double Junk (쌍피) counts as two. */
   junkStartAt: 10,
   /** Combo bonuses. 홍단/청단/초단 are the red, blue and grass Ribbon sets. */
   combos: { hongdan: 3, cheongdan: 3, chodan: 3, godori: 5 },

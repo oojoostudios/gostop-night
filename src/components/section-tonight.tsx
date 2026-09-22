@@ -12,6 +12,7 @@ import { RecordHandDialog } from '@/components/tonight-record';
 import { CashOutView } from '@/components/tonight-cashout';
 import { GOSTOP_SECTIONS } from '@/lib/sections';
 import { useDemoFlag, useMounted, useTonight } from '@/lib/use-tonight';
+import { usePendingScore } from '@/lib/use-pending-score';
 import {
   finishEvent,
   rebuy,
@@ -43,6 +44,7 @@ export function SectionTonight() {
   const { state, update } = useTonight(demo);
   const [view, setView] = useState<View>(null);
   const [recording, setRecording] = useState(false);
+  const { points: pendingPoints, clear: clearPendingPoints } = usePendingScore();
 
   const active = state.active;
   const pastEvent =
@@ -53,6 +55,10 @@ export function SectionTonight() {
   else if (view === 'cashout' && active) screen = 'cashout';
   else if (pastEvent) screen = 'past';
   else screen = active ? 'table' : 'home';
+
+  // The Section 04 calculator's "Use this score in Game Time" button lands here —
+  // open the hand-entry dialog with the score already filled in.
+  const recordingOpen = recording || (pendingPoints !== null && screen === 'table');
 
   return (
     <section id="section-tonight" className="relative border-t border-hairline py-24">
@@ -134,8 +140,12 @@ export function SectionTonight() {
       {active && (
         <RecordHandDialog
           ev={active}
-          isOpen={recording}
-          onClose={() => setRecording(false)}
+          isOpen={recordingOpen}
+          initialPoints={pendingPoints ?? undefined}
+          onClose={() => {
+            setRecording(false);
+            clearPendingPoints();
+          }}
           onSaveHand={(input) => update((s) => recordHand(s, input))}
           onSaveDraw={() => update((s) => recordDraw(s))}
         />

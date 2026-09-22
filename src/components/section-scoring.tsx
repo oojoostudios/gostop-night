@@ -213,26 +213,6 @@ function CategoryHeader({ type }: { type: HwatuType }) {
   );
 }
 
-function PointsList({ rows }: { rows: { en: string; ko: string; value: string }[] }) {
-  const { locale } = useLocale();
-  return (
-    <dl className="grid grid-cols-[1fr_auto]">
-      {rows.map((row, i) => (
-        <Fragment key={row.en}>
-          <dt className={`py-2.5 text-body ${i > 0 ? 'border-t border-hairline' : ''}`}>
-            {locale === 'ko' ? row.ko : row.en}
-          </dt>
-          <dd
-            className={`py-2.5 text-body font-bold tabular-nums text-right ${i > 0 ? 'border-t border-hairline' : ''}`}
-          >
-            {row.value}
-          </dd>
-        </Fragment>
-      ))}
-    </dl>
-  );
-}
-
 function ComboRow({
   nameEn,
   nameKo,
@@ -282,7 +262,6 @@ function CategoryBlock({ type }: { type: HwatuType }) {
     <article className="club-card p-5 sm:p-6">
       <CategoryHeader type={type} />
       <p className="mb-4 max-w-[60ch] text-body">{RULE[type][ko ? 'ko' : 'en']}</p>
-      <PointsList rows={POINTS[type]} />
 
       {type === 'tti' && (
         <div className="mt-3.5 space-y-3.5">
@@ -363,31 +342,6 @@ const RULE: Record<HwatuType, { en: string; ko: string }> = {
     en: '10 Junk score 1 point, plus 1 for each extra. Double junk counts as 2.',
     ko: `피는 ${SCORING.junkStartAt}장부터 1점, 이후 한 장마다 +1점. 쌍피는 두 장으로 셈해요.`,
   },
-};
-
-const POINTS: Record<HwatuType, { en: string; ko: string; value: string }[]> = {
-  gwang: [
-    { en: '3 Brights', ko: '광 3장', value: String(SCORING.brights.three) },
-    {
-      en: '3 Brights, one of them the Dec rain Bright',
-      ko: '광 3장 (12월 비광 포함)',
-      value: String(SCORING.brights.threeWithRain),
-    },
-    { en: '4 Brights', ko: '광 4장', value: String(SCORING.brights.four) },
-    { en: 'All 5 Brights', ko: '광 5장 전부', value: String(SCORING.brights.five) },
-  ],
-  tti: [
-    { en: '5 Ribbons', ko: '띠 5장', value: '1' },
-    { en: 'Each extra Ribbon', ko: '추가 띠 1장마다', value: '+1' },
-  ],
-  kkeut: [
-    { en: '5 Animals', ko: '열 5장', value: '1' },
-    { en: 'Each extra Animal', ko: '추가 열 1장마다', value: '+1' },
-  ],
-  pi: [
-    { en: '10 Junk', ko: '피 10장', value: '1' },
-    { en: 'Each extra Junk', ko: '추가 피 1장마다', value: '+1' },
-  ],
 };
 
 const NOTE: Partial<Record<HwatuType, { en: string; ko: string }>> = {

@@ -1,11 +1,12 @@
 import { HwatuCardImage } from '@/components/hwatu-card-image';
-import { isDoubleJunk, type HwatuCard } from '@/lib/hwatu';
+import { MONTHS, isDoubleJunk, type HwatuCard } from '@/lib/hwatu';
 import { BIGWANG_ID } from '@/lib/score';
 
 /**
  * One card as shown in Section 04 (the summary blocks and the calculator): the image,
- * a small ink "Rain" or "×2" pill where it applies, and the month caption underneath
- * (always `3월` — the month number, not the section's language toggle).
+ * a small ink "Rain" or "×2" pill where it applies, and the month caption underneath —
+ * two lines, `3월` then `Mar` — the month number and abbreviation, not the section's
+ * language toggle.
  */
 export function ScoreCardArt({
   card,
@@ -33,7 +34,12 @@ export function ScoreCardArt({
           </span>
         )}
       </div>
-      {showMonth && <div className="mt-1 text-center text-label text-ink-soft">{card.month}월</div>}
+      {showMonth && (
+        <div className="mt-1 text-center leading-snug text-label text-ink-soft">
+          <div>{card.month}월</div>
+          <div>{MONTHS[card.month - 1].abbr}</div>
+        </div>
+      )}
     </div>
   );
 }

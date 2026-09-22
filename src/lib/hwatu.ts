@@ -130,22 +130,25 @@ export function cardTypeLabels(card: HwatuCard): { en: string; ko: string } {
 }
 
 /**
- * The 3-line card caption used everywhere a card image appears (CLAUDE.md):
- *   3월 · Mar
+ * The card caption used everywhere a card image appears (CLAUDE.md), the month split
+ * across two lines:
+ *   3월
+ *   Mar
  *   Cherry Blossom Red Ribbon
  *   벚꽃 홍단 · Ribbon 띠
- * In Korean, lines 2 and 3 swap places.
+ * In Korean, line2 and line3 swap places.
  */
 export function cardCaption(
   card: HwatuCard,
   locale: 'en' | 'ko' = 'en',
-): { line1: string; line2: string; line3: string } {
+): { monthNum: string; monthAbbr: string; line2: string; line3: string } {
   const month = MONTHS[card.month - 1];
   const type = cardTypeLabels(card);
   const english = card.name;
   const korean = `${card.nameKo} · ${type.en} ${type.ko}`;
   return {
-    line1: `${card.month}월 · ${month.abbr}`,
+    monthNum: `${card.month}월`,
+    monthAbbr: month.abbr,
     line2: locale === 'ko' ? korean : english,
     line3: locale === 'ko' ? english : korean,
   };
@@ -157,8 +160,8 @@ export function cardCaption(
  * languages are always included.
  */
 export function cardLabel(card: HwatuCard): string {
-  const { line1, line2, line3 } = cardCaption(card);
-  return `${line1} · ${line2} · ${line3}`;
+  const { monthNum, monthAbbr, line2, line3 } = cardCaption(card);
+  return `${monthNum} · ${monthAbbr} · ${line2} · ${line3}`;
 }
 
 /** Combo text for the card in the given language, or undefined if it has none. */

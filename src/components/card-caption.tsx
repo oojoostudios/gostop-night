@@ -21,10 +21,15 @@ export function CardCaption({
   className?: string;
 }) {
   const { locale: siteLocale } = useLocale();
-  const { line1, line2, line3 } = cardCaption(card, forcedLocale ?? siteLocale);
+  const { monthNum, monthAbbr, line2, line3 } = cardCaption(card, forcedLocale ?? siteLocale);
   return (
     <div className={`text-label leading-snug ${className}`}>
-      <div className={`tabular-nums text-ink-soft ${compact ? 'font-semibold' : ''}`}>{line1}</div>
+      <div className={`tabular-nums text-ink-soft ${compact ? 'font-semibold' : ''}`}>
+        {monthNum}
+      </div>
+      <div className={`tabular-nums text-ink-soft ${compact ? 'font-semibold' : ''}`}>
+        {monthAbbr}
+      </div>
       <div className="font-medium">{line2}</div>
       <div className="text-ink-soft">{line3}</div>
     </div>

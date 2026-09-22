@@ -148,12 +148,16 @@ function Check({
 export function RecordHandDialog({
   ev,
   isOpen,
+  initialPoints,
   onClose,
   onSaveHand,
   onSaveDraw,
 }: {
   ev: TonightEvent;
   isOpen: boolean;
+  /** Prefills the points stepper — carried over from the Section 04 calculator's
+   * "Use this score in Game Time" button. */
+  initialPoints?: number;
   onClose: () => void;
   onSaveHand: (input: HandInput) => void;
   onSaveDraw: () => void;
@@ -182,6 +186,7 @@ export function RecordHandDialog({
             {isOpen && (
               <HandForm
                 ev={ev}
+                initialPoints={initialPoints}
                 onCancel={onClose}
                 onSaveHand={(input) => {
                   onSaveHand(input);
@@ -202,11 +207,13 @@ export function RecordHandDialog({
 
 function HandForm({
   ev,
+  initialPoints,
   onCancel,
   onSaveHand,
   onSaveDraw,
 }: {
   ev: TonightEvent;
+  initialPoints?: number;
   onCancel: () => void;
   onSaveHand: (input: HandInput) => void;
   onSaveDraw: () => void;
@@ -218,7 +225,9 @@ function HandForm({
   const afterDraw = nextHandDoubled(ev);
 
   const [winner, setWinner] = useState<string | 'draw' | null>(null);
-  const [points, setPoints] = useState<number>(callThreshold(playerCount as Players));
+  const [points, setPoints] = useState<number>(
+    initialPoints ?? callThreshold(playerCount as Players),
+  );
   const [gos, setGos] = useState(0);
   const [shakes, setShakes] = useState(0);
   const [bombs, setBombs] = useState(0);

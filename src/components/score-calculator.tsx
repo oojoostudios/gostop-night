@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
-import { RotateCcw, Trophy } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { ArrowRight, RotateCcw, Trophy } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { useLocale } from '@/contexts/locale-context';
 import { ScoreCardArt } from '@/components/score-card';
@@ -11,6 +11,7 @@ import { HWATU_DECK, HWATU_TYPES, type HwatuCard, type HwatuType } from '@/lib/h
 import { computeScore, SAKE_CUP_ID } from '@/lib/score';
 import { callThreshold } from '@/config/rules';
 import { usePlayers } from '@/lib/use-players';
+import { setPendingScore } from '@/lib/use-pending-score';
 
 const TYPE_ORDER: ReadonlyArray<HwatuType> = ['gwang', 'tti', 'kkeut', 'pi'];
 
@@ -70,7 +71,7 @@ export function ScoreCalculator() {
 
       <PlayersSwitch />
 
-      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_260px] lg:items-start">
+      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px] lg:items-start">
         <div className="club-card space-y-5 p-5 sm:p-6">
           {TYPE_ORDER.map((type) => (
             <PickerGroup key={type} type={type} selected={selected} onToggle={toggle} />
@@ -160,6 +161,14 @@ function TotalPanel({
 }) {
   const { locale } = useLocale();
   const ko = locale === 'ko';
+  const reduceMotion = useReducedMotion();
+
+  const useScore = () => {
+    setPendingScore(score.total);
+    document
+      .getElementById('section-tonight')
+      ?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  };
 
   // The breakdown lines shown under the total: brights/ribbons/animals/junk that scored
   // (their base count, not counting combo bonuses — those get their own line below),
@@ -255,11 +264,22 @@ function TotalPanel({
       )}
 
       <Button
+        variant="primary"
+        size="sm"
+        onPress={useScore}
+        isDisabled={score.total === 0}
+        className="mt-5 w-full justify-center gap-2 text-label"
+      >
+        {ko ? '이 점수로 게임 타임 기록하기' : 'Use this score in Game Time'}
+        <ArrowRight className="size-3.5" />
+      </Button>
+
+      <Button
         variant="ghost"
         size="sm"
         onPress={onReset}
         isDisabled={score.total === 0}
-        className="mt-4 w-full justify-center gap-2 text-label"
+        className="mt-2 w-full justify-center gap-2 text-label"
       >
         <RotateCcw className="size-3.5" />
         {ko ? '카드 지우기' : 'Clear cards'}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { Modal } from '@heroui/react';
 import { RULES, bakRules, callThreshold, type Players } from '@/config/rules';
@@ -205,18 +205,25 @@ export function RecordHandDialog({
   );
 }
 
-function HandForm({
+/**
+ * The form itself, split out from the modal so it can also be embedded inline on a page
+ * (Section 07 Stage 2's live table screen shows it directly, not in a dialog).
+ */
+export function HandForm({
   ev,
   initialPoints,
   onCancel,
   onSaveHand,
   onSaveDraw,
+  onDraftChange,
 }: {
   ev: TonightEvent;
   initialPoints?: number;
   onCancel: () => void;
   onSaveHand: (input: HandInput) => void;
   onSaveDraw: () => void;
+  /** Fires when the form goes from "no winner picked yet" to "picking a winner or a draw", and back. */
+  onDraftChange?: (active: boolean) => void;
 }) {
   const { locale } = useLocale();
   const ko = locale === 'ko';
@@ -225,6 +232,10 @@ function HandForm({
   const afterDraw = nextHandDoubled(ev);
 
   const [winner, setWinner] = useState<string | 'draw' | null>(null);
+
+  useEffect(() => {
+    onDraftChange?.(winner !== null);
+  }, [winner, onDraftChange]);
   const [points, setPoints] = useState<number>(
     initialPoints ?? callThreshold(playerCount as Players),
   );

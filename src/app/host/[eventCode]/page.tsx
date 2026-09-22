@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getEventByCode, toPublicEvent } from '@/lib/live/events';
 import { isHostSession } from '@/lib/live/host-session';
+import { listPlayersForEvent, listTablesForEvent } from '@/lib/live/tables';
+import { tableQrDataUrl } from '@/lib/live/qrcode';
+import { siteUrl } from '@/lib/live/site-url';
 import { HostPinGate } from '@/components/host-pin-gate';
 import { HostDashboard } from '@/components/host-dashboard';
 
@@ -23,5 +26,16 @@ export default async function HostEventPage({
     return <HostPinGate eventCode={event.code} />;
   }
 
-  return <HostDashboard event={toPublicEvent(event)} />;
+  const [tables, players] = await Promise.all([
+    listTablesForEvent(event.id),
+    listPlayersForEvent(event.id),
+  ]);
+  const tablesWithQr = await Promise.all(
+    tables.map(async (table) => ({
+      table,
+      qrDataUrl: await tableQrDataUrl(`${siteUrl()}/t/${table.code}`),
+    })),
+  );
+
+  return <HostDashboard event={toPublicEvent(event)} tables={tablesWithQr} players={players} />;
 }

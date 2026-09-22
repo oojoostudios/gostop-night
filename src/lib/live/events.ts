@@ -50,6 +50,12 @@ export async function getEventByCode(code: string): Promise<EventRow | null> {
   return data as EventRow | null;
 }
 
+export async function getEventById(id: string): Promise<EventRow | null> {
+  const { data, error } = await supabaseAdmin().from('events').select().eq('id', id).maybeSingle();
+  if (error) throw new Error(error.message);
+  return data as EventRow | null;
+}
+
 /** `EventRow` without the PIN hash — the shape that's safe to pass to a Client Component. */
 export type PublicEvent = Omit<EventRow, 'host_pin_hash'>;
 

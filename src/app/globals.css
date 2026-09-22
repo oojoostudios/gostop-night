@@ -25,10 +25,10 @@
   /* ink, plum and the mascot colors come from the logo. */
 
   /* paper: page background */
-  --palette-paper-light: #f3eada;
+  --palette-paper-light: #f6f4f0;
   --palette-paper-dark: #17302b;
   /* surface: cards, panels, inputs. Must read clearly lighter than paper */
-  --palette-surface-light: #fffcf2;
+  --palette-surface-light: #ffffff;
   --palette-surface-dark: #1f3d37;
   /* ink: body text and hairlines */
   --palette-ink-light: #1a3731;
@@ -54,6 +54,15 @@
   /* hairline: card borders and dividers, as a share of ink */
   --palette-hairline-light: 18%;
   --palette-hairline-dark: 26%;
+
+  /* card-type dot colors: filters, legends, the calculator. Fills only, never text.
+   * Same hex in both modes. Always paired with a 1px ink ring (`.type-dot` below) —
+   * the pink and mint are too pale to read on paper without it. */
+  --color-type-bright: #efa3c8;
+  --color-type-animal: #f7bc3a;
+  --color-type-ribbon: #6c7cf2;
+  --color-type-junk: #6dc29a;
+  --color-type-double: #5b914a;
 
   /* ── 2. ROLES (light is the default; the .dark block below swaps them) ── */
   --color-paper: var(--palette-paper-light);
@@ -89,13 +98,15 @@
 
 /* Light: the default on the page, and an "island" that forces light colors on one
  * element even inside dark mode (the mascot badge is one: its outlines are dark,
- * so it needs light paper). This rule must stay ABOVE the dark one below, so that
- * `.dark` wins when both match the page root. */
+ * so it needs light paper; the wordmark logo is another: its baked-in background
+ * is light paper, so its dark-mode panel needs to match). This rule must stay
+ * ABOVE the dark one below, so that `.dark` wins when both match the page root. */
 :root,
 .light,
 [data-theme='light'],
 .mascot-badge,
-.dark .mascot-frame {
+.dark .mascot-frame,
+.dark .wordmark-frame {
   --color-paper: var(--palette-paper-light);
   --color-surface: var(--palette-surface-light);
   --color-ink: var(--palette-ink-light);
@@ -133,7 +144,8 @@
 .dark,
 [data-theme='dark'],
 .mascot-badge,
-.dark .mascot-frame {
+.dark .mascot-frame,
+.dark .wordmark-frame {
   /* Secondary text and lines are ink at a set strength. */
   --color-ink-soft: color-mix(in oklab, var(--color-ink) var(--ink-soft-strength), transparent);
   --color-hairline: color-mix(in oklab, var(--color-ink) var(--hairline-strength), transparent);
@@ -427,6 +439,12 @@ body::before {
     border-radius: var(--radius-card);
   }
 
+  /* Card-type dot: the 1px ink ring every type-bright/animal/ribbon/junk/double dot gets,
+   * since the pale ones (pink, mint) are too faint against paper on their own. */
+  .type-dot {
+    box-shadow: 0 0 0 1px var(--color-ink);
+  }
+
   .club-input {
     background: var(--color-surface);
     color: var(--color-ink);
@@ -545,6 +563,25 @@ body::before {
     left: 50%;
     max-width: none;
     transform: translate(-50%, -50%);
+  }
+
+  /* Wordmark logo frame (the hero's big PNG export, not the small text <Wordmark>).
+   * Light mode: the PNG's own baked-in background is `paper`, so it sits flush with
+   * the page — no wrapper needed. Dark mode: this is a light island (see the token
+   * section at the top), so the frame becomes a light-paper rounded panel, and its
+   * square background never shows as a box on the dark page. */
+  .wordmark-frame {
+    display: block;
+  }
+  .wordmark-frame > img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .dark .wordmark-frame {
+    overflow: hidden;
+    background: var(--color-paper);
+    border-radius: var(--radius-card);
   }
 }
 

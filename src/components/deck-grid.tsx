@@ -11,7 +11,7 @@ import {
   MONTHS,
   cardLabel,
   deckColumn,
-  monthHeader,
+  monthRowLabel,
   type DeckColumn,
   type HwatuCard,
   type HwatuType,
@@ -19,13 +19,13 @@ import {
 
 export type DeckFilter = 'all' | HwatuType;
 
-// Type colors are fills and dots only: Bright gold, Animal ink, Ribbon plum, Junk sage.
+// Card-type dot colors (globals.css): each gets a 1px ink ring via `.type-dot`.
 const COLUMN_DOT: Record<DeckColumn, string> = {
-  gwang: 'bg-gold',
-  kkeut: 'bg-ink',
-  tti: 'bg-plum',
-  pi: 'bg-sage',
-  double: 'bg-sage',
+  gwang: 'type-dot bg-type-bright',
+  kkeut: 'type-dot bg-type-animal',
+  tti: 'type-dot bg-type-ribbon',
+  pi: 'type-dot bg-type-junk',
+  double: 'type-dot bg-type-double',
 };
 
 // The grid has six card slots per row: Bright 1, Animal 1, Ribbon 1, Junk 2, Double junk 1.
@@ -101,8 +101,8 @@ export function DeckGrid({
           );
           return (
             <div key={month.num} className={`${ROW} items-center border-t border-hairline py-4`}>
-              <div className="col-span-6 mb-3 text-xs uppercase tracking-[0.12em] text-ink-soft md:col-span-1 md:mb-0">
-                {monthHeader(month)}
+              <div className="col-span-6 mb-3 text-xs tracking-[0.04em] text-ink-soft md:col-span-1 md:mb-0">
+                {monthRowLabel(month)}
               </div>
               {placed.map(({ card, slot }) => {
                 const index = HWATU_DECK.indexOf(card);

@@ -27,11 +27,12 @@ const TYPE_BADGE: Record<HwatuType, string> = {
   pi: 'bg-sage text-on-fill',
 };
 
+// Card-type dot colors (globals.css): each gets a 1px ink ring via `.type-dot`.
 const TYPE_DOT: Record<HwatuType, string> = {
-  gwang: 'bg-gold',
-  tti: 'bg-plum',
-  kkeut: 'bg-ink',
-  pi: 'bg-sage',
+  gwang: 'type-dot bg-type-bright',
+  tti: 'type-dot bg-type-ribbon',
+  kkeut: 'type-dot bg-type-animal',
+  pi: 'type-dot bg-type-junk',
 };
 
 export function ScoreCalculator() {

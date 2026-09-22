@@ -5,9 +5,8 @@ import { Providers } from '@/components/providers';
 import { ScrollProgress } from '@/components/scroll-progress';
 import { bodyFont, displayKoreanFont, displayLatinFont } from '@/lib/fonts';
 
-// Set NEXT_PUBLIC_SITE_URL to the real address when the site has one. Until then links in
-// the share preview point at localhost.
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+// Set NEXT_PUBLIC_SITE_URL to override this (e.g. a custom domain later).
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://gostop-night.vercel.app';
 const SITE_NAME = 'Club Go Stop · 클럽 고스톱';
 const SITE_DESCRIPTION =
   'A phone-first Go-Stop guide for our game nights: learn the rules in five minutes. 고스톱 게임 나이트를 위한 모바일 가이드, 5분이면 룰을 익혀요.';

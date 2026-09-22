@@ -242,14 +242,14 @@ function Ttadak() {
   return (
     <RuleBlock
       titleKo="따닥"
-      titleEn="Ttadak — same-month triple match"
+      titleEn="Ttadak — same-month double match"
       badge={<PiBadge count={1} />}
       accent="sage"
     >
       <p className="text-sm text-ink-soft leading-relaxed mb-5 max-w-[65ch]">
         {locale === 'ko'
-          ? '바닥에 같은 월 카드가 2장 있을 때, 내 손패가 그 월과 같으면 3장 모두 가져가요. 상대 한 명당 피 한 장씩 받아요.'
-          : 'When two same-month cards are already on the floor and your hand card matches them, you take all three. Plus one pi from each opponent.'}
+          ? '바닥에 같은 월 카드가 2장 있을 때, 내 손패가 그중 한 장을 가져가고, 이어서 더미에서 뒤집은 카드가 나머지 한 장을 가져가요. 손패·뒤집은 카드·바닥 2장, 4장 모두 내 것이 돼요. 상대 한 명당 피 한 장씩 받아요.'
+          : 'When two same-month cards are already on the floor, your hand card takes one of them — then the card you flip from the deck takes the other. Your hand, the flip, and both floor cards: all four end up in your pile. Plus one pi from each opponent.'}
       </p>
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex flex-col items-start gap-1.5">
@@ -266,9 +266,16 @@ function Ttadak() {
           <MiniCard id="01-gwang" />
           <span className="text-xs text-ink-soft">{locale === 'ko' ? '내 손패' : 'Your hand'}</span>
         </div>
+        <span className="text-ink-soft text-lg">+</span>
+        <div className="flex flex-col items-start gap-1.5">
+          <MiniCard id="01-tti" />
+          <span className="text-xs text-ink-soft">
+            {locale === 'ko' ? '더미에서 뒤집음' : 'Flipped'}
+          </span>
+        </div>
         <span className="text-ink-soft text-lg">=</span>
         <span className="text-xs text-ink-soft font-semibold">
-          {locale === 'ko' ? '3장 모두 내 것' : 'Take all three'}
+          {locale === 'ko' ? '4장 모두 내 것' : 'Take all four'}
         </span>
       </div>
     </RuleBlock>

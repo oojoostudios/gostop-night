@@ -101,30 +101,25 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       {game === 'gostop' && visibleVariants.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <div className="text-xs uppercase tracking-[0.18em] text-ink-soft">
-            {locale === 'ko' ? '룰셋' : 'Ruleset'}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {visibleVariants.map((v) => (
-              <motion.button
-                key={v.id}
-                type="button"
-                onClick={() => setVariant(v.id)}
-                aria-pressed={variant === v.id}
-                whileTap={{ scale: 0.93 }}
-                transition={{
-                  type: 'spring',
-                  stiffness: 400,
-                  damping: 30,
-                  mass: 0.6,
-                }}
-                className="club-chip"
-              >
-                {locale === 'ko' ? v.labelKo : v.label}
-              </motion.button>
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-2">
+          {visibleVariants.map((v) => (
+            <motion.button
+              key={v.id}
+              type="button"
+              onClick={() => setVariant(v.id)}
+              aria-pressed={variant === v.id}
+              whileTap={{ scale: 0.93 }}
+              transition={{
+                type: 'spring',
+                stiffness: 400,
+                damping: 30,
+                mass: 0.6,
+              }}
+              className="club-chip"
+            >
+              {locale === 'ko' ? v.labelKo : v.label}
+            </motion.button>
+          ))}
         </div>
       )}
 

@@ -196,6 +196,10 @@ export const monthsForColumn = (column: DeckColumn): ReadonlyArray<Month> =>
 export const monthHeader = (month: Month): string =>
   `${String(month.num).padStart(2, '0')} · ${month.motifKo} · ${month.motif.toUpperCase()}`;
 
+/** A row label for Section 01's month-by-type grid, e.g. `01 · Jan · 송학 · Pine`. */
+export const monthRowLabel = (month: Month): string =>
+  `${String(month.num).padStart(2, '0')} · ${month.abbr} · ${month.motifKo} · ${month.motif}`;
+
 /** Months as a list for the given language: "Jan · Mar · Aug" or "1월 · 3월 · 8월". */
 export const monthList = (months: ReadonlyArray<Month>, locale: 'en' | 'ko'): string =>
   months.map((m) => (locale === 'ko' ? `${m.num}월` : m.abbr)).join(' · ');

@@ -4,7 +4,6 @@ import type { ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { useLocale } from '@/contexts/locale-context';
 import { ScoreCalculator } from '@/components/score-calculator';
-import { WinningPatterns } from '@/components/winning-patterns';
 import { FadeInOnView } from '@/components/fade-in-on-view';
 import { HwatuCardImage } from '@/components/hwatu-card-image';
 import { HWATU_DECK, HWATU_TYPES, type HwatuType } from '@/lib/hwatu';
@@ -12,11 +11,12 @@ import { SCORING } from '@/config/rules';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+// Card-type dot colors (globals.css): each gets a 1px ink ring via `.type-dot`.
 const TYPE_DOT: Record<HwatuType, string> = {
-  gwang: 'bg-gold',
-  tti: 'bg-plum',
-  kkeut: 'bg-ink',
-  pi: 'bg-sage',
+  gwang: 'type-dot bg-type-bright',
+  tti: 'type-dot bg-type-ribbon',
+  kkeut: 'type-dot bg-type-animal',
+  pi: 'type-dot bg-type-junk',
 };
 
 // Combos
@@ -58,6 +58,10 @@ export function SectionScoring() {
               : 'Brights, ribbons, animals, junk — each type scores differently. Special combos (three-of-a-color, three songbirds) earn bonus points.'}
           </FadeInOnView>
 
+          <FadeInOnView className="mb-16">
+            <ScoringSummary />
+          </FadeInOnView>
+
           <div className="space-y-16">
             <FadeInOnView>
               <GwangBlock />
@@ -73,14 +77,125 @@ export function SectionScoring() {
             </FadeInOnView>
           </div>
 
-          <div className="border-t border-hairline pt-14 mt-16">
-            <WinningPatterns />
-          </div>
-
           <ScoreCalculator />
         </div>
       </div>
     </section>
+  );
+}
+
+type SummaryRow = {
+  dot: string;
+  labelKo: string;
+  labelEn: string;
+  scoreKo: string;
+  scoreEn: string;
+};
+
+/** Every way to score, one row each, with its points — the same combos shown in the type blocks below. */
+function ScoringSummary() {
+  const { locale } = useLocale();
+  const rows: SummaryRow[] = [
+    {
+      dot: TYPE_DOT.gwang,
+      labelKo: '3광 (비광 X)',
+      labelEn: '3 Brights (no rain)',
+      scoreKo: `${SCORING.brights.three}점`,
+      scoreEn: `${SCORING.brights.three} pts`,
+    },
+    {
+      dot: TYPE_DOT.gwang,
+      labelKo: '3광 (비광 O)',
+      labelEn: '3 Brights (with rain)',
+      scoreKo: `${SCORING.brights.threeWithRain}점`,
+      scoreEn: `${SCORING.brights.threeWithRain} pts`,
+    },
+    {
+      dot: TYPE_DOT.gwang,
+      labelKo: '4광',
+      labelEn: '4 Brights',
+      scoreKo: `${SCORING.brights.four}점`,
+      scoreEn: `${SCORING.brights.four} pts`,
+    },
+    {
+      dot: TYPE_DOT.gwang,
+      labelKo: '5광',
+      labelEn: '5 Brights',
+      scoreKo: `${SCORING.brights.five}점`,
+      scoreEn: `${SCORING.brights.five} pts`,
+    },
+    {
+      dot: TYPE_DOT.tti,
+      labelKo: `띠 ${SCORING.ribbonsStartAt}장+`,
+      labelEn: `Ribbons (${SCORING.ribbonsStartAt}+)`,
+      scoreKo: '1점, +1/장',
+      scoreEn: '1 pt, +1/extra',
+    },
+    {
+      dot: TYPE_DOT.tti,
+      labelKo: '홍단 (1·2·3월)',
+      labelEn: 'Hongdan · Red ribbons',
+      scoreKo: `+${SCORING.combos.hongdan}점`,
+      scoreEn: `+${SCORING.combos.hongdan} pts`,
+    },
+    {
+      dot: TYPE_DOT.tti,
+      labelKo: '청단 (6·9·10월)',
+      labelEn: 'Cheongdan · Blue ribbons',
+      scoreKo: `+${SCORING.combos.cheongdan}점`,
+      scoreEn: `+${SCORING.combos.cheongdan} pts`,
+    },
+    {
+      dot: TYPE_DOT.tti,
+      labelKo: '초단 (4·5·7월)',
+      labelEn: 'Chodan · Grass ribbons',
+      scoreKo: `+${SCORING.combos.chodan}점`,
+      scoreEn: `+${SCORING.combos.chodan} pts`,
+    },
+    {
+      dot: TYPE_DOT.kkeut,
+      labelKo: `열 ${SCORING.animalsStartAt}장+`,
+      labelEn: `Animals (${SCORING.animalsStartAt}+)`,
+      scoreKo: '1점, +1/장',
+      scoreEn: '1 pt, +1/extra',
+    },
+    {
+      dot: TYPE_DOT.kkeut,
+      labelKo: '고도리',
+      labelEn: 'Godori · Songbird trio',
+      scoreKo: `+${SCORING.combos.godori}점`,
+      scoreEn: `+${SCORING.combos.godori} pts`,
+    },
+    {
+      dot: TYPE_DOT.pi,
+      labelKo: `피 ${SCORING.junkStartAt}장+`,
+      labelEn: `Junk (${SCORING.junkStartAt}+)`,
+      scoreKo: '1점, +1/장',
+      scoreEn: '1 pt, +1/extra',
+    },
+  ];
+
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-[0.2em] text-ink-soft mb-3">
+        {locale === 'ko' ? '한눈에 보는 점수표' : 'Every way to score'}
+      </div>
+      <div className="club-card divide-y divide-hairline">
+        {rows.map((row) => (
+          <div key={row.labelEn} className="flex items-center justify-between gap-3 px-5 py-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span aria-hidden className={`size-2.5 shrink-0 rounded-full ${row.dot}`} />
+              <span className="text-sm truncate">
+                {locale === 'ko' ? row.labelKo : row.labelEn}
+              </span>
+            </div>
+            <span className="text-sm font-bold tabular-nums shrink-0">
+              {locale === 'ko' ? row.scoreKo : row.scoreEn}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -455,12 +570,6 @@ function PiBlock() {
           </div>
         </Block>
       </div>
-
-      <p className="text-xs text-ink-soft mt-4">
-        {locale === 'ko'
-          ? '* 보너스피(맞고 룰)는 같은 방식으로 ×2.'
-          : '* Bonus pi (matgo only) similarly counts as 2.'}
-      </p>
     </div>
   );
 }

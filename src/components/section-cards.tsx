@@ -18,12 +18,12 @@ import {
 // Order of the four types: Bright, Animal, Ribbon, Junk (the same as the grid's columns).
 const TYPE_ORDER: ReadonlyArray<HwatuType> = ['gwang', 'kkeut', 'tti', 'pi'];
 
-// Type colors are fills and dots only: Bright gold, Animal ink, Ribbon plum, Junk sage.
+// Card-type dot colors (globals.css): each gets a 1px ink ring via `.type-dot`.
 const TYPE_DOT: Record<HwatuType, string> = {
-  gwang: 'bg-gold',
-  kkeut: 'bg-ink',
-  tti: 'bg-plum',
-  pi: 'bg-sage',
+  gwang: 'type-dot bg-type-bright',
+  kkeut: 'type-dot bg-type-animal',
+  tti: 'type-dot bg-type-ribbon',
+  pi: 'type-dot bg-type-junk',
 };
 
 const smallLabel = 'mb-1 text-xs uppercase tracking-wider text-ink-soft';
@@ -69,10 +69,15 @@ export function SectionCards() {
               : '12 months × 4 cards = 48 in total. Each card belongs to one of four types. Filter by type, then tap any card to enlarge it and turn it over for its details.'}
           </FadeInOnView>
 
-          {/* The four types */}
-          <div className="mb-14 grid gap-5 md:grid-cols-2">
+          {/* The four types: one swipeable row on phones, all four side by side from md up. */}
+          <div className="mb-14 -mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 sm:-mx-8 sm:px-8 md:mx-0 md:grid md:snap-none md:grid-cols-4 md:overflow-visible md:px-0 md:pb-0">
             {TYPE_ORDER.map((type) => (
-              <TypeCard key={type} type={type} />
+              <div
+                key={type}
+                className="w-[82%] shrink-0 snap-start sm:w-[60%] md:w-auto md:shrink"
+              >
+                <TypeCard type={type} />
+              </div>
             ))}
           </div>
 
@@ -117,38 +122,34 @@ function TypeCard({ type }: { type: HwatuType }) {
     : [t.label, `${t.labelKo} · ${t.roman}`];
 
   return (
-    <div className="club-card flex gap-5 p-6">
-      <div aria-hidden className="shrink-0 pt-1 font-display text-5xl leading-none text-ink">
-        {t.hanja}
+    <div className="club-card flex h-full flex-col gap-3 p-5">
+      <div className="flex items-center gap-2.5">
+        <span aria-hidden className={`size-2.5 shrink-0 rounded-full ${TYPE_DOT[type]}`} />
+        <div aria-hidden className="font-display text-2xl leading-none text-ink">
+          {t.hanja}
+        </div>
+        <h3 className="font-display text-xl leading-tight">{main}</h3>
       </div>
-      <div className="min-w-0">
-        <div className="flex items-center gap-2.5">
-          <span aria-hidden className={`size-2.5 shrink-0 rounded-full ${TYPE_DOT[type]}`} />
-          <h3 className="font-display text-2xl leading-tight">{main}</h3>
-        </div>
-        <div className="mt-0.5 text-sm text-ink-soft">{sub}</div>
-        <p className="mt-3 text-sm leading-relaxed">{ko ? t.blurbKo : t.blurb}</p>
+      <div className="-mt-1 text-sm text-ink-soft">{sub}</div>
+      <p className="text-sm leading-relaxed">{ko ? t.blurbKo : t.blurb}</p>
 
-        <div className="mt-4">
-          <div className={smallLabel}>{ko ? '나오는 달' : 'Appears in'}</div>
-          <div className="text-sm font-medium">{monthList(monthsForColumn(type), locale)}</div>
-        </div>
+      <div className="mt-1">
+        <div className={smallLabel}>{ko ? '나오는 달' : 'Appears in'}</div>
+        <div className="text-sm font-medium">{monthList(monthsForColumn(type), locale)}</div>
+      </div>
 
-        {/* Double junk is a Junk card worth two, so it is listed on the Junk card. */}
-        {type === 'pi' && (
-          <div className="mt-3">
-            <div className={smallLabel}>
-              {ko
-                ? `${DOUBLE_JUNK.labelKo} · ${DOUBLE_JUNK.label}`
-                : `${DOUBLE_JUNK.label} · ${DOUBLE_JUNK.termKo}`}{' '}
-              · {DOUBLE_JUNK.roman}
-            </div>
-            <div className="text-sm font-medium">
-              {monthList(monthsForColumn('double'), locale)}
-            </div>
+      {/* Double junk is a Junk card worth two, so it is listed on the Junk card. */}
+      {type === 'pi' && (
+        <div className="mt-1">
+          <div className={smallLabel}>
+            {ko
+              ? `${DOUBLE_JUNK.labelKo} · ${DOUBLE_JUNK.label}`
+              : `${DOUBLE_JUNK.label} · ${DOUBLE_JUNK.termKo}`}{' '}
+            · {DOUBLE_JUNK.roman}
           </div>
-        )}
-      </div>
+          <div className="text-sm font-medium">{monthList(monthsForColumn('double'), locale)}</div>
+        </div>
+      )}
     </div>
   );
 }

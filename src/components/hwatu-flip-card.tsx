@@ -14,8 +14,13 @@ import {
   type HwatuCard,
 } from '@/lib/hwatu';
 
-// Type colors are fills and dots only: Bright gold, Animal ink, Ribbon plum, Junk sage.
-const TYPE_DOT = { gwang: 'bg-gold', kkeut: 'bg-ink', tti: 'bg-plum', pi: 'bg-sage' } as const;
+// Card-type dot colors (globals.css): each gets a 1px ink ring via `.type-dot`.
+const TYPE_DOT = {
+  gwang: 'type-dot bg-type-bright',
+  kkeut: 'type-dot bg-type-animal',
+  tti: 'type-dot bg-type-ribbon',
+  pi: 'type-dot bg-type-junk',
+} as const;
 
 /**
  * A tapped card, enlarged in the middle of the screen (Section 01).

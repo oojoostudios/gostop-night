@@ -10,28 +10,31 @@ export type Section = {
   blurbKo: string;
 };
 
-const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
+// The single source of truth for both the sidebar labels and each section's own page
+// title — see CLAUDE.md "Section titles". A section component imports its own entry
+// from here instead of hardcoding its title, so the two can never drift apart.
+export const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
   {
     id: 'section-cards',
     num: '01',
-    label: 'What are hwatu cards?',
-    labelKo: '화투 카드란?',
+    label: 'Hwatu Cards',
+    labelKo: '화투 카드',
     blurb: '48 cards across 12 months — each illustrated with a flower, animal, or seasonal motif.',
     blurbKo: '12달 48장의 카드. 각 달마다 꽃, 동물, 계절 풍경이 그려져 있어요.',
   },
   {
     id: 'section-deal',
     num: '02',
-    label: 'How a round begins',
-    labelKo: '한 판이 시작될 때',
+    label: 'Setup Hand',
+    labelKo: '패 돌리기',
     blurb: 'Shuffle, deal 8 to the floor, then 7 to each player. The remaining 19 form the deck.',
     blurbKo: '셔플 → 바닥에 8장 → 각자 7장씩. 남은 19장이 더미.',
   },
   {
     id: 'section-flow',
     num: '03',
-    label: 'How a round works',
-    labelKo: '한 판은 이렇게',
+    label: 'Playing Game',
+    labelKo: '게임 진행',
     blurb: "Take turns, match cards by month, and stack what you've won.",
     blurbKo: '차례대로 같은 월의 카드를 매칭하면서 먹어가요.',
   },
@@ -47,8 +50,8 @@ const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
   {
     id: 'section-special',
     num: '05',
-    label: 'Special rules',
-    labelKo: '특수 룰',
+    label: 'Special Rules',
+    labelKo: '특수 규칙',
     blurb:
       'Bombs, ttadak, jjok, shakes, and the optional 박 penalty — small moves with big consequences.',
     blurbKo: '폭탄·따닥·쪽·흔들기, 그리고 선택 규칙인 박. 작은 움직임이 큰 결과로 이어지는 묘미.',
@@ -57,15 +60,15 @@ const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
     id: 'section-gostop',
     num: '06',
     label: 'Go or Stop?',
-    labelKo: '고냐 스톱이냐',
+    labelKo: '고? 스톱?',
     blurb: `Reach ${callThresholdBoth()} points (3 / 2 players) and you choose: stop and score, or call Go for more.`,
     blurbKo: `${callThresholdBoth()}점(3인 / 2인)이 되면 결정해요 — 여기서 멈출 것인가, 고를 외칠 것인가.`,
   },
   {
     id: 'section-tonight',
     num: '07',
-    label: 'Tonight',
-    labelKo: '오늘 밤',
+    label: 'Game Time',
+    labelKo: '게임 타임',
     blurb: 'Buy-ins, hands and a running scorecard for your table. Saved on this phone.',
     blurbKo: '바이인, 판 기록, 실시간 점수판. 이 폰에 저장돼요.',
   },

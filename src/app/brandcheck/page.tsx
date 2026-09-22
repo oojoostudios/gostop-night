@@ -62,7 +62,7 @@ const Mascot = ({ className = '', small }: { className?: string; small?: boolean
   // eslint-disable-next-line @next/next/no-img-element
   <img
     src={small ? '/brand/mascot-sm.webp' : '/brand/mascot-hero.webp'}
-    alt="Club Go Stop mascot: a red plum-blossom character"
+    alt="GoStop Club mascot: a red plum-blossom character"
     className={className}
     draggable={false}
   />
@@ -80,12 +80,12 @@ const Wordmark = ({ size }: { size: 'lg' | 'sm' }) => (
     <div
       className={`font-display text-plum leading-none ${size === 'lg' ? 'text-4xl sm:text-5xl' : 'text-xl'}`}
     >
-      Club Go Stop
+      GoStop Club
     </div>
     <div
       className={`font-display mt-1.5 leading-tight ${size === 'lg' ? 'text-2xl' : 'text-sm text-ink-soft'}`}
     >
-      클럽 고스톱
+      고스톱 클럽
     </div>
   </div>
 );
@@ -130,7 +130,7 @@ export default function BrandCheckPage() {
         <Section
           n="02"
           title="Mascot and wordmark"
-          note="The hero: the mascot large, next to the wordmark. Fraunces 600 for Club Go Stop and Gowun Batang Bold for 클럽 고스톱, both in the same weight and the plum of the logo."
+          note="The hero: the mascot large, next to the wordmark. Fraunces 600 for GoStop Club and Gowun Batang Bold for 고스톱 클럽, both in the same weight and the plum of the logo."
         >
           <div className="grid gap-6 lg:grid-cols-2">
             <Island mode="light" title="Light">

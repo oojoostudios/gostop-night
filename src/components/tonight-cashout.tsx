@@ -55,11 +55,11 @@ export function CashOutView({
   return (
     <div className="space-y-6">
       <div className="club-card p-5 sm:p-6">
-        <div className="text-xs font-bold uppercase tracking-[0.18em] text-ink-soft">
+        <div className="text-label font-bold uppercase tracking-[0.18em] text-ink-soft">
           {readOnly ? t('Past event', '지난 게임') : t('Cash-out', '정산')}
         </div>
-        <h3 className="mt-1 font-display text-2xl leading-tight">{ev.name}</h3>
-        <p className="mt-1 text-sm text-ink-soft tabular-nums">
+        <h3 className="mt-1 font-display text-sub leading-tight">{ev.name}</h3>
+        <p className="mt-1 text-label text-ink-soft tabular-nums">
           {ev.date} · {t('1 chip', '칩 1개')} = {chipValueText(chipValue(ev))}
         </p>
 
@@ -70,8 +70,8 @@ export function CashOutView({
               className="flex flex-col gap-1 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-x-4"
             >
               <div className="min-w-0">
-                <div className="truncate font-display text-xl">{r.player.name}</div>
-                <div className="text-xs tabular-nums text-ink-soft">
+                <div className="truncate font-display text-sub">{r.player.name}</div>
+                <div className="text-label tabular-nums text-ink-soft">
                   {t(
                     `${r.buyIns} × ${ev.chipsPerBuyIn} chips bought`,
                     `바이인 ${r.buyIns}회 × ${ev.chipsPerBuyIn}칩`,
@@ -79,11 +79,11 @@ export function CashOutView({
                 </div>
               </div>
               <div className="tabular-nums sm:text-right">
-                <div className="text-2xl font-bold">
+                <div className="text-num font-bold">
                   {r.chips}{' '}
-                  <span className="text-sm font-normal text-ink-soft">{t('chips', '칩')}</span>
+                  <span className="text-label font-normal text-ink-soft">{t('chips', '칩')}</span>
                 </div>
-                <div className="text-base">
+                <div className="text-body">
                   {money(r.dollars)}{' '}
                   <span className="text-ink-soft">
                     ({signed(r.net)} {t('chips', '칩')} · {signedMoney(r.netDollars)})
@@ -97,7 +97,7 @@ export function CashOutView({
         <div className="mt-5 border-t border-hairline pt-4">
           <BalanceCheck ev={ev} />
         </div>
-        <p className="mt-4 text-base font-medium">
+        <p className="mt-4 text-body font-medium">
           {t(
             'Chips are tracked here — settle up in person.',
             '칩은 여기서 기록만 해요 — 정산은 직접 만나서 하세요.',
@@ -106,11 +106,11 @@ export function CashOutView({
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <button type="button" className="club-btn text-base" onClick={() => downloadCsv(ev, ko)}>
+        <button type="button" className="club-btn text-body" onClick={() => downloadCsv(ev, ko)}>
           <Download className="size-4" />
           {t('Export CSV', 'CSV 내보내기')}
         </button>
-        <button type="button" className="club-btn text-base" onClick={onBack}>
+        <button type="button" className="club-btn text-body" onClick={onBack}>
           {readOnly
             ? t('Back to past events', '지난 게임 목록')
             : t('Back to the table', '테이블로 돌아가기')}
@@ -119,19 +119,19 @@ export function CashOutView({
           onFinish &&
           (confirming ? (
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-base">
+              <span className="text-body">
                 {t('Save this night to past events?', '이 게임을 지난 게임에 저장할까요?')}
               </span>
               <button
                 type="button"
-                className="club-btn club-btn--primary text-base"
+                className="club-btn club-btn--primary text-body"
                 onClick={onFinish}
               >
                 {t('Yes, finish', '네, 마칠게요')}
               </button>
               <button
                 type="button"
-                className="club-btn text-base"
+                className="club-btn text-body"
                 onClick={() => setConfirming(false)}
               >
                 {t('Not yet', '아직이요')}
@@ -140,7 +140,7 @@ export function CashOutView({
           ) : (
             <button
               type="button"
-              className="club-btn club-btn--primary text-base"
+              className="club-btn club-btn--primary text-body"
               onClick={() => setConfirming(true)}
             >
               {t('Finish event', '이벤트 마치기')}

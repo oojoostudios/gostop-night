@@ -95,10 +95,10 @@ export default function StyleCheckPage() {
                   48px on phones, 60px above · wordmark, in plum
                 </div>
                 <div className="font-display text-5xl sm:text-6xl leading-none text-plum">
-                  Club Go Stop
+                  GoStop Club
                 </div>
                 <div className="font-display text-5xl sm:text-6xl leading-tight text-plum">
-                  클럽 고스톱
+                  고스톱 클럽
                 </div>
               </div>
               <div className="space-y-2">

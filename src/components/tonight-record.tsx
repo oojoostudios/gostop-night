@@ -89,8 +89,8 @@ function Stepper({
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="min-w-0">
-        <div className="text-base font-medium">{label}</div>
-        {hint && <div className="text-xs text-ink-soft">{hint}</div>}
+        <div className="text-body font-medium">{label}</div>
+        {hint && <div className="text-label text-ink-soft">{hint}</div>}
       </div>
       <div className="flex shrink-0 items-center gap-2">
         <button
@@ -102,7 +102,7 @@ function Stepper({
         >
           <Minus className="size-4" />
         </button>
-        <span className="w-9 text-center text-xl font-bold tabular-nums" aria-live="polite">
+        <span className="w-9 text-center text-sub font-bold tabular-nums" aria-live="polite">
           {value}
         </span>
         <button
@@ -129,7 +129,7 @@ function Check({
   children: React.ReactNode;
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-3 py-1 text-base">
+    <label className="flex cursor-pointer items-center gap-3 py-1 text-body">
       <input
         type="checkbox"
         checked={checked}
@@ -249,16 +249,16 @@ function HandForm({
     : null;
   const calc = input ? calcHand(input, ev.chipsPerPoint, playerCount) : null;
 
-  const sectionTitle = 'mb-2 text-xs uppercase tracking-[0.18em] font-bold text-ink-soft';
+  const sectionTitle = 'mb-2 text-label uppercase tracking-[0.18em] font-bold text-ink-soft';
 
   return (
     <div
       className="club-card max-h-[82vh] w-[min(92vw,30rem)] overflow-y-auto p-5 sm:p-6"
       data-testid="record-hand"
     >
-      <h3 className="font-display text-2xl">{t('Record a hand', '판 기록')}</h3>
+      <h3 className="font-display text-sub">{t('Record a hand', '판 기록')}</h3>
       {afterDraw && (
-        <p className="mt-2 inline-block rounded-full bg-gold px-3 py-1 text-sm font-medium text-on-fill">
+        <p className="mt-2 inline-block rounded-full bg-gold px-3 py-1 text-label font-medium text-on-fill">
           {t('Draw last time — this hand counts ×2', '지난 판 나가리 — 이번 판은 ×2')}
         </p>
       )}
@@ -290,7 +290,7 @@ function HandForm({
 
       {isDraw && (
         <div className="mt-5">
-          <p className="text-base">
+          <p className="text-body">
             {t('Nobody wins, so no chips move.', '아무도 이기지 못했어요. 칩은 움직이지 않아요.')}{' '}
             {RULES.nagariDoubles &&
               t("The next hand's score counts double.", '다음 판 점수가 두 배가 돼요.')}
@@ -298,12 +298,12 @@ function HandForm({
           <div className="sticky bottom-0 -mx-5 mt-5 flex flex-wrap gap-3 bg-surface px-5 pb-1 pt-3 sm:-mx-6 sm:px-6">
             <button
               type="button"
-              className="club-btn club-btn--primary text-base"
+              className="club-btn club-btn--primary text-body"
               onClick={onSaveDraw}
             >
               {t('Save the draw', '나가리 저장')}
             </button>
-            <button type="button" className="club-btn text-base" onClick={onCancel}>
+            <button type="button" className="club-btn text-body" onClick={onCancel}>
               {t('Cancel', '취소')}
             </button>
           </div>
@@ -359,7 +359,7 @@ function HandForm({
 
           <div className="mt-6 rounded-input bg-paper p-4" aria-live="polite">
             <div className={sectionTitle}>{t('The math', '계산')}</div>
-            <ul className="space-y-2 text-sm tabular-nums">
+            <ul className="space-y-2 text-label tabular-nums">
               {calc.losers.map((l) => (
                 <li key={l.playerId}>
                   <span className="font-bold">{names[l.playerId]}</span>{' '}
@@ -367,7 +367,7 @@ function HandForm({
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-base font-bold tabular-nums">
+            <p className="mt-3 text-body font-bold tabular-nums">
               {t(
                 `${names[winnerId]} takes ${calc.winnerGets} chips`,
                 `${names[winnerId]}: +${calc.winnerGets}칩`,
@@ -378,12 +378,12 @@ function HandForm({
           <div className="sticky bottom-0 -mx-5 mt-6 flex flex-wrap gap-3 bg-surface px-5 pb-1 pt-3 sm:-mx-6 sm:px-6">
             <button
               type="button"
-              className="club-btn club-btn--primary text-base"
+              className="club-btn club-btn--primary text-body"
               onClick={() => onSaveHand(input)}
             >
               {t('Save hand', '판 저장')}
             </button>
-            <button type="button" className="club-btn text-base" onClick={onCancel}>
+            <button type="button" className="club-btn text-body" onClick={onCancel}>
               {t('Cancel', '취소')}
             </button>
           </div>
@@ -392,7 +392,7 @@ function HandForm({
 
       {!winner && (
         <div className="mt-5">
-          <button type="button" className="club-btn text-base" onClick={onCancel}>
+          <button type="button" className="club-btn text-body" onClick={onCancel}>
             {t('Cancel', '취소')}
           </button>
         </div>

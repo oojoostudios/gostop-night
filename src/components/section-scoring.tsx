@@ -1,15 +1,17 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { motion } from 'motion/react';
+import { Fragment, type ReactNode } from 'react';
 import { useLocale } from '@/contexts/locale-context';
-import { ScoreCalculator } from '@/components/score-calculator';
 import { FadeInOnView } from '@/components/fade-in-on-view';
-import { HwatuCardImage } from '@/components/hwatu-card-image';
-import { HWATU_DECK, HWATU_TYPES, type HwatuType } from '@/lib/hwatu';
+import { SectionTitle } from '@/components/section-title';
+import { ScoreCardArt } from '@/components/score-card';
+import { ScoreCalculator } from '@/components/score-calculator';
+import { GOSTOP_SECTIONS } from '@/lib/sections';
+import { HWATU_DECK, HWATU_TYPES, type HwatuCard, type HwatuType } from '@/lib/hwatu';
 import { SCORING } from '@/config/rules';
+import { HONGDAN_IDS, CHEONGDAN_IDS, CHODAN_IDS, GODORI_IDS } from '@/lib/score';
 
-const EASE = [0.16, 1, 0.3, 1] as const;
+const SECTION = GOSTOP_SECTIONS.find((s) => s.id === 'section-scoring')!;
 
 // Card-type dot colors (globals.css): each gets a 1px ink ring via `.type-dot`.
 const TYPE_DOT: Record<HwatuType, string> = {
@@ -19,19 +21,19 @@ const TYPE_DOT: Record<HwatuType, string> = {
   pi: 'type-dot bg-type-junk',
 };
 
-// Combos
-const HONGDAN = ['01-tti', '02-tti', '03-tti']; // 1 + 2 + 3월
-const CHEONGDAN = ['06-tti', '09-tti', '10-tti']; // 6 + 9 + 10월
-const CHODAN = ['04-tti', '05-tti', '07-tti']; // 4 + 5 + 7월
-/** 5 -> "Five", 10 -> "Ten" (other numbers stay as digits). */
-const numberWord = (n: number) => ({ 5: 'Five', 10: 'Ten' })[n] ?? String(n);
-
-const GODORI = ['02-kkeut', '04-kkeut', '08-kkeut']; // 꾀꼬리 + 두견새 + 기러기
-
+const cardsOfType = (type: HwatuType): HwatuCard[] => HWATU_DECK.filter((c) => c.type === type);
 const cardById = (id: string) => HWATU_DECK.find((c) => c.id === id);
+const cardsById = (ids: ReadonlyArray<string>): HwatuCard[] =>
+  ids.map(cardById).filter((c): c is HwatuCard => Boolean(c));
 
+/**
+ * Section 04 — Scoring. Matches assets-source/reference/scoring-preview.html:
+ * the "Every way to score" summary table, four identical category blocks
+ * (Brights, Ribbons, Animals, Junk), then the score calculator.
+ */
 export function SectionScoring() {
   const { locale } = useLocale();
+  const ko = locale === 'ko';
 
   return (
     <section
@@ -40,40 +42,34 @@ export function SectionScoring() {
     >
       <div className="lg:ml-72">
         <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
-          <FadeInOnView
-            as="h2"
-            delay={0.05}
-            className="font-display text-4xl md:text-5xl leading-tight mb-6"
-          >
-            <span className="text-plum">04</span>
-            <span className="ml-4">{locale === 'ko' ? '점수 계산' : 'Scoring'}</span>
-          </FadeInOnView>
+          <SectionTitle section={SECTION} />
           <FadeInOnView
             as="p"
             delay={0.12}
-            className="text-lg text-ink-soft max-w-2xl leading-relaxed mb-14"
+            className="text-body text-ink-soft max-w-2xl leading-relaxed mb-14"
           >
-            {locale === 'ko'
-              ? '광·띠·열·피 — 카드 종류마다 점수 계산이 달라요. 같은 색 띠 3장 같은 콤보가 추가 점수를 만들어요.'
-              : 'Brights, ribbons, animals, junk — each type scores differently. Special combos (three-of-a-color, three songbirds) earn bonus points.'}
+            {ko
+              ? '스톱을 부른 사람만 점수를 얻어요. 내가 가져온 카드를 기준으로, 아래 조건에 해당하는 항목을 모두 더해요.'
+              : 'Only the player who calls Stop scores. Everything you captured is checked, and every line below that you meet adds together.'}
           </FadeInOnView>
 
-          <FadeInOnView className="mb-16">
-            <ScoringSummary />
+          <FadeInOnView className="club-card p-5 sm:p-6 mb-16">
+            <SubHeading en="Every way to score" ko="점수표" />
+            <SummaryTable />
           </FadeInOnView>
 
           <div className="space-y-16">
             <FadeInOnView>
-              <GwangBlock />
+              <CategoryBlock type="gwang" />
             </FadeInOnView>
             <FadeInOnView>
-              <TtiBlock />
+              <CategoryBlock type="tti" />
             </FadeInOnView>
             <FadeInOnView>
-              <KkeutBlock />
+              <CategoryBlock type="kkeut" />
             </FadeInOnView>
             <FadeInOnView>
-              <PiBlock />
+              <CategoryBlock type="pi" />
             </FadeInOnView>
           </div>
 
@@ -84,506 +80,323 @@ export function SectionScoring() {
   );
 }
 
-type SummaryRow = {
-  dot: string;
-  labelKo: string;
-  labelEn: string;
-  scoreKo: string;
-  scoreEn: string;
-};
-
-/** Every way to score, one row each, with its points — the same combos shown in the type blocks below. */
-function ScoringSummary() {
+/* An h3-level sub-heading: the current language, then the other language inline
+ * (not stacked — that stacked treatment is reserved for the section's own h2). */
+function SubHeading({ en, ko: koText }: { en: string; ko: string }) {
   const { locale } = useLocale();
-  const rows: SummaryRow[] = [
-    {
-      dot: TYPE_DOT.gwang,
-      labelKo: '3광 (비광 X)',
-      labelEn: '3 Brights (no rain)',
-      scoreKo: `${SCORING.brights.three}점`,
-      scoreEn: `${SCORING.brights.three} pts`,
-    },
-    {
-      dot: TYPE_DOT.gwang,
-      labelKo: '3광 (비광 O)',
-      labelEn: '3 Brights (with rain)',
-      scoreKo: `${SCORING.brights.threeWithRain}점`,
-      scoreEn: `${SCORING.brights.threeWithRain} pts`,
-    },
-    {
-      dot: TYPE_DOT.gwang,
-      labelKo: '4광',
-      labelEn: '4 Brights',
-      scoreKo: `${SCORING.brights.four}점`,
-      scoreEn: `${SCORING.brights.four} pts`,
-    },
-    {
-      dot: TYPE_DOT.gwang,
-      labelKo: '5광',
-      labelEn: '5 Brights',
-      scoreKo: `${SCORING.brights.five}점`,
-      scoreEn: `${SCORING.brights.five} pts`,
-    },
-    {
-      dot: TYPE_DOT.tti,
-      labelKo: `띠 ${SCORING.ribbonsStartAt}장+`,
-      labelEn: `Ribbons (${SCORING.ribbonsStartAt}+)`,
-      scoreKo: '1점, +1/장',
-      scoreEn: '1 pt, +1/extra',
-    },
-    {
-      dot: TYPE_DOT.tti,
-      labelKo: '홍단 (1·2·3월)',
-      labelEn: 'Hongdan · Red ribbons',
-      scoreKo: `+${SCORING.combos.hongdan}점`,
-      scoreEn: `+${SCORING.combos.hongdan} pts`,
-    },
-    {
-      dot: TYPE_DOT.tti,
-      labelKo: '청단 (6·9·10월)',
-      labelEn: 'Cheongdan · Blue ribbons',
-      scoreKo: `+${SCORING.combos.cheongdan}점`,
-      scoreEn: `+${SCORING.combos.cheongdan} pts`,
-    },
-    {
-      dot: TYPE_DOT.tti,
-      labelKo: '초단 (4·5·7월)',
-      labelEn: 'Chodan · Grass ribbons',
-      scoreKo: `+${SCORING.combos.chodan}점`,
-      scoreEn: `+${SCORING.combos.chodan} pts`,
-    },
-    {
-      dot: TYPE_DOT.kkeut,
-      labelKo: `열 ${SCORING.animalsStartAt}장+`,
-      labelEn: `Animals (${SCORING.animalsStartAt}+)`,
-      scoreKo: '1점, +1/장',
-      scoreEn: '1 pt, +1/extra',
-    },
-    {
-      dot: TYPE_DOT.kkeut,
-      labelKo: '고도리',
-      labelEn: 'Godori · Songbird trio',
-      scoreKo: `+${SCORING.combos.godori}점`,
-      scoreEn: `+${SCORING.combos.godori} pts`,
-    },
-    {
-      dot: TYPE_DOT.pi,
-      labelKo: `피 ${SCORING.junkStartAt}장+`,
-      labelEn: `Junk (${SCORING.junkStartAt}+)`,
-      scoreKo: '1점, +1/장',
-      scoreEn: '1 pt, +1/extra',
-    },
-  ];
-
+  const [main, sub] = locale === 'ko' ? [koText, en] : [en, koText];
   return (
-    <div>
-      <div className="text-xs uppercase tracking-[0.2em] text-ink-soft mb-3">
-        {locale === 'ko' ? '한눈에 보는 점수표' : 'Every way to score'}
-      </div>
-      <div className="club-card divide-y divide-hairline">
-        {rows.map((row) => (
-          <div key={row.labelEn} className="flex items-center justify-between gap-3 px-5 py-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <span aria-hidden className={`size-2.5 shrink-0 rounded-full ${row.dot}`} />
-              <span className="text-sm truncate">
-                {locale === 'ko' ? row.labelKo : row.labelEn}
-              </span>
-            </div>
-            <span className="text-sm font-bold tabular-nums shrink-0">
-              {locale === 'ko' ? row.scoreKo : row.scoreEn}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
+    <h3 className="font-display text-sub mb-3">
+      {main}
+      <span className="ml-2 font-display text-ink-soft">{sub}</span>
+    </h3>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* "Every way to score" summary table                                         */
+/* -------------------------------------------------------------------------- */
+
+type SummaryRow = { en: string; ko: string; value: string };
+type SummaryGroup = { type: HwatuType; rows: SummaryRow[] };
+
+const SUMMARY: SummaryGroup[] = [
+  {
+    type: 'gwang',
+    rows: [
+      { en: '3 Brights', ko: '광 3장', value: String(SCORING.brights.three) },
+      {
+        en: '3 Brights, one of them the Dec rain Bright',
+        ko: '광 3장 (12월 비광 포함)',
+        value: String(SCORING.brights.threeWithRain),
+      },
+      { en: '4 Brights', ko: '광 4장', value: String(SCORING.brights.four) },
+      { en: 'All 5 Brights', ko: '광 5장 전부', value: String(SCORING.brights.five) },
+    ],
+  },
+  {
+    type: 'tti',
+    rows: [
+      { en: 'Any 5 Ribbons', ko: '띠 5장', value: '1' },
+      { en: 'Each extra Ribbon', ko: '추가 띠 1장마다', value: '+1' },
+      {
+        en: '홍단 Red set: Jan, Feb, Mar',
+        ko: '홍단 · 1·2·3월',
+        value: `+${SCORING.combos.hongdan}`,
+      },
+      {
+        en: '청단 Blue set: Jun, Sep, Oct',
+        ko: '청단 · 6·9·10월',
+        value: `+${SCORING.combos.cheongdan}`,
+      },
+      {
+        en: '초단 Grass set: Apr, May, Jul',
+        ko: '초단 · 4·5·7월',
+        value: `+${SCORING.combos.chodan}`,
+      },
+    ],
+  },
+  {
+    type: 'kkeut',
+    rows: [
+      { en: 'Any 5 Animals', ko: '열 5장', value: '1' },
+      { en: 'Each extra Animal', ko: '추가 열 1장마다', value: '+1' },
+      {
+        en: '고도리 Godori: Feb, Apr, Aug birds',
+        ko: '고도리 · 2·4·8월 새',
+        value: `+${SCORING.combos.godori}`,
+      },
+    ],
+  },
+  {
+    type: 'pi',
+    rows: [
+      { en: 'Any 10 Junk (double junk counts as 2)', ko: '피 10장 (쌍피는 2장)', value: '1' },
+      { en: 'Each extra Junk', ko: '추가 피 1장마다', value: '+1' },
+    ],
+  },
+];
+
+function SummaryTable() {
+  const { locale } = useLocale();
+  const ko = locale === 'ko';
+  return (
+    <table className="w-full border-collapse">
+      <tbody>
+        {SUMMARY.map((group) => (
+          <Fragment key={group.type}>
+            <tr>
+              <td colSpan={2} className="pt-5 pb-2 first:pt-0">
+                <span
+                  aria-hidden
+                  className={`mr-2.5 inline-block size-3 rounded-full align-[-1px] ${TYPE_DOT[group.type]}`}
+                />
+                <span className="text-body font-bold">
+                  {ko ? HWATU_TYPES[group.type].labelKo : HWATU_TYPES[group.type].label}
+                  <span className="ml-1.5 font-normal text-ink-soft">
+                    {ko ? HWATU_TYPES[group.type].label : HWATU_TYPES[group.type].labelKo}
+                  </span>
+                </span>
+              </td>
+            </tr>
+            {group.rows.map((row) => (
+              <tr key={row.en} className="border-t border-hairline">
+                <td className="py-3 text-body align-top">{ko ? row.ko : row.en}</td>
+                <td className="py-3 text-body font-bold tabular-nums text-right align-top whitespace-nowrap">
+                  {row.value}
+                </td>
+              </tr>
+            ))}
+          </Fragment>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Category blocks                                                            */
+/* -------------------------------------------------------------------------- */
 
 function CategoryHeader({ type }: { type: HwatuType }) {
   const { locale } = useLocale();
   const meta = HWATU_TYPES[type];
+  const [main, sub] = locale === 'ko' ? [meta.labelKo, meta.label] : [meta.label, meta.labelKo];
   return (
-    <div className="flex items-center gap-3 mb-4">
+    <header className="flex items-center gap-3 mb-3">
       <span className={`size-3 rounded-full shrink-0 ${TYPE_DOT[type]}`} aria-hidden />
-      <span className="text-xs uppercase tracking-wider font-semibold text-ink-soft">
-        {locale === 'ko' ? meta.labelKo : meta.label}
-      </span>
-      <h3 className="font-display text-2xl">
-        {locale === 'ko'
-          ? type === 'gwang'
-            ? '광'
-            : type === 'tti'
-              ? '띠'
-              : type === 'kkeut'
-                ? '열'
-                : '피'
-          : type === 'gwang'
-            ? 'Brights'
-            : type === 'tti'
-              ? 'Ribbons'
-              : type === 'kkeut'
-                ? 'Animals'
-                : 'Junk'}
+      <h3 className="font-display text-sub">
+        {main}
+        <span className="ml-2 font-display text-ink-soft">{sub}</span>
       </h3>
-    </div>
+    </header>
   );
 }
 
-function MiniCard({ id, dimmed }: { id: string; dimmed?: boolean }) {
-  const card = cardById(id);
-  if (!card) return null;
+function PointsList({ rows }: { rows: { en: string; ko: string; value: string }[] }) {
+  const { locale } = useLocale();
   return (
-    <div
-      className={`relative aspect-[2/3] w-14 sm:w-16 transition-opacity duration-200 ${
-        dimmed ? 'opacity-40' : ''
-      }`}
-    >
-      <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
-    </div>
+    <dl className="grid grid-cols-[1fr_auto]">
+      {rows.map((row, i) => (
+        <Fragment key={row.en}>
+          <dt className={`py-2.5 text-body ${i > 0 ? 'border-t border-hairline' : ''}`}>
+            {locale === 'ko' ? row.ko : row.en}
+          </dt>
+          <dd
+            className={`py-2.5 text-body font-bold tabular-nums text-right ${i > 0 ? 'border-t border-hairline' : ''}`}
+          >
+            {row.value}
+          </dd>
+        </Fragment>
+      ))}
+    </dl>
   );
 }
 
-function ScoreCell({
-  label,
-  score,
-  detail,
-  emphasis,
-  delay = 0,
-}: {
-  label: string;
-  score: string;
-  detail?: string;
-  emphasis?: boolean;
-  delay?: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-30px' }}
-      transition={{ duration: 0.36, ease: EASE, delay }}
-      className={`club-card relative px-4 py-3 ${emphasis ? 'score-cell-emphasis' : ''}`}
-    >
-      <div className="text-xs uppercase tracking-wider font-semibold text-ink-soft">{label}</div>
-      <div className="text-lg font-bold tabular-nums mt-1">{score}</div>
-      {detail && <div className="text-xs text-ink-soft leading-tight mt-1">{detail}</div>}
-    </motion.div>
-  );
-}
-
-function ComboCallout({
-  title,
-  score,
-  desc,
+function ComboRow({
+  nameEn,
+  nameKo,
+  points,
   cardIds,
-  dotClass,
 }: {
-  title: string;
-  score: string;
-  desc: string;
+  nameEn: string;
+  nameKo: string;
+  points: number;
   cardIds: ReadonlyArray<string>;
-  dotClass: string;
 }) {
+  const { locale } = useLocale();
+  const ko = locale === 'ko';
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.45, ease: EASE }}
-      whileHover="lift"
-      className="group club-card p-5"
-    >
-      <div className="flex items-center gap-2 mb-2">
-        <span className={`size-3 rounded-full shrink-0 ${dotClass}`} aria-hidden />
-        <span className="font-semibold">{title}</span>
-        <motion.span
-          variants={{ lift: { scale: 1.08 } }}
-          transition={{ type: 'spring', stiffness: 360, damping: 22 }}
-          className="text-sm font-bold tabular-nums text-ink-soft inline-block origin-left"
-        >
-          {score}
-        </motion.span>
+    <div className="grid gap-2.5 border-t border-hairline pt-3.5">
+      <div className="flex items-baseline justify-between gap-3">
+        <strong className="font-bold">{ko ? nameKo : nameEn}</strong>
+        <span className="font-bold tabular-nums">+{points}</span>
       </div>
-      <p className="text-sm text-ink-soft leading-relaxed mb-3">{desc}</p>
-      <div className="flex gap-2">
-        {cardIds.map((id, i) => (
-          <motion.div
-            key={id}
-            variants={{ lift: { y: -4 } }}
-            transition={{
-              type: 'spring',
-              stiffness: 320,
-              damping: 22,
-              delay: i * 0.04,
-            }}
-          >
-            <MiniCard id={id} />
-          </motion.div>
-        ))}
-      </div>
-    </motion.div>
+      <CardsGrid cards={cardsById(cardIds)} ko={ko} />
+    </div>
   );
 }
 
-function GwangBlock() {
-  const { locale } = useLocale();
-  const gwangs = HWATU_DECK.filter((c) => c.type === 'gwang');
-  const biggang = '12-gwang';
-
+function CardsGrid({ cards, ko, label }: { cards: HwatuCard[]; ko: boolean; label?: ReactNode }) {
   return (
-    <div>
-      <CategoryHeader type="gwang" />
-      <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
-        {locale === 'ko'
-          ? `광은 다섯 장. 3장부터 점수가 들어와요. 12월 비광이 끼면 3광은 ${SCORING.brights.three}점이 아니라 ${SCORING.brights.threeWithRain}점이고, 4광은 항상 ${SCORING.brights.four}점, 5광은 ${SCORING.brights.five}점이에요.`
-          : `There are five brights. Three or more begin to score. With the December Rain bright (비광 · Bigwang), three brights are worth ${SCORING.brights.threeWithRain} instead of ${SCORING.brights.three}; four are always ${SCORING.brights.four}, and five are ${SCORING.brights.five}.`}
-      </p>
-
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-w-xl mb-6">
-        <ScoreCell
-          label={locale === 'ko' ? '3광 (비광 X)' : '3 brights (no rain)'}
-          score={locale === 'ko' ? `${SCORING.brights.three}점` : `${SCORING.brights.three} pts`}
-          delay={0}
-        />
-        <ScoreCell
-          label={locale === 'ko' ? '3광 (비광 O)' : '3 brights (w/ rain)'}
-          score={
-            locale === 'ko'
-              ? `${SCORING.brights.threeWithRain}점`
-              : `${SCORING.brights.threeWithRain} pts`
-          }
-          detail={locale === 'ko' ? '비광 차감' : 'rain penalty'}
-          delay={0.06}
-        />
-        <ScoreCell
-          label={locale === 'ko' ? '4광' : '4 brights'}
-          score={locale === 'ko' ? `${SCORING.brights.four}점` : `${SCORING.brights.four} pts`}
-          delay={0.12}
-        />
-        <ScoreCell
-          label={locale === 'ko' ? '5광' : '5 brights'}
-          score={locale === 'ko' ? `${SCORING.brights.five}점` : `${SCORING.brights.five} pts`}
-          detail={locale === 'ko' ? '최고 점수' : 'max'}
-          emphasis
-          delay={0.18}
-        />
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        {gwangs.map((g, i) => (
-          <motion.div
-            key={g.id}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.4, ease: EASE, delay: i * 0.05 }}
-            whileHover={{ y: -3 }}
-            className="flex flex-col items-center gap-1.5"
-          >
-            <MiniCard id={g.id} />
-            <div className="text-xs text-ink-soft tabular-nums">
-              {g.month}월
-              {g.id === biggang && (
-                <span className="ml-1 text-ink font-bold">{locale === 'ko' ? '비광' : 'Rain'}</span>
-              )}
-            </div>
-          </motion.div>
+    <div className={label ? 'grid gap-2.5 border-t border-hairline pt-3.5' : undefined}>
+      {label && (
+        <div className="flex items-baseline justify-between gap-3">
+          <strong className="font-bold">{label}</strong>
+        </div>
+      )}
+      <div className="grid max-w-[420px] grid-cols-5 gap-2 md:max-w-none md:[grid-template-columns:repeat(auto-fill,68px)]">
+        {cards.map((card) => (
+          <ScoreCardArt key={card.id} card={card} ko={ko} />
         ))}
       </div>
     </div>
   );
 }
 
-function TtiBlock() {
+function CategoryBlock({ type }: { type: HwatuType }) {
   const { locale } = useLocale();
+  const ko = locale === 'ko';
 
   return (
-    <div>
-      <CategoryHeader type="tti" />
-      <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
-        {locale === 'ko'
-          ? `띠 ${SCORING.ribbonsStartAt}장이면 1점, 한 장 추가될 때마다 +1점. 추가로 같은 색 띠 3장이 모이면 콤보 점수가 따로 들어와요.`
-          : `${numberWord(SCORING.ribbonsStartAt)} ribbons score 1 point, +1 per extra. Three of the same color form a separate combo bonus.`}
-      </p>
+    <article className="club-card p-5 sm:p-6">
+      <CategoryHeader type={type} />
+      <p className="mb-4 max-w-[60ch] text-body">{RULE[type][ko ? 'ko' : 'en']}</p>
+      <PointsList rows={POINTS[type]} />
 
-      <div className="space-y-3">
-        <ComboCallout
-          title={locale === 'ko' ? '홍단 (1·2·3월)' : 'Hongdan · Red ribbons'}
-          score={
-            locale === 'ko' ? `+${SCORING.combos.hongdan}점` : `+${SCORING.combos.hongdan} pts`
-          }
-          desc={
-            locale === 'ko'
-              ? '1월·2월·3월의 빨간 띠 (시문이 적힌 홍색 띠)'
-              : 'Red ribbons of January, February, March — poetry-inscribed.'
-          }
-          cardIds={HONGDAN}
-          dotClass="bg-plum"
-        />
-        <ComboCallout
-          title={locale === 'ko' ? '청단 (6·9·10월)' : 'Cheongdan · Blue ribbons'}
-          score={
-            locale === 'ko' ? `+${SCORING.combos.cheongdan}점` : `+${SCORING.combos.cheongdan} pts`
-          }
-          desc={
-            locale === 'ko' ? '6월·9월·10월의 파란 띠' : 'Blue ribbons of June, September, October.'
-          }
-          cardIds={CHEONGDAN}
-          dotClass="bg-sky"
-        />
-        <ComboCallout
-          title={locale === 'ko' ? '초단 (4·5·7월)' : 'Chodan · Grass ribbons'}
-          score={locale === 'ko' ? `+${SCORING.combos.chodan}점` : `+${SCORING.combos.chodan} pts`}
-          desc={
-            locale === 'ko' ? '4월·5월·7월의 초록 띠' : 'Grass-colored ribbons of April, May, July.'
-          }
-          cardIds={CHODAN}
-          dotClass="bg-sage"
-        />
-      </div>
+      {type === 'tti' && (
+        <div className="mt-3.5 space-y-3.5">
+          <ComboRow
+            nameEn="홍단 · Red set"
+            nameKo="홍단 · 홍색 세트"
+            points={SCORING.combos.hongdan}
+            cardIds={HONGDAN_IDS}
+          />
+          <ComboRow
+            nameEn="청단 · Blue set"
+            nameKo="청단 · 청색 세트"
+            points={SCORING.combos.cheongdan}
+            cardIds={CHEONGDAN_IDS}
+          />
+          <ComboRow
+            nameEn="초단 · Grass set"
+            nameKo="초단 · 초록 세트"
+            points={SCORING.combos.chodan}
+            cardIds={CHODAN_IDS}
+          />
+        </div>
+      )}
 
-      <p className="text-xs text-ink-soft mt-4">
-        {locale === 'ko'
-          ? '* 12월 띠는 콤보에 들어가지 않아요. 띠 카운트엔 포함.'
-          : "* The December ribbon doesn't count toward any combo, but does add to total ribbon count."}
-      </p>
-    </div>
+      {type === 'kkeut' && (
+        <div className="mt-3.5 space-y-3.5">
+          <ComboRow
+            nameEn="고도리 · Godori"
+            nameKo="고도리"
+            points={SCORING.combos.godori}
+            cardIds={GODORI_IDS}
+          />
+          <CardsGrid
+            cards={cardsOfType('kkeut')}
+            ko={ko}
+            label={ko ? '열 9장 전부' : 'All 9 Animals'}
+          />
+        </div>
+      )}
+
+      {type === 'gwang' && (
+        <div className="mt-3.5">
+          <CardsGrid cards={cardsOfType('gwang')} ko={ko} />
+        </div>
+      )}
+
+      {type === 'pi' && (
+        <div className="mt-3.5">
+          <CardsGrid
+            cards={cardsOfType('pi')}
+            ko={ko}
+            label={ko ? '피 24장 전부' : 'All 24 Junk'}
+          />
+        </div>
+      )}
+
+      {NOTE[type] && (
+        <p className="mt-3.5 text-label text-ink-soft">{NOTE[type]![ko ? 'ko' : 'en']}</p>
+      )}
+    </article>
   );
 }
 
-function KkeutBlock() {
-  const { locale } = useLocale();
-  const kkeuts = HWATU_DECK.filter((c) => c.type === 'kkeut');
+const RULE: Record<HwatuType, { en: string; ko: string }> = {
+  gwang: {
+    en: `Collect ${SCORING.brights.three} or more of the 5 Brights.`,
+    ko: `광 5장 중 ${SCORING.brights.three}장 이상을 모으면 점수가 돼요.`,
+  },
+  tti: {
+    en: 'Any 5 Ribbons score 1 point, plus 1 for each extra. A full set of 3 scores 3 more on top.',
+    ko: `띠는 ${SCORING.ribbonsStartAt}장부터 1점, 이후 한 장마다 +1점. 같은 색 3장을 모으면 추가로 점수가 붙어요.`,
+  },
+  kkeut: {
+    en: 'Any 5 Animals score 1 point, plus 1 for each extra. The three birds together score 5 more.',
+    ko: `열은 ${SCORING.animalsStartAt}장부터 1점, 이후 한 장마다 +1점. 새 3마리를 모으면 고도리로 추가 점수.`,
+  },
+  pi: {
+    en: '10 Junk score 1 point, plus 1 for each extra. Double junk counts as 2.',
+    ko: `피는 ${SCORING.junkStartAt}장부터 1점, 이후 한 장마다 +1점. 쌍피는 두 장으로 셈해요.`,
+  },
+};
 
-  return (
-    <div>
-      <CategoryHeader type="kkeut" />
-      <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
-        {locale === 'ko'
-          ? `열 ${SCORING.animalsStartAt}장이면 1점, 한 장 추가될 때마다 +1점. 새 3마리를 모으면 고도리 콤보.`
-          : `${numberWord(SCORING.animalsStartAt)} animals score 1 point, +1 per extra. Collecting all three songbirds forms godori — a separate combo.`}
-      </p>
+const POINTS: Record<HwatuType, { en: string; ko: string; value: string }[]> = {
+  gwang: [
+    { en: '3 Brights', ko: '광 3장', value: String(SCORING.brights.three) },
+    {
+      en: '3 Brights, one of them the Dec rain Bright',
+      ko: '광 3장 (12월 비광 포함)',
+      value: String(SCORING.brights.threeWithRain),
+    },
+    { en: '4 Brights', ko: '광 4장', value: String(SCORING.brights.four) },
+    { en: 'All 5 Brights', ko: '광 5장 전부', value: String(SCORING.brights.five) },
+  ],
+  tti: [
+    { en: '5 Ribbons', ko: '띠 5장', value: '1' },
+    { en: 'Each extra Ribbon', ko: '추가 띠 1장마다', value: '+1' },
+  ],
+  kkeut: [
+    { en: '5 Animals', ko: '열 5장', value: '1' },
+    { en: 'Each extra Animal', ko: '추가 열 1장마다', value: '+1' },
+  ],
+  pi: [
+    { en: '10 Junk', ko: '피 10장', value: '1' },
+    { en: 'Each extra Junk', ko: '추가 피 1장마다', value: '+1' },
+  ],
+};
 
-      <ComboCallout
-        title={locale === 'ko' ? '고도리' : 'Godori · Songbird trio'}
-        score={locale === 'ko' ? `+${SCORING.combos.godori}점` : `+${SCORING.combos.godori} pts`}
-        desc={
-          locale === 'ko'
-            ? '새가 그려진 열 3장 — 꾀꼬리(2월) + 두견새(4월) + 기러기(8월)'
-            : 'Three bird animals — warbler (February), cuckoo (April), geese (August).'
-        }
-        cardIds={GODORI}
-        dotClass="bg-ink"
-      />
-
-      <div className="text-xs uppercase tracking-[0.18em] text-ink-soft mt-6 mb-2 font-semibold">
-        {locale === 'ko' ? '전체 열 (9장)' : 'All animals (9)'}
-      </div>
-      <p className="mt-3 max-w-2xl text-xs leading-relaxed text-ink-soft">
-        {locale === 'ko'
-          ? '9월 술잔(국진)은 열로도, 쌍피(피 2장)로도 셀 수 있어요. 점수를 셈할 때 직접 골라요.'
-          : 'The September sake cup (국진) counts as an Animal or as 2 junk. You pick when you score.'}
-      </p>
-      <div className="flex flex-wrap gap-1.5">
-        {kkeuts.map((k, i) => (
-          <motion.div
-            key={k.id}
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: '-30px' }}
-            transition={{ duration: 0.32, ease: EASE, delay: i * 0.04 }}
-          >
-            <MiniCard id={k.id} dimmed={!GODORI.includes(k.id)} />
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function PiBlock() {
-  const { locale } = useLocale();
-  const pis = HWATU_DECK.filter((c) => c.type === 'pi');
-  const ssangPi = pis.filter((p) => p.tag === '쌍피');
-  const regularPi = pis.filter((p) => p.tag !== '쌍피');
-
-  return (
-    <div>
-      <CategoryHeader type="pi" />
-      <p className="text-sm text-ink-soft max-w-2xl leading-relaxed mb-5">
-        {locale === 'ko'
-          ? `피 ${SCORING.junkStartAt}장이면 1점, 한 장 추가될 때마다 +1점. 쌍피는 한 장이 두 장의 효과를 가져요.`
-          : `${numberWord(SCORING.junkStartAt)} junk score 1 point, +1 per extra. Double junk (쌍피) count as two each.`}
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start">
-        <Block label={locale === 'ko' ? '일반 피' : 'Regular junk'} count={regularPi.length}>
-          <div className="flex flex-wrap gap-1.5">
-            {regularPi.slice(0, 8).map((p, i) => (
-              <motion.div
-                key={p.id}
-                initial={{ opacity: 0, y: 6 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-30px' }}
-                transition={{ duration: 0.3, ease: EASE, delay: i * 0.03 }}
-              >
-                <MiniCard id={p.id} />
-              </motion.div>
-            ))}
-            {regularPi.length > 8 && (
-              <motion.div
-                initial={{ opacity: 0, y: 6 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-30px' }}
-                transition={{ duration: 0.3, ease: EASE, delay: 8 * 0.03 }}
-                className="aspect-[2/3] w-14 sm:w-16 flex items-center justify-center text-xs text-ink-soft tabular-nums"
-              >
-                +{regularPi.length - 8}
-              </motion.div>
-            )}
-          </div>
-        </Block>
-
-        <Block label={locale === 'ko' ? '쌍피 (×2)' : 'Double junk (×2)'} count={ssangPi.length}>
-          <div className="flex gap-1.5">
-            {ssangPi.map((p, i) => (
-              <motion.div
-                key={p.id}
-                initial={{ opacity: 0, scale: 0.85 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: '-30px' }}
-                transition={{
-                  type: 'spring',
-                  stiffness: 380,
-                  damping: 22,
-                  delay: i * 0.08,
-                }}
-                whileHover={{ y: -3, scale: 1.04 }}
-                className="relative"
-              >
-                <MiniCard id={p.id} />
-                <span className="absolute -top-1 -right-1 text-xs font-bold bg-sage text-on-fill px-1.5 rounded-full leading-none py-0.5">
-                  ×2
-                </span>
-              </motion.div>
-            ))}
-          </div>
-        </Block>
-      </div>
-    </div>
-  );
-}
-
-function Block({ label, count, children }: { label: string; count: number; children: ReactNode }) {
-  return (
-    <div>
-      <div className="flex items-baseline gap-2 mb-2">
-        <span className="text-xs uppercase tracking-[0.18em] font-semibold text-ink-soft">
-          {label}
-        </span>
-        <span className="text-xs text-ink-soft tabular-nums">({count})</span>
-      </div>
-      {children}
-    </div>
-  );
-}
+const NOTE: Partial<Record<HwatuType, { en: string; ko: string }>> = {
+  tti: {
+    en: 'The Dec ribbon counts toward your 5 Ribbons but belongs to no set.',
+    ko: '12월 띠는 5장 카운트엔 포함되지만 어떤 세트에도 속하지 않아요.',
+  },
+  kkeut: {
+    en: 'The Sep sake cup counts as an Animal or as 2 Junk. You pick whichever scores higher.',
+    ko: '9월 술잔은 열 또는 쌍피(피 2장)로 셀 수 있어요. 더 높은 점수가 되는 쪽으로 계산돼요.',
+  },
+};

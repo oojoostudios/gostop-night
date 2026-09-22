@@ -1,5 +1,5 @@
 /**
- * HOUSE RULES — Club Go Stop
+ * HOUSE RULES — GoStop Club
  *
  * This is the ONE place to change a rule. Change a value here and the whole
  * site follows: the guide sections, the score calculator, and (later) the
@@ -46,7 +46,7 @@ export type Rules = {
 
 export const RULES: Rules = {
   callThreshold: { twoPlayer: 7, threePlayer: 3 },
-  goScoring: 'flat',
+  goScoring: 'standard',
   bakPenalties: {
     enabled: false,
     piBak: true,

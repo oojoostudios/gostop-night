@@ -12,16 +12,16 @@ export function SiteFooter() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="relative border-t border-hairline mt-12 py-12 text-center text-sm text-ink-soft"
+      className="relative border-t border-hairline mt-12 py-12 text-center text-body text-ink-soft"
     >
       <div className="lg:ml-72">
         <div className="max-w-2xl mx-auto px-6 sm:px-8 lg:px-16 space-y-2">
           <p>
             {locale === 'ko'
-              ? '클럽 고스톱 — 우리 고스톱 게임 나이트를 위한 가이드.'
-              : 'Club Go Stop — a guide for our Go-Stop game nights.'}
+              ? '고스톱 클럽 — 우리 고스톱 게임 나이트를 위한 가이드.'
+              : 'GoStop Club — a guide for our Go-Stop game nights.'}
           </p>
-          <p className="text-xs text-ink-soft">
+          <p className="text-label text-ink-soft">
             {locale === 'ko' ? (
               <>
                 <a

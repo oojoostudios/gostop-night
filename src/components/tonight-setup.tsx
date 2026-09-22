@@ -60,9 +60,9 @@ export function SetupView({
     });
   };
 
-  const label = 'mb-1.5 block text-sm font-medium';
+  const label = 'mb-1.5 block text-label font-medium';
   const input = 'club-input !bg-paper w-full';
-  const heading = 'mb-3 text-xs font-bold uppercase tracking-[0.18em] text-ink-soft';
+  const heading = 'mb-3 text-label font-bold uppercase tracking-[0.18em] text-ink-soft';
 
   return (
     <form
@@ -72,7 +72,7 @@ export function SetupView({
         start();
       }}
     >
-      <h3 className="font-display text-2xl">{t('Set up the night', '오늘 밤 준비')}</h3>
+      <h3 className="font-display text-sub">{t('Set up the night', '오늘 밤 준비')}</h3>
 
       <div>
         <div className={heading}>{t('Event', '이벤트')}</div>
@@ -133,7 +133,7 @@ export function SetupView({
             />
           </label>
         </div>
-        <p className="mt-3 text-base tabular-nums" aria-live="polite">
+        <p className="mt-3 text-body tabular-nums" aria-live="polite">
           {valid
             ? t(
                 `1 chip = ${chipValueText(buyInN / chipsN)}`,
@@ -182,12 +182,12 @@ export function SetupView({
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
-          className="club-btn club-btn--primary text-base disabled:cursor-not-allowed disabled:opacity-40"
+          className="club-btn club-btn--primary text-body disabled:cursor-not-allowed disabled:opacity-40"
           disabled={!valid}
         >
           {t('Start the game', '게임 시작')}
         </button>
-        <button type="button" className="club-btn text-base" onClick={onCancel}>
+        <button type="button" className="club-btn text-body" onClick={onCancel}>
           {t('Cancel', '취소')}
         </button>
       </div>

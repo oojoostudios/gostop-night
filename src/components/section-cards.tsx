@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { useLocale } from '@/contexts/locale-context';
 import { FadeInOnView } from '@/components/fade-in-on-view';
+import { SectionTitle } from '@/components/section-title';
 import { DeckGrid, type DeckFilter } from '@/components/deck-grid';
 import { FlipCardModal } from '@/components/hwatu-flip-card';
+import { GOSTOP_SECTIONS } from '@/lib/sections';
 import {
   DOUBLE_JUNK,
   HWATU_DECK,
@@ -14,6 +16,8 @@ import {
   type HwatuCard,
   type HwatuType,
 } from '@/lib/hwatu';
+
+const SECTION = GOSTOP_SECTIONS.find((s) => s.id === 'section-cards')!;
 
 // Order of the four types: Bright, Animal, Ribbon, Junk (the same as the grid's columns).
 const TYPE_ORDER: ReadonlyArray<HwatuType> = ['gwang', 'kkeut', 'tti', 'pi'];
@@ -26,7 +30,7 @@ const TYPE_DOT: Record<HwatuType, string> = {
   pi: 'type-dot bg-type-junk',
 };
 
-const smallLabel = 'mb-1 text-xs uppercase tracking-wider text-ink-soft';
+const smallLabel = 'mb-1 text-label uppercase tracking-wider text-ink-soft';
 
 /** Section 01: The Hwatu Deck. Type cards, filter chips, the month-by-type grid, and the tap-to-flip card. */
 export function SectionCards() {
@@ -49,20 +53,11 @@ export function SectionCards() {
     >
       <div className="lg:ml-72">
         <div className="mx-auto max-w-5xl px-6 sm:px-8 lg:px-16">
-          <FadeInOnView
-            as="h2"
-            delay={0.05}
-            className="mb-6 font-display text-4xl leading-tight md:text-5xl"
-          >
-            <span className="text-plum">01</span>
-            <span className="ml-4">
-              {locale === 'ko' ? '화투 카드란?' : 'What are hwatu cards?'}
-            </span>
-          </FadeInOnView>
+          <SectionTitle section={SECTION} />
           <FadeInOnView
             as="p"
             delay={0.12}
-            className="mb-12 max-w-2xl text-lg leading-relaxed text-ink-soft"
+            className="mb-12 max-w-2xl text-body leading-relaxed text-ink-soft"
           >
             {locale === 'ko'
               ? '12달 × 4장 = 48장. 각 카드는 4가지 종류 중 하나에 속해요. 필터로 종류를 골라보고, 카드를 탭하면 커지면서 뒤집혀 자세한 정보가 보여요.'
@@ -125,17 +120,17 @@ function TypeCard({ type }: { type: HwatuType }) {
     <div className="club-card flex h-full flex-col gap-3 p-5">
       <div className="flex items-center gap-2.5">
         <span aria-hidden className={`size-2.5 shrink-0 rounded-full ${TYPE_DOT[type]}`} />
-        <div aria-hidden className="font-display text-2xl leading-none text-ink">
+        <div aria-hidden className="font-display text-sub leading-none text-ink">
           {t.hanja}
         </div>
-        <h3 className="font-display text-xl leading-tight">{main}</h3>
+        <h3 className="font-display text-sub leading-tight">{main}</h3>
       </div>
-      <div className="-mt-1 text-sm text-ink-soft">{sub}</div>
-      <p className="text-sm leading-relaxed">{ko ? t.blurbKo : t.blurb}</p>
+      <div className="-mt-1 text-label text-ink-soft">{sub}</div>
+      <p className="text-body leading-relaxed">{ko ? t.blurbKo : t.blurb}</p>
 
       <div className="mt-1">
         <div className={smallLabel}>{ko ? '나오는 달' : 'Appears in'}</div>
-        <div className="text-sm font-medium">{monthList(monthsForColumn(type), locale)}</div>
+        <div className="text-label font-medium">{monthList(monthsForColumn(type), locale)}</div>
       </div>
 
       {/* Double junk is a Junk card worth two, so it is listed on the Junk card. */}
@@ -147,7 +142,9 @@ function TypeCard({ type }: { type: HwatuType }) {
               : `${DOUBLE_JUNK.label} · ${DOUBLE_JUNK.termKo}`}{' '}
             · {DOUBLE_JUNK.roman}
           </div>
-          <div className="text-sm font-medium">{monthList(monthsForColumn('double'), locale)}</div>
+          <div className="text-label font-medium">
+            {monthList(monthsForColumn('double'), locale)}
+          </div>
         </div>
       )}
     </div>

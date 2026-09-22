@@ -76,14 +76,14 @@ export function DeckGrid({
                 style={{ '--slot': FIRST_SLOT[column] } as React.CSSProperties}
                 className={`${column === 'pi' ? slotClassWide : slotClass} text-center leading-tight md:pb-1`}
               >
-                <div className="text-xs font-bold text-ink">
+                <div className="text-label font-bold text-ink">
                   <span
                     aria-hidden
                     className={`mr-1 inline-block size-2 rounded-full ${COLUMN_DOT[column]}`}
                   />
                   {main}
                 </div>
-                <div className="text-xs text-ink-soft">{other}</div>
+                <div className="text-label text-ink-soft">{other}</div>
               </div>
             );
           })}
@@ -101,7 +101,7 @@ export function DeckGrid({
           );
           return (
             <div key={month.num} className={`${ROW} items-center border-t border-hairline py-4`}>
-              <div className="col-span-6 mb-3 text-xs tracking-[0.04em] text-ink-soft md:col-span-1 md:mb-0">
+              <div className="col-span-6 mb-3 text-label tracking-[0.04em] text-ink-soft md:col-span-1 md:mb-0">
                 {monthRowLabel(month)}
               </div>
               {placed.map(({ card, slot }) => {

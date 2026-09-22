@@ -33,7 +33,7 @@ export function BalanceCheck({ ev }: { ev: TonightEvent }) {
           <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-sage text-on-fill">
             <Check className="size-4" strokeWidth={3} />
           </span>
-          <span className="text-base font-medium tabular-nums">
+          <span className="text-body font-medium tabular-nums">
             {ko
               ? `칩이 맞아요: 테이블 ${b.onTable} = 산 칩 ${b.boughtIn}`
               : `Chips balance: ${b.onTable} on the table = ${b.boughtIn} bought in`}
@@ -41,10 +41,10 @@ export function BalanceCheck({ ev }: { ev: TonightEvent }) {
         </div>
       ) : (
         <>
-          <span className="rounded-full bg-plum px-3 py-1 text-base font-bold tabular-nums text-surface">
+          <span className="rounded-full bg-plum px-3 py-1 text-body font-bold tabular-nums text-surface">
             {ko ? `칩 ${signed(b.diff)} 차이` : `Off by ${signed(b.diff)} chips`}
           </span>
-          <span className="text-sm tabular-nums text-ink-soft">
+          <span className="text-label tabular-nums text-ink-soft">
             {ko
               ? `테이블 ${b.onTable} · 산 칩 ${b.boughtIn}`
               : `${b.onTable} on the table, ${b.boughtIn} bought in`}
@@ -92,7 +92,7 @@ export function History({ ev }: { ev: TonightEvent }) {
   const shown = all ? entries : entries.slice(0, 5);
   if (entries.length === 0) {
     return (
-      <p className="text-sm text-ink-soft">
+      <p className="text-body text-ink-soft">
         {ko ? '아직 기록된 판이 없어요.' : 'No hands recorded yet.'}
       </p>
     );
@@ -101,7 +101,7 @@ export function History({ ev }: { ev: TonightEvent }) {
     <div>
       <ul className="space-y-2">
         {shown.map((e) => (
-          <li key={e.id} className="text-sm leading-relaxed text-ink">
+          <li key={e.id} className="text-body leading-relaxed text-ink">
             {describe(e, ev, ko)}
           </li>
         ))}
@@ -153,8 +153,8 @@ export function TableView({
   return (
     <div className="space-y-6">
       <div className="club-card p-5 sm:p-6">
-        <h3 className="font-display text-2xl leading-tight">{ev.name}</h3>
-        <p className="mt-1 text-sm text-ink-soft tabular-nums">
+        <h3 className="font-display text-sub leading-tight">{ev.name}</h3>
+        <p className="mt-1 text-label text-ink-soft tabular-nums">
           {ev.date} · {t('1 chip', '칩 1개')} = {chipValueText(v)} ·{' '}
           {t(`${ev.chipsPerPoint} chip per point`, `1점 = ${ev.chipsPerPoint}칩`)}
         </p>
@@ -166,27 +166,27 @@ export function TableView({
       <div className="grid gap-3 sm:grid-cols-3" data-testid="players">
         {rows.map((r) => (
           <div key={r.player.id} className="club-card p-5">
-            <div className="truncate font-display text-xl">{r.player.name}</div>
+            <div className="truncate font-display text-sub">{r.player.name}</div>
             <div className="mt-3 flex items-baseline gap-2">
-              <CountUp value={r.chips} className="text-4xl font-bold" />
-              <span className="text-sm text-ink-soft">{t('chips', '칩')}</span>
+              <CountUp value={r.chips} className="text-num font-bold" />
+              <span className="text-label text-ink-soft">{t('chips', '칩')}</span>
             </div>
-            <div className="mt-2 flex flex-wrap items-baseline gap-x-3 text-base tabular-nums">
+            <div className="mt-2 flex flex-wrap items-baseline gap-x-3 text-body tabular-nums">
               <span>
                 <CountUp value={r.net} signed className="font-bold" />{' '}
-                <span className="text-sm text-ink-soft">{t('net', '순')}</span>
+                <span className="text-label text-ink-soft">{t('net', '순')}</span>
               </span>
               <span>
                 <span className="text-ink-soft">= </span>
                 <CountUp value={r.dollars} decimals={2} prefix="$" className="font-medium" />
               </span>
             </div>
-            <div className="mt-1 text-xs tabular-nums text-ink-soft">
+            <div className="mt-1 text-label tabular-nums text-ink-soft">
               {t(`Buy-ins: ${r.buyIns}`, `바이인 ${r.buyIns}회`)}
             </div>
             <button
               type="button"
-              className="club-btn mt-4 !px-4 !py-2 text-base"
+              className="club-btn mt-4 !px-4 !py-2 text-body"
               onClick={() => onRebuy(r.player.id)}
             >
               <Plus className="size-4" />
@@ -197,31 +197,31 @@ export function TableView({
       </div>
 
       {doubled && (
-        <p className="inline-block rounded-full bg-gold px-3 py-1 text-sm font-medium text-on-fill">
+        <p className="inline-block rounded-full bg-gold px-3 py-1 text-label font-medium text-on-fill">
           {t('Draw last time — next hand counts ×2', '지난 판 나가리 — 다음 판은 ×2')}
         </p>
       )}
 
       <div className="flex flex-wrap gap-3">
-        <button type="button" className="club-btn club-btn--primary text-base" onClick={onRecord}>
+        <button type="button" className="club-btn club-btn--primary text-body" onClick={onRecord}>
           {t('Record a hand', '판 기록하기')}
         </button>
         <button
           type="button"
-          className="club-btn text-base disabled:cursor-not-allowed disabled:opacity-40"
+          className="club-btn text-body disabled:cursor-not-allowed disabled:opacity-40"
           onClick={onUndo}
           disabled={!hasHandToUndo(ev)}
         >
           <Undo2 className="size-4" />
           {t('Undo last hand', '마지막 판 취소')}
         </button>
-        <button type="button" className="club-btn text-base" onClick={onCashOut}>
+        <button type="button" className="club-btn text-body" onClick={onCashOut}>
           {t('Cash out', '정산하기')}
         </button>
       </div>
 
       <div className="club-card p-5 sm:p-6">
-        <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-ink-soft">
+        <div className="mb-3 text-label font-bold uppercase tracking-[0.18em] text-ink-soft">
           {t('History', '기록')}
         </div>
         <History ev={ev} />

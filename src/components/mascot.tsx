@@ -1,5 +1,5 @@
 /**
- * The Club Go Stop mascot, in its square frame.
+ * The GoStop Club mascot, in its square frame.
  *
  * Light mode: the mascot sits straight on the page.
  * Dark mode: the frame becomes a round light-paper badge (see `.mascot-frame` in

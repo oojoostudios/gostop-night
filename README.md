@@ -1,8 +1,8 @@
 <div align="center">
 
-![Club Go Stop](./src/app/opengraph-image.png)
+![GoStop Club](./src/app/opengraph-image.png)
 
-# Club Go Stop · 클럽 고스톱
+# GoStop Club · 고스톱 클럽
 
 A phone-first Go-Stop guide for our game nights. 고스톱 게임 나이트를 위한 모바일 가이드.
 
@@ -12,7 +12,7 @@ A phone-first Go-Stop guide for our game nights. 고스톱 게임 나이트를 �
 
 ## About
 
-Go-stop is the most popular card game in Korea, but the rules look brutal on paper: **48 cards, 12 monthly suits, four card types, special calls, scoring multipliers, and a decision every turn.** Club Go Stop walks a first-timer through them visually, in about five minutes, in English and Korean. Guests open a link on their phone: no login, no app.
+Go-stop is the most popular card game in Korea, but the rules look brutal on paper: **48 cards, 12 monthly suits, four card types, special calls, scoring multipliers, and a decision every turn.** GoStop Club walks a first-timer through them visually, in about five minutes, in English and Korean. Guests open a link on their phone: no login, no app.
 
 The look is "Vintage print": warm paper, fine ink lines, no shadows, with a plum-blossom mascot. All colors, fonts, corners and press effects live in one place, `src/app/globals.css` (colors) and `src/lib/fonts.ts` (fonts).
 

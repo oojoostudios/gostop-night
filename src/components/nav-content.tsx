@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'motion/react';
 import { Moon, Sun } from 'lucide-react';
@@ -9,19 +8,15 @@ import { Button } from '@heroui/react';
 import { SECTIONS_BY_GAME } from '@/lib/sections';
 import { getActiveGame } from '@/lib/games';
 import { useLocale } from '@/contexts/locale-context';
-import { useVariant, VARIANTS } from '@/contexts/variant-context';
 import { useTheme } from '@/contexts/theme-context';
-import { Mascot } from '@/components/mascot';
-import { Wordmark } from '@/components/wordmark';
+import { BrandBlock } from '@/components/brand-block';
 
 export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   const { locale, setLocale } = useLocale();
-  const { variant, setVariant } = useVariant();
   const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const game = getActiveGame(pathname);
   const sections = SECTIONS_BY_GAME[game];
-  const visibleVariants = VARIANTS.filter((v) => !v.disabled);
   const [active, setActive] = useState<string>(sections[0].id);
 
   // Reset active section when switching games.
@@ -62,7 +57,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <>
-      <BrandBlock />
+      <BrandBlock className="w-36" />
 
       <nav className="flex flex-col gap-0.5">
         {sections.map((section) => {
@@ -91,8 +86,8 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                   }}
                 />
               )}
-              <span className="relative z-10 text-xs tabular-nums">{section.num}</span>
-              <span className="relative z-10 text-sm leading-snug">
+              <span className="relative z-10 text-label tabular-nums">{section.num}</span>
+              <span className="relative z-10 text-label leading-snug">
                 {locale === 'ko' ? section.labelKo : section.label}
               </span>
             </a>
@@ -100,31 +95,8 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      {game === 'gostop' && visibleVariants.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {visibleVariants.map((v) => (
-            <motion.button
-              key={v.id}
-              type="button"
-              onClick={() => setVariant(v.id)}
-              aria-pressed={variant === v.id}
-              whileTap={{ scale: 0.93 }}
-              transition={{
-                type: 'spring',
-                stiffness: 400,
-                damping: 30,
-                mass: 0.6,
-              }}
-              className="club-chip"
-            >
-              {locale === 'ko' ? v.labelKo : v.label}
-            </motion.button>
-          ))}
-        </div>
-      )}
-
       <div className="flex flex-col gap-2">
-        <div className="text-xs uppercase tracking-[0.18em] text-ink-soft">
+        <div className="text-label uppercase tracking-[0.18em] text-ink-soft">
           {locale === 'ko' ? '언어' : 'Language'}
         </div>
         <div className="flex gap-2">
@@ -153,7 +125,7 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
         variant="ghost"
         size="sm"
         onPress={toggleTheme}
-        className="justify-start gap-2 text-xs"
+        className="justify-start gap-2 text-label"
       >
         {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
         {locale === 'ko'
@@ -165,15 +137,5 @@ export function NavContent({ onNavigate }: { onNavigate?: () => void }) {
             : 'Dark'}
       </Button>
     </>
-  );
-}
-
-/** Brand block: the mascot and the Club Go Stop wordmark, linking home. */
-function BrandBlock() {
-  return (
-    <Link href="/gostop" className="flex items-center gap-3">
-      <Mascot size="sm" className="w-14" />
-      <Wordmark size="sm" />
-    </Link>
   );
 }

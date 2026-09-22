@@ -1,7 +1,7 @@
 import { Fraunces, Gowun_Batang, IBM_Plex_Sans_KR } from 'next/font/google';
 
 /**
- * FONTS — Club Go Stop, "Vintage print"
+ * FONTS — GoStop Club, "Vintage print"
  *
  * To swap a font: change the import name and the function name on ONE of the
  * three blocks below (keep each `variable` string as it is — the theme in

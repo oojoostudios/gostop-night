@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ══════════════════════════════════════════════════════════════════════════ */
-/*  CLUB GO STOP — DESIGN TOKENS  ·  "Vintage print"                          */
+/*  GOSTOP CLUB — DESIGN TOKENS  ·  "Vintage print"                           */
 /*                                                                            */
 /*  An old printed card box: warm paper, fine ink lines, no heavy outlines,   */
 /*  no shadows. Separation comes from color, not from borders.                */
@@ -94,6 +94,41 @@
   /* ── DISPLAY TYPE: Fraunces weight and optical size (9 low, 144 high) ─── */
   --display-weight: 600;
   --display-opsz: 144;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/*  TYPE SCALE — the only five sizes allowed, in every section (01–07)        */
+/*  Phone value, then a ≥760px override below. Nothing is ever under 14px.    */
+/* ══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --fs-title: 28px; /* section title */
+  --fs-sub: 20px; /* sub-heading: Brights, Ribbons, card-block names, the Korean title line */
+  --fs-body: 16px; /* body text */
+  --fs-label: 14px; /* labels, captions, badges, table headers, card captions */
+  --fs-num: 32px; /* big numbers: scores, chips, totals */
+}
+@media (min-width: 760px) {
+  :root {
+    --fs-title: 36px;
+    --fs-sub: 22px;
+    --fs-num: 40px;
+  }
+}
+@utility text-title {
+  font-size: var(--fs-title);
+}
+@utility text-sub {
+  font-size: var(--fs-sub);
+}
+@utility text-body {
+  font-size: var(--fs-body);
+}
+@utility text-label {
+  font-size: var(--fs-label);
+}
+@utility text-num {
+  font-size: var(--fs-num);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Light: the default on the page, and an "island" that forces light colors on one

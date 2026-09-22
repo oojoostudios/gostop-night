@@ -6,9 +6,13 @@ import { ChevronRight, RotateCcw, Shuffle } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { useLocale } from '@/contexts/locale-context';
 import { FadeInOnView } from '@/components/fade-in-on-view';
+import { SectionTitle } from '@/components/section-title';
 import { HwatuCardImage } from '@/components/hwatu-card-image';
 import { HwatuCardBack } from '@/components/hwatu-card-back';
+import { GOSTOP_SECTIONS } from '@/lib/sections';
 import { HWATU_DECK, type HwatuCard as HwatuCardData } from '@/lib/hwatu';
+
+const SECTION = GOSTOP_SECTIONS.find((s) => s.id === 'section-deal')!;
 
 const cardById = (id: string): HwatuCardData | undefined => HWATU_DECK.find((c) => c.id === id);
 
@@ -101,20 +105,11 @@ export function SectionDeal() {
     <section id="section-deal" className="relative py-24 border-t border-hairline section-flow-bg">
       <div className="lg:ml-72">
         <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
-          <FadeInOnView
-            as="h2"
-            delay={0.05}
-            className="font-display text-4xl md:text-5xl leading-tight mb-6"
-          >
-            <span className="text-plum">02</span>
-            <span className="ml-4">
-              {locale === 'ko' ? '한 판이 시작될 때' : 'How a round begins'}
-            </span>
-          </FadeInOnView>
+          <SectionTitle section={SECTION} />
           <FadeInOnView
             as="p"
             delay={0.12}
-            className="text-lg text-ink-soft max-w-[65ch] leading-relaxed mb-10"
+            className="text-body text-ink-soft max-w-[65ch] leading-relaxed mb-10"
           >
             {locale === 'ko'
               ? "카드를 어떻게 나누고 어디에 두는지 — 4단계로 따라가 보세요. '다음' 버튼을 눌러 진행할 수 있어요."
@@ -133,10 +128,10 @@ export function SectionDeal() {
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.18 }}
               >
-                <h3 className="font-display text-xl mb-2">
+                <h3 className="font-display text-sub mb-2">
                   {locale === 'ko' ? meta.titleKo : meta.titleEn}
                 </h3>
-                <p className="text-sm text-ink-soft leading-relaxed max-w-[65ch]">
+                <p className="text-body text-ink-soft leading-relaxed max-w-[65ch]">
                   {locale === 'ko' ? meta.descKo : meta.descEn}
                 </p>
               </motion.div>
@@ -183,7 +178,7 @@ export function SectionDeal() {
                 }`}
               />
             ))}
-            <span className="ml-3 text-xs tabular-nums text-ink-soft">
+            <span className="ml-3 text-label tabular-nums text-ink-soft">
               {step + 1} / {STEP_META.length}
             </span>
           </div>
@@ -234,7 +229,7 @@ function DealStage({ step }: { step: Step }) {
               ))}
           </AnimatePresence>
           {!showFloor && (
-            <div className="text-xs text-ink-soft self-center">
+            <div className="text-label text-ink-soft self-center">
               {locale === 'ko'
                 ? '다음 단계: 8장이 여기에 펼쳐져요'
                 : 'Next: 8 cards land here face-up'}
@@ -295,10 +290,10 @@ function Zone({
   return (
     <div>
       <div className="flex items-baseline justify-between mb-2">
-        <div className="text-xs uppercase tracking-[0.18em] font-semibold text-ink-soft">
+        <div className="text-label uppercase tracking-[0.18em] font-semibold text-ink-soft">
           {locale === 'ko' ? labelKo : labelEn}
         </div>
-        <div className="text-xs text-ink-soft">{locale === 'ko' ? helpKo : helpEn}</div>
+        <div className="text-label text-ink-soft">{locale === 'ko' ? helpKo : helpEn}</div>
       </div>
       {children}
     </div>
@@ -438,7 +433,7 @@ function DeckPile({
   const { locale } = useLocale();
   return (
     <div className="flex flex-col items-start gap-2">
-      <div className="text-xs uppercase tracking-[0.18em] font-semibold text-ink-soft">
+      <div className="text-label uppercase tracking-[0.18em] font-semibold text-ink-soft">
         {locale === 'ko' ? '더미' : 'Deck'}
       </div>
       <div ref={pileRef} className="relative h-24 w-16 sm:w-[72px]">
@@ -460,7 +455,7 @@ function DeckPile({
           </div>
         ))}
       </div>
-      <div className="text-xs tabular-nums text-ink-soft mt-1">
+      <div className="text-label tabular-nums text-ink-soft mt-1">
         <AnimatePresence mode="sync" initial={false}>
           <motion.span
             key={count}
@@ -498,8 +493,10 @@ function PlayerHand({
   return (
     <div>
       <div className="flex items-baseline justify-between mb-2">
-        <div className="text-xs uppercase tracking-[0.18em] font-semibold text-ink-soft">{who}</div>
-        <div className="text-xs text-ink-soft">{help}</div>
+        <div className="text-label uppercase tracking-[0.18em] font-semibold text-ink-soft">
+          {who}
+        </div>
+        <div className="text-label text-ink-soft">{help}</div>
       </div>
       <div className="flex flex-wrap gap-1.5 min-h-[5rem]">
         <AnimatePresence>
@@ -518,7 +515,7 @@ function PlayerHand({
           })}
         </AnimatePresence>
         {!visibleHand && (
-          <div className="text-xs text-ink-soft self-center">
+          <div className="text-label text-ink-soft self-center">
             {locale === 'ko' ? '아직 손패 없음' : 'No cards yet'}
           </div>
         )}

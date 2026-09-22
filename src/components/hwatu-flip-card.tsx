@@ -99,18 +99,20 @@ function FlipCard({ card }: { card: HwatuCard }) {
   const lore = ko ? card.loreKo : card.lore;
 
   const faceBase = 'absolute inset-0';
-  const label = 'mb-1 text-xs uppercase tracking-wider text-ink-soft';
+  const label = 'mb-1 text-label uppercase tracking-wider text-ink-soft';
 
   const front = <HwatuCardImage card={card} className="absolute inset-0 h-full w-full" />;
   const back = (
     <div className="flex h-full flex-col overflow-y-auto rounded-card border border-hairline bg-surface p-6 text-ink">
-      <div className="text-xs uppercase tracking-[0.14em] text-ink-soft">{monthHeader(month)}</div>
-      <h3 className="mt-4 font-display text-3xl leading-tight">{nameMain}</h3>
-      <p className="mt-1 text-lg">{nameOther}</p>
-      <dl className="mt-6 space-y-5 text-sm">
+      <div className="text-label uppercase tracking-[0.14em] text-ink-soft">
+        {monthHeader(month)}
+      </div>
+      <h3 className="mt-4 font-display text-sub leading-tight">{nameMain}</h3>
+      <p className="mt-1 text-label text-ink-soft">{nameOther}</p>
+      <dl className="mt-6 space-y-5 text-body">
         <div>
           <dt className={label}>{ko ? '종류' : 'Type'}</dt>
-          <dd className="flex items-center gap-2 text-base font-medium">
+          <dd className="flex items-center gap-2 text-body font-medium">
             <span aria-hidden className={`size-2.5 shrink-0 rounded-full ${dot}`} />
             {ko ? `${type.ko} ${type.en}` : `${type.en} ${type.ko}`}
           </dd>
@@ -118,7 +120,7 @@ function FlipCard({ card }: { card: HwatuCard }) {
         {combo && (
           <div>
             <dt className={label}>{ko ? '조합' : 'Combo'}</dt>
-            <dd className="text-base font-medium">{combo}</dd>
+            <dd className="text-body font-medium">{combo}</dd>
           </div>
         )}
         {lore && (

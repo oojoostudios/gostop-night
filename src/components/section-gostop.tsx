@@ -1,33 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
-import { ArrowRight, RotateCcw, ShieldCheck, Zap } from 'lucide-react';
-import { Button } from '@heroui/react';
+import { motion } from 'motion/react';
+import { ShieldCheck, Zap } from 'lucide-react';
 import { useLocale } from '@/contexts/locale-context';
 import { FadeInOnView } from '@/components/fade-in-on-view';
+import { SectionTitle } from '@/components/section-title';
 import { PlayersSwitch } from '@/components/players-switch';
 import { usePlayers } from '@/lib/use-players';
-import { RULES, SCORING, callThreshold, goRows, type Players } from '@/config/rules';
+import { GOSTOP_SECTIONS } from '@/lib/sections';
+import { RULES, callThreshold, goRows, scoreAfterGos, type Players } from '@/config/rules';
+
+const SECTION = GOSTOP_SECTIONS.find((s) => s.id === 'section-gostop')!;
 
 type Choice = 'stop' | 'go';
-type ScenarioState = { picked?: Choice };
-
-type Scenario = {
-  id: string;
-  title: string;
-  titleKo: string;
-  setup: string;
-  setupKo: string;
-  /** Compact bullets to show under setup. */
-  facts: { label: string; labelKo: string; value: string }[];
-  best: Choice;
-  reasoningStop: string;
-  reasoningStopKo: string;
-  reasoningGo: string;
-  reasoningGoKo: string;
-};
-
 type Lang = 'en' | 'ko';
 
 /* -------------------------------------------------------------------------- */
@@ -78,90 +64,36 @@ function nagariLine(lang: Lang): string {
     : 'If nobody wins the hand (a draw, 나가리), play moves on to the next hand.';
 }
 
-/** The three "Try the call" examples, with the numbers filled in for this many players. */
-function buildScenarios(players: Players): ReadonlyArray<Scenario> {
-  const T = callThreshold(players);
-  const two = players === 2;
-  const bakEn = goBakClause(players, 'en');
-  const bakKo = goBakClause(players, 'ko');
-  const brightsThree = SCORING.brights.three;
-  const brightsFour = SCORING.brights.four;
-  // "Far from a comeback": opponents sit well under the threshold.
-  const low1 = Math.round(T * 0.45);
-  const low2 = Math.round(T * 0.3);
+/** "5 points, 3 Gos → (5 + 2) × 2 = 14 chips from each opponent." — the numbers follow
+ * whatever goScoring is set to in rules.ts; only the example's starting 5 points and
+ * 3 Gos are fixed, to keep the sentence concrete. */
+function workedExampleLine(lang: Lang): string {
+  const base = 5;
+  const goCount = 3;
+  const final = scoreAfterGos(base, goCount);
+  const multiplier = RULES.goScoring === 'standard' && goCount >= 3 ? 2 ** (goCount - 2) : 1;
+  const formula =
+    multiplier > 1 ? `(${base} + 2) × ${multiplier} = ${final}` : `${base} + ${goCount} = ${final}`;
+  return lang === 'ko'
+    ? `${base}점, 고 ${goCount}번 → ${formula}칩 (상대 한 명당)`
+    : `${base} points, ${goCount} Gos → ${formula} chips from each opponent.`;
+}
 
-  return [
-    {
-      id: 'safe-stop',
-      title: 'Safe stop',
-      titleKo: '안전한 스톱',
-      setup: `You've just hit ${T} points. ${
-        two ? 'Your opponent is' : 'Both opponents are'
-      } far from a comeback, and the deck is almost empty.`,
-      setupKo: `방금 ${T}점 달성. ${
-        two ? '상대는' : '상대 둘 다'
-      } 점수가 낮고, 더미도 거의 다 떨어졌어요.`,
-      facts: [
-        { label: 'Your score', labelKo: '내 점수', value: String(T) },
-        {
-          label: two ? 'Opponent' : 'Opponents',
-          labelKo: '상대',
-          value: two ? String(low1) : `${low1} / ${low2}`,
-        },
-        { label: 'Cards left', labelKo: '남은 더미', value: '4' },
-      ],
-      best: 'stop',
-      reasoningStop: `Locking in ${T} points is the safer call. The deck is too thin for ${
-        two ? 'your opponent' : 'opponents'
-      } to catch up, but also too thin for you to add another point comfortably.`,
-      reasoningStopKo: `${T}점에 안전하게 멈추는 게 정답이에요. 더미가 4장밖에 안 남아서 상대가 추격하기도, 내가 1점 더 따기도 쉽지 않아요.`,
-      reasoningGo: `Going here is greedy. With only 4 cards in the deck you might not score the extra point — and if an opponent stops first, ${bakEn}.`,
-      reasoningGoKo: `이 상황에서 고는 욕심이에요. 더미 4장 안에 1점을 더 만들지 못할 수도 있고, 그 사이 상대가 먼저 스톱하면 ${bakKo}.`,
-    },
-    {
-      id: 'tempting-go',
-      title: 'Tempting go',
-      titleKo: '고고고',
-      setup: `You hit ${T} with two brights (광) already, and you can see the third bright is on the floor — easily reachable. Plenty of deck left.`,
-      setupKo: `광 2장으로 ${T}점 달성. 바닥에 또 다른 광이 보이고, 더미도 충분히 남아있어요.`,
-      facts: [
-        { label: 'Your score', labelKo: '내 점수', value: String(T) },
-        { label: 'Brights you have', labelKo: '내 광', value: '2 / 5' },
-        { label: 'Bright on floor', labelKo: '바닥의 광', value: '✓' },
-        { label: 'Cards left', labelKo: '남은 더미', value: '12' },
-      ],
-      best: 'go',
-      reasoningStop: `Stopping at ${T} leaves a lot on the table. With three brights reachable and 12 cards left, going is mathematically the better call.`,
-      reasoningStopKo: `${T}점에서 멈추면 너무 보수적. 3광 (${brightsThree}점)이 보이고 더미도 12장 남아있으니, 기댓값상 고가 더 좋은 선택.`,
-      reasoningGo: `Going makes sense. If you grab the third bright you add ${brightsThree} more points; that lets you call '1-go' and possibly aim for four brights = ${brightsFour} points.`,
-      reasoningGoKo: `고는 합리적이에요. 바닥의 광을 먹으면 3광(${brightsThree}점)이 되고, 1고 → 4광(${brightsFour}점) 노릴 수도 있어요.`,
-    },
-    {
-      id: 'losing-go',
-      title: 'Trap of going',
-      titleKo: '함정의 고',
-      setup: `You hit ${T} but an opponent is at ${T - 1} and clearly hunting brights — they have 2 already. Going here is dangerous.`,
-      setupKo: `내가 ${T}점인데, 한 상대가 ${T - 1}점에 광 2장으로 광을 노리고 있어요. 여기서 고는 위험해요.`,
-      facts: [
-        { label: 'Your score', labelKo: '내 점수', value: String(T) },
-        { label: 'Top opponent', labelKo: '상위 상대', value: String(T - 1) },
-        { label: 'Their brights', labelKo: '상대 광', value: '2 / 5' },
-        { label: 'Cards left', labelKo: '남은 더미', value: '10' },
-      ],
-      best: 'stop',
-      reasoningStop: `Stop now. Going makes you a target — if your opponent reaches ${T} next turn and stops first, ${bakEn}.`,
-      reasoningStopKo: `지금은 스톱. 고하면 표적이 돼요. 상대가 ${T}점 도달해서 스톱하면, ${bakKo}.`,
-      reasoningGo: `Going is risky here. The opponent only needs one bright pair to overtake — and your ${T} points turn into a loss instead of a win.`,
-      reasoningGoKo: `고는 위험해요. 상대가 광 한 쌍만 더 모으면 추월당하고, 내가 쌓은 ${T}점이 빚이 돼요.`,
-    },
-  ];
+/** The three chip amounts shown next to the decision: stopping now, going and winning
+ * by one more point, and going and losing (paying the goBak share). Both use the current
+ * threshold as the stand-in score — the decision moment has no other number to go on. */
+function chipMath(threshold: number) {
+  return {
+    stop: threshold,
+    goWin: scoreAfterGos(threshold + 1, 1),
+    goLose: threshold * 2,
+  };
 }
 
 export function SectionGoStop() {
   const { locale } = useLocale();
   const { players } = usePlayers();
   const T = callThreshold(players);
-  const scenarios = buildScenarios(players);
   const ko = locale === 'ko';
 
   return (
@@ -171,18 +103,11 @@ export function SectionGoStop() {
     >
       <div className="lg:ml-72">
         <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-16">
-          <FadeInOnView
-            as="h2"
-            delay={0.05}
-            className="font-display text-4xl md:text-5xl leading-tight mb-6"
-          >
-            <span className="text-plum">06</span>
-            <span className="ml-4">{ko ? '고냐 스톱이냐' : 'Go or Stop?'}</span>
-          </FadeInOnView>
+          <SectionTitle section={SECTION} />
           <FadeInOnView
             as="p"
             delay={0.12}
-            className="text-lg text-ink-soft max-w-2xl leading-relaxed mb-8"
+            className="text-body text-ink-soft max-w-2xl leading-relaxed mb-8"
           >
             {ko
               ? `게임 이름에 들어간 그 결정. ${T}점에 도달하는 순간, 멈출지 더 갈지를 직접 골라야 해요. ${goScoringLine('ko')} ${goBakLine(players, 'ko')} 욕심과 리스크 사이의 줄타기.`
@@ -192,7 +117,7 @@ export function SectionGoStop() {
           {/* How many are at the table decides how many points you need before you may call. */}
           <div className="mb-12">
             <PlayersSwitch />
-            <p className="mt-3 text-sm text-ink-soft">
+            <p className="mt-3 text-body text-ink-soft">
               {ko
                 ? `${players}인 테이블: ${T}점부터 고/스톱을 부를 수 있어요.`
                 : `${players}-player table: you can call Go or Stop from ${T} points.`}
@@ -202,7 +127,7 @@ export function SectionGoStop() {
           <DecisionMoment threshold={T} players={players} />
 
           <div className="mt-16">
-            <h3 className="text-sm uppercase tracking-[0.18em] font-semibold text-ink-soft mb-5">
+            <h3 className="text-label uppercase tracking-[0.18em] font-semibold text-ink-soft mb-5">
               {RULES.goScoring === 'flat'
                 ? ko
                   ? '고 진행 — 고마다 추가되는 점수'
@@ -212,22 +137,14 @@ export function SectionGoStop() {
                   : 'Go progression — points and multipliers'}
             </h3>
             <MultiplierTable />
-            <p className="text-xs text-ink-soft mt-4 max-w-[65ch]">
+            <p className="text-label text-ink-soft mt-4 max-w-[65ch]">
+              {ko ? `예: ${workedExampleLine('ko')}` : `Example: ${workedExampleLine('en')}`}
+            </p>
+            <p className="text-label text-ink-soft mt-2 max-w-[65ch]">
               {ko
                 ? `* 고할 때마다 점수를 1점 이상 더 올려야 다시 고할 수 있어요. ${nagariLine('ko')}`
                 : `* Each Go requires you to score at least one more point before calling again. ${nagariLine('en')}`}
             </p>
-          </div>
-
-          <div className="mt-16">
-            <h3 className="text-sm uppercase tracking-[0.18em] font-semibold text-ink-soft mb-5">
-              {ko ? '직접 골라보기' : 'Try the call'}
-            </h3>
-            <div className="space-y-4">
-              {scenarios.map((s) => (
-                <ScenarioCard key={s.id} scenario={s} />
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -242,15 +159,18 @@ function DecisionMoment({ threshold, players }: { threshold: number; players: Pl
   const [hover, setHover] = useState<Choice | null>(null);
   const ko = locale === 'ko';
   const goBak = goBakLine(players, locale);
+  const chips = chipMath(threshold);
 
   return (
     <div className="club-card p-6 md:p-10">
       <div className="text-center mb-6">
-        <div className="text-xs uppercase tracking-[0.22em] text-ink-soft mb-2">
+        <div className="text-label uppercase tracking-[0.22em] text-ink-soft mb-2">
           {ko ? '내 점수' : 'Your score'}
         </div>
-        <div className="text-7xl md:text-8xl font-bold tabular-nums">{threshold}</div>
-        <div className="text-sm text-ink-soft mt-1">{ko ? '결정해야 해요' : 'Time to decide'}</div>
+        <div className="text-num font-bold tabular-nums">{threshold}</div>
+        <div className="text-body text-ink-soft mt-1">
+          {ko ? '결정해야 해요' : 'Time to decide'}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
@@ -279,6 +199,40 @@ function DecisionMoment({ threshold, players }: { threshold: number; players: Pl
           desc={`${ko ? '라운드를 계속해서 더 많은 점수를.' : 'Continue scoring.'} ${goScoringLine(locale)} ${goBak}`.trim()}
         />
       </div>
+
+      {/* Chip math: what each path is worth right now, in chips (1 chip per point). */}
+      <div className="mt-6 max-w-2xl mx-auto border-t border-hairline pt-5">
+        <div className="text-label uppercase tracking-[0.18em] font-semibold text-ink-soft mb-3">
+          {ko ? '칩으로 보면' : 'In chips'}
+        </div>
+        <dl className="space-y-3">
+          <ChipMathRow
+            label={ko ? '지금 스톱' : 'Stop now'}
+            value={ko ? `상대 한 명당 ${chips.stop}칩` : `${chips.stop} from each`}
+          />
+          <ChipMathRow
+            label={ko ? '고 후 +1점 승리' : 'Go and win at +1 point'}
+            value={ko ? `상대 한 명당 ${chips.goWin}칩` : `${chips.goWin} from each`}
+          />
+          <ChipMathRow
+            label={ko ? '고 후 패배' : 'Go and lose'}
+            value={
+              ko
+                ? `${chips.goLose}칩을 물어요 (테이블 전체 몫)`
+                : `you pay ${chips.goLose} (the whole table's share)`
+            }
+          />
+        </dl>
+      </div>
+    </div>
+  );
+}
+
+function ChipMathRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="text-body">
+      <div className="text-ink-soft">{label}</div>
+      <div className="mt-0.5 font-bold tabular-nums">{value}</div>
     </div>
   );
 }
@@ -324,10 +278,10 @@ function PathCard({
         >
           {icon}
         </span>
-        <span className="font-display text-2xl">{label}</span>
+        <span className="font-display text-sub">{label}</span>
       </div>
-      <div className="text-sm text-ink-soft mb-3">{subtitle}</div>
-      <p className="text-sm text-ink leading-relaxed">{desc}</p>
+      <div className="text-body text-ink-soft mb-3">{subtitle}</div>
+      <p className="text-body text-ink leading-relaxed">{desc}</p>
     </motion.div>
   );
 }
@@ -382,130 +336,16 @@ function MultiplierTable() {
             key={r.goCount}
             className={`rounded-card p-4 ${emphasis ? 'bg-gold/30' : 'bg-surface'}`}
           >
-            <div className="text-xs uppercase tracking-wider font-semibold text-ink-soft mb-1">
+            <div className="text-label uppercase tracking-wider font-semibold text-ink-soft mb-1">
               {locale === 'ko' ? GO_LABELS[r.goCount].ko : GO_LABELS[r.goCount].en}
             </div>
-            <div className="text-xl font-bold tabular-nums">{value}</div>
-            <div className="text-xs text-ink-soft leading-snug mt-1">
+            <div className="text-sub font-bold tabular-nums">{value}</div>
+            <div className="text-label text-ink-soft leading-snug mt-1">
               {goNote(r.goCount, locale)}
             </div>
           </div>
         );
       })}
-    </div>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-
-function ScenarioCard({ scenario }: { scenario: Scenario }) {
-  const { locale } = useLocale();
-  const [state, setState] = useState<ScenarioState>({});
-
-  const pick = (c: Choice) => setState({ picked: c });
-  const reset = () => setState({});
-
-  return (
-    <div className="club-card p-6">
-      <h4 className="font-display text-xl mb-2">
-        {locale === 'ko' ? scenario.titleKo : scenario.title}
-      </h4>
-      <p className="text-sm text-ink-soft leading-relaxed mb-4">
-        {locale === 'ko' ? scenario.setupKo : scenario.setup}
-      </p>
-
-      <div className="flex flex-wrap gap-2 mb-5">
-        {scenario.facts.map((f) => (
-          <div key={f.label} className="rounded-md bg-paper px-3 py-1.5 text-xs">
-            <span className="text-ink-soft mr-1.5">{locale === 'ko' ? f.labelKo : f.label}</span>
-            <span className="font-bold tabular-nums">{f.value}</span>
-          </div>
-        ))}
-      </div>
-
-      <AnimatePresence mode="wait">
-        {!state.picked ? (
-          <motion.div
-            key="choices"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="grid grid-cols-2 gap-3 max-w-sm"
-          >
-            <button
-              type="button"
-              onClick={() => pick('stop')}
-              className="club-btn club-btn--primary"
-            >
-              <ShieldCheck className="size-4" />
-              {locale === 'ko' ? '스톱' : 'Stop'}
-            </button>
-            <button type="button" onClick={() => pick('go')} className="club-btn">
-              <Zap className="size-4" />
-              {locale === 'ko' ? '고' : 'Go'}
-            </button>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="reveal"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Verdict
-              choice={state.picked}
-              best={scenario.best}
-              reasoning={
-                state.picked === 'stop'
-                  ? locale === 'ko'
-                    ? scenario.reasoningStopKo
-                    : scenario.reasoningStop
-                  : locale === 'ko'
-                    ? scenario.reasoningGoKo
-                    : scenario.reasoningGo
-              }
-            />
-            <Button variant="ghost" size="sm" onPress={reset} className="mt-3 gap-1.5 text-xs">
-              <RotateCcw className="size-3.5" />
-              {locale === 'ko' ? '다시' : 'Try again'}
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function Verdict({ choice, best, reasoning }: { choice: Choice; best: Choice; reasoning: string }) {
-  const { locale } = useLocale();
-  const correct = choice === best;
-  return (
-    <div className={`rounded-card px-5 py-4 ${correct ? 'bg-sage/25' : 'bg-plum/15'}`}>
-      <div className="text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2 text-ink">
-        <span
-          className={`size-2.5 shrink-0 rounded-full ${correct ? 'bg-sage' : 'bg-plum'}`}
-          aria-hidden
-        />
-        {correct
-          ? locale === 'ko'
-            ? '좋은 선택'
-            : 'Good call'
-          : locale === 'ko'
-            ? '위험한 선택'
-            : 'Risky pick'}
-        <ArrowRight className="size-3.5" />
-        <span className="font-normal normal-case tracking-normal text-ink-soft">
-          {locale === 'ko'
-            ? choice === 'stop'
-              ? '스톱했어요'
-              : '고했어요'
-            : choice === 'stop'
-              ? 'you chose stop'
-              : 'you chose go'}
-        </span>
-      </div>
-      <p className="text-sm text-ink leading-relaxed max-w-[65ch]">{reasoning}</p>
     </div>
   );
 }

@@ -22,10 +22,11 @@ const FLOOR_NORMAL = ['01-pi-1', '02-tti', '04-pi-1', '08-gwang', '10-kkeut', '1
 const NORMAL_STEPS: Step[] = [
   {
     id: 'setup',
-    title: 'Deal the cards.',
-    titleKo: '패를 나눠요.',
-    desc: 'Each player has 7 cards. 6 cards are face up on the floor, and 21 are left in the deck.',
-    descKo: '각 플레이어는 7장씩 가져요. 바닥엔 6장이 펼쳐져 있고, 더미엔 21장이 남아요.',
+    title: 'A turn in progress.',
+    titleKo: '진행 중인 한 턴.',
+    desc: "Here's the middle of someone's turn. Simplified view: only the cards that matter this turn are shown, not a full 7-card hand.",
+    descKo:
+      '누군가의 턴 중간이에요. 간단히 보기: 이번 턴에 중요한 카드만 보여줘요. 실제 7장 손패 전체가 아니에요.',
     state: { hand: HAND, floor: FLOOR_NORMAL, taken: [], deckCount: 21 },
   },
   {
@@ -143,7 +144,7 @@ const DOUBLE_STEPS: Step[] = [
     id: 'take-both',
     title: 'Take the May pair.',
     titleKo: '5월 짝을 가져가요.',
-    desc: "Four cards in one turn. There's no junk bonus here; that only comes from the special moves in 05.",
+    desc: "Four cards in one turn. There's no Junk bonus here; that only comes from the special moves in 05.",
     descKo:
       '한 턴에 네 장. 여기서는 피 보너스가 없어요 — 보너스는 05 특수 규칙의 움직임에서만 나와요.',
     state: {
@@ -313,7 +314,17 @@ export function SectionFlow() {
             </motion.p>
           </AnimatePresence>
 
+          <span className="mb-2 inline-block rounded-full bg-ink/10 px-2.5 py-1 text-label font-semibold text-ink-soft">
+            {locale === 'ko' ? '간단히 보기 · Simplified view' : 'Simplified view · 간단히 보기'}
+          </span>
+
           <StepThrough steps={scenario.steps} key={scenario.id} />
+
+          <p className="mt-8 text-label text-ink-soft max-w-[65ch]">
+            {locale === 'ko'
+              ? '매치되는 카드를 꼭 낼 필요는 없어요. 언제든 아무것도 맞지 않는 카드를 낼 수 있어요.'
+              : "You don't have to play a matching card. You can always put down a card that matches nothing."}
+          </p>
 
           {scenario.id === 'double' && (
             <p className="mt-8 text-label text-ink-soft max-w-[65ch]">

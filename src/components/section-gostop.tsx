@@ -21,50 +21,24 @@ type Lang = 'en' | 'ko';
 /* src/config/rules.ts, so changing a house rule there changes this section.   */
 /* -------------------------------------------------------------------------- */
 
-/** What a player who called Go pays when someone else stops first (the goBak rule). */
-function goBakClause(players: Players, lang: Lang): string {
-  if (!RULES.goBak) return lang === 'ko' ? '그 판을 져요' : 'you simply lose the round';
+/** The Go-bak risk sentence: what a player who called Go pays if someone else stops first. */
+function goRiskLine(players: Players, lang: Lang): string {
+  if (!RULES.goBak) {
+    return lang === 'ko'
+      ? '위험: 상대가 먼저 목표에 도달해 스톱을 부르면, 나는 아무것도 얻지 못하고 그 판을 잃어요.'
+      : 'The risk: if an opponent reaches their target and calls Stop before you score again, you win nothing and you simply lose the round.';
+  }
   if (players === 3) {
     return lang === 'ko'
-      ? '판 전체를 혼자 물어줘요 (고박)'
-      : 'you pay for the whole table (Go-bak)';
-  }
-  return lang === 'ko' ? '두 배로 물어줘요 (고박)' : 'you pay double (Go-bak)';
-}
-
-/** How Go adds to the score (the goScoring rule), as one sentence. */
-function goScoringLine(lang: Lang): string {
-  if (RULES.goScoring === 'flat') {
-    return lang === 'ko'
-      ? '고를 할 때마다 점수가 1점씩 올라가요.'
-      : 'Each Go adds 1 point to your score.';
+      ? '위험: 상대가 먼저 목표에 도달해 스톱을 부르면, 나는 아무것도 얻지 못하고 판 전체를(다른 패자의 몫까지) 내가 물어줘요. 이게 고박(Go-bak)이에요.'
+      : "The risk: if an opponent reaches their target and calls Stop before you score again, you win nothing and you pay for the whole table, including the other loser's share. That's Go-bak (고박).";
   }
   return lang === 'ko'
-    ? '처음 두 번의 고는 1점씩, 그다음부터는 고할 때마다 점수가 두 배가 돼요.'
-    : 'The first two Gos add a point each, then every Go doubles your score.';
+    ? '위험: 상대가 먼저 목표에 도달해 스톱을 부르면, 나는 아무것도 얻지 못하고 두 배로 물어줘요. 이게 고박(Go-bak)이에요.'
+    : "The risk: if an opponent reaches their target and calls Stop before you score again, you win nothing and you pay double. That's Go-bak (고박).";
 }
 
-/** The Go-bak warning as one sentence (empty when the goBak rule is off). */
-function goBakLine(players: Players, lang: Lang): string {
-  if (!RULES.goBak) return '';
-  return lang === 'ko'
-    ? `하지만 상대가 먼저 스톱하면 ${goBakClause(players, 'ko')}.`
-    : `But if an opponent stops first, ${goBakClause(players, 'en')}.`;
-}
-
-/** What happens after a drawn hand (the nagariDoubles rule), as a sentence. */
-function nagariLine(lang: Lang): string {
-  if (RULES.nagariDoubles) {
-    return lang === 'ko'
-      ? '아무도 이기지 못하면 나가리, 다음 판 점수가 2배가 돼요.'
-      : "If nobody wins the hand (a draw, 나가리), the next hand's score is doubled.";
-  }
-  return lang === 'ko'
-    ? '아무도 이기지 못하면 나가리, 다음 판으로 넘어가요.'
-    : 'If nobody wins the hand (a draw, 나가리), play moves on to the next hand.';
-}
-
-/** "5 points, 3 Gos → (5 + 2) × 2 = 14 chips from each opponent." — the numbers follow
+/** "5 points after 3 Gos = (5 + 2) × 2 = 14 chips from each opponent." — the numbers follow
  * whatever goScoring is set to in rules.ts; only the example's starting 5 points and
  * 3 Gos are fixed, to keep the sentence concrete. */
 function workedExampleLine(lang: Lang): string {
@@ -75,8 +49,8 @@ function workedExampleLine(lang: Lang): string {
   const formula =
     multiplier > 1 ? `(${base} + 2) × ${multiplier} = ${final}` : `${base} + ${goCount} = ${final}`;
   return lang === 'ko'
-    ? `${base}점, 고 ${goCount}번 → ${formula}칩 (상대 한 명당)`
-    : `${base} points, ${goCount} Gos → ${formula} chips from each opponent.`;
+    ? `${base}점, 고 ${goCount}번 후 = ${formula}칩 (상대 한 명당)`
+    : `${base} points after ${goCount} Gos = ${formula} chips from each opponent.`;
 }
 
 /** The three chip amounts shown next to the decision: stopping now, going and winning
@@ -110,8 +84,8 @@ export function SectionGoStop() {
             className="text-body text-ink-soft max-w-2xl leading-relaxed mb-8"
           >
             {ko
-              ? `게임 이름에 들어간 그 결정. ${T}점에 도달하는 순간, 멈출지 더 갈지를 직접 골라야 해요. ${goScoringLine('ko')} ${goBakLine(players, 'ko')} 욕심과 리스크 사이의 줄타기.`
-              : `The decision baked into the game's name. The moment you hit ${T} points, you choose: end the round or go on. ${goScoringLine('en')} ${goBakLine(players, 'en')}`}
+              ? `가져온 카드는 매 턴 끝날 때마다 확인해요. ${callThreshold(3)}점(2인전은 ${callThreshold(2)}점)에 도달하는 순간, 판이 멈추고 직접 골라야 해요.`
+              : `Your captured cards are checked after every turn. The moment they reach ${callThreshold(3)} points (${callThreshold(2)} with two players), the hand pauses and you choose.`}
           </FadeInOnView>
 
           {/* How many are at the table decides how many points you need before you may call. */}
@@ -140,10 +114,10 @@ export function SectionGoStop() {
             <p className="text-label text-ink-soft mt-4 max-w-[65ch]">
               {ko ? `예: ${workedExampleLine('ko')}` : `Example: ${workedExampleLine('en')}`}
             </p>
-            <p className="text-label text-ink-soft mt-2 max-w-[65ch]">
+            <p className="text-body text-ink leading-relaxed mt-6 max-w-[65ch]">
               {ko
-                ? `* 고할 때마다 점수를 1점 이상 더 올려야 다시 고할 수 있어요. ${nagariLine('ko')}`
-                : `* Each Go requires you to score at least one more point before calling again. ${nagariLine('en')}`}
+                ? '고스톱이 처음인가요? 처음 몇 판은 스톱하세요. 어떤 카드가 점수를 더 줄지 확실히 말할 수 있을 때만 고를 부르세요.'
+                : 'New to Go-Stop? Stop the first few times. Only call Go when you can name the cards that will get you more points.'}
             </p>
           </div>
         </div>
@@ -158,7 +132,6 @@ function DecisionMoment({ threshold, players }: { threshold: number; players: Pl
   const { locale } = useLocale();
   const [hover, setHover] = useState<Choice | null>(null);
   const ko = locale === 'ko';
-  const goBak = goBakLine(players, locale);
   const chips = chipMath(threshold);
 
   return (
@@ -173,7 +146,7 @@ function DecisionMoment({ threshold, players }: { threshold: number; players: Pl
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto items-stretch">
         <PathCard
           choice="stop"
           active={hover === 'stop'}
@@ -181,13 +154,14 @@ function DecisionMoment({ threshold, players }: { threshold: number; players: Pl
           accent="sage"
           icon={<ShieldCheck className="size-4" />}
           label={ko ? '스톱' : 'Stop'}
-          subtitle={ko ? '라운드 종료' : 'End the round'}
-          desc={
-            ko
-              ? '내 점수로 라운드 마무리. 안전하게 승리 확정.'
-              : 'Lock in your current score. Round ends, you win — at base value.'
-          }
-        />
+          subtitle={ko ? '지금 승리를 가져가요' : 'Take the win now'}
+        >
+          <p className="text-body text-ink leading-relaxed">
+            {ko
+              ? '판이 끝나요. 상대 각자가 내 점수만큼 칩을 줘요. 안전하고 확실해요.'
+              : 'The hand ends. Each opponent pays you your score in chips. Safe and done.'}
+          </p>
+        </PathCard>
         <PathCard
           choice="go"
           active={hover === 'go'}
@@ -195,9 +169,17 @@ function DecisionMoment({ threshold, players }: { threshold: number; players: Pl
           accent="gold"
           icon={<Zap className="size-4" />}
           label={ko ? '고' : 'Go'}
-          subtitle={ko ? '한 번 더 노려요' : 'Push for more'}
-          desc={`${ko ? '라운드를 계속해서 더 많은 점수를.' : 'Continue scoring.'} ${goScoringLine(locale)} ${goBak}`.trim()}
-        />
+          subtitle={ko ? '더 노리고 계속해요' : 'Keep playing for more'}
+        >
+          <p className="text-body text-ink leading-relaxed">
+            {ko
+              ? '판이 계속되고 점수를 더 쌓아 봐요. 고를 할 때마다 이겼을 때 얻는 게 커져요.'
+              : 'The hand continues and you try to add to your score. Every Go makes the win bigger.'}
+          </p>
+          <p className="mt-2 text-body text-ink-soft leading-relaxed">
+            {goRiskLine(players, locale)}
+          </p>
+        </PathCard>
       </div>
 
       {/* Chip math: what each path is worth right now, in chips (1 chip per point). */}
@@ -211,7 +193,7 @@ function DecisionMoment({ threshold, players }: { threshold: number; players: Pl
             value={ko ? `상대 한 명당 ${chips.stop}칩` : `${chips.stop} from each`}
           />
           <ChipMathRow
-            label={ko ? '고 후 +1점 승리' : 'Go and win at +1 point'}
+            label={ko ? '고 후 1점 더 얻고 승리' : 'Go and win with 1 more point'}
             value={ko ? `상대 한 명당 ${chips.goWin}칩` : `${chips.goWin} from each`}
           />
           <ChipMathRow
@@ -247,7 +229,7 @@ function PathCard({
   icon,
   label,
   subtitle,
-  desc,
+  children,
 }: {
   choice: Choice;
   active: boolean;
@@ -256,7 +238,7 @@ function PathCard({
   icon: React.ReactNode;
   label: string;
   subtitle: string;
-  desc: string;
+  children: React.ReactNode;
 }) {
   void choice;
   // Fill colors by meaning: sage = safe (Stop), gold = risky push (Go).
@@ -270,7 +252,7 @@ function PathCard({
       onMouseLeave={() => onHover(false)}
       animate={{ scale: active ? 1.015 : 1 }}
       transition={{ type: 'spring', stiffness: 360, damping: 26 }}
-      className={`rounded-card bg-paper p-6 transition-colors cursor-default ${cls.hover}`}
+      className={`h-full rounded-card bg-paper p-6 transition-colors cursor-default ${cls.hover}`}
     >
       <div className="flex items-center gap-3 mb-2">
         <span
@@ -281,7 +263,7 @@ function PathCard({
         <span className="font-display text-sub">{label}</span>
       </div>
       <div className="text-body text-ink-soft mb-3">{subtitle}</div>
-      <p className="text-body text-ink leading-relaxed">{desc}</p>
+      {children}
     </motion.div>
   );
 }
@@ -300,18 +282,18 @@ const GO_LABELS: ReadonlyArray<{ en: string; ko: string }> = [
 function goNote(goCount: number, lang: Lang): string {
   const flat = RULES.goScoring === 'flat';
   const en = [
-    'End now, base score.',
-    'One more point on top.',
-    flat ? 'Two extra points in all.' : 'Two points on top in all.',
-    flat ? 'Three extra points in all.' : 'Score doubled — turning point.',
-    flat ? 'One more point for every further Go.' : 'Each further Go doubles it again.',
+    'Your score, as is.',
+    '+1 point.',
+    flat ? '+1 more point.' : '+1 more point.',
+    flat ? 'Three extra points in all.' : 'Your whole score doubles.',
+    flat ? 'One more point for every further Go.' : 'Doubles again each time.',
   ];
   const ko = [
-    '현재 점수 그대로 종료.',
-    '점수에 1점 추가.',
-    '점수에 총 2점 추가.',
-    flat ? '점수에 총 3점 추가.' : '점수 2배 — 진짜 시작.',
-    flat ? '고를 할 때마다 1점씩 더.' : '한 번 갈 때마다 다시 2배.',
+    '내 점수 그대로.',
+    '+1점.',
+    '+1점 더.',
+    flat ? '점수에 총 3점 추가.' : '내 점수 전체가 2배.',
+    flat ? '고를 할 때마다 1점씩 더.' : '갈 때마다 다시 2배.',
   ];
   return (lang === 'ko' ? ko : en)[goCount];
 }

@@ -9,7 +9,7 @@ import { SectionTitle } from '@/components/section-title';
 import { HwatuCardImage } from '@/components/hwatu-card-image';
 import { GOSTOP_SECTIONS } from '@/lib/sections';
 import { HWATU_DECK } from '@/lib/hwatu';
-import { RULES, SCORING, bakRules } from '@/config/rules';
+import { RULES, bakRules } from '@/config/rules';
 import { BAK_FACTOR } from '@/lib/tonight';
 import { MonthCaption, StepThrough, type Step } from '@/components/turn-stage';
 
@@ -73,7 +73,7 @@ const JJOK_STEPS: Step[] = [
   },
   {
     id: 'take-bonus',
-    title: 'Take both, plus 1 junk from each player.',
+    title: 'Take both, plus 1 Junk from each player.',
     titleKo: '둘 다 가져가고, 상대에게 피를 1장씩 받아요.',
     desc: 'Both January cards go to your pile, and every other player gives you one Junk card.',
     descKo: '1월 카드 두 장 모두 내 더미로 가고, 다른 모든 플레이어가 피 카드를 한 장씩 줘요.',
@@ -138,7 +138,7 @@ const TTADAK_STEPS: Step[] = [
   },
   {
     id: 'bonus',
-    title: 'Plus 1 junk from each player.',
+    title: 'Plus 1 Junk from each player.',
     titleKo: '상대에게 피를 1장씩 받아요.',
     desc: 'Every other player gives you one Junk card.',
     descKo: '다른 모든 플레이어가 피 카드를 한 장씩 줘요.',
@@ -190,7 +190,7 @@ const PPEOK_STEPS: Step[] = [
     id: 'locked',
     title: 'Stuck.',
     titleKo: '묶여요.',
-    desc: 'You take nothing. The three January cards stay stuck on the floor. Whoever plays the fourth January takes all four, plus 1 junk from each player, even if they made the stack.',
+    desc: 'You take nothing. The three January cards stay stuck on the floor. Whoever plays the fourth January takes all four, plus 1 Junk from each player, even if they made the stack.',
     descKo:
       '아무것도 못 가져가요. 1월 카드 세 장이 바닥에 그대로 묶여요. 네 번째 1월을 내는 사람이 네 장을 모두 가져가고, 다른 플레이어들에게 피도 한 장씩 받아요 — 자기가 쌓았어도 마찬가지예요.',
     state: {
@@ -240,7 +240,7 @@ const SWEEP_STEPS: Step[] = [
     id: 'sweep',
     title: 'The flip is October.',
     titleKo: '뒤집은 카드가 10월이에요.',
-    desc: "Your flip is an October card, and it takes the last floor card. The floor is empty. That's Sweep: each player gives you 1 junk.",
+    desc: "Your flip is an October card, and it takes the last floor card. The floor is empty. That's Sweep: each player gives you 1 Junk.",
     descKo:
       '뒤집은 카드가 10월 카드인데, 이게 바닥의 마지막 카드를 가져가요. 바닥이 텅 비어요. 이게 싹쓸이 — 상대가 피를 1장씩 줘요.',
     state: {
@@ -278,7 +278,7 @@ const POKDAN_STEPS: Step[] = [
     id: 'drop',
     title: 'Play all three at once.',
     titleKo: '세 장을 한꺼번에 내요.',
-    desc: 'Put all three down together and take all four August cards. Each player gives you 1 junk.',
+    desc: 'Put all three down together and take all four August cards. Each player gives you 1 Junk.',
     descKo:
       '세 장을 한 번에 내려놓고 8월 카드 네 장을 모두 가져가요. 다른 플레이어들이 피를 한 장씩 줘요.',
     state: {
@@ -336,16 +336,16 @@ const TAKE_JUNK_RULES: RuleCopy[] = [
     id: 'jjok',
     nameEn: 'Jjok',
     nameKo: '쪽',
-    badgeEn: 'Take 1 junk from each',
+    badgeEn: 'Take 1 Junk from each',
     badgeKo: '상대 한 명당 피 1장씩',
     whenEn:
       'You play a card that matches nothing, so it stays on the floor. Then the card you flip from the deck is the same month.',
     whenKo:
       '낸 카드가 바닥의 아무 카드와도 맞지 않아 그대로 바닥에 남아요. 그런데 더미에서 뒤집은 카드가 같은 월이에요.',
-    whatEn: 'You take both cards, and each player gives you 1 junk.',
+    whatEn: 'You take both cards, and each player gives you 1 Junk.',
     whatKo: '두 카드를 모두 가져가고, 다른 플레이어들이 피를 한 장씩 줘요.',
     exampleEn:
-      'You play a January card and nothing matches. You flip another January. Both are yours, plus 1 junk from each player.',
+      'You play a January card and nothing matches. You flip another January. Both are yours, plus 1 Junk from each player.',
     exampleKo:
       '1월 카드를 냈는데 아무것도 안 맞아요. 더미에서 또 1월을 뒤집어요. 두 장 다 내 것이 되고, 상대 한 명당 피도 1장씩 받아요.',
     steps: JJOK_STEPS,
@@ -354,13 +354,13 @@ const TAKE_JUNK_RULES: RuleCopy[] = [
     id: 'ttadak',
     nameEn: 'Ttadak',
     nameKo: '따닥',
-    badgeEn: 'Take 1 junk from each',
+    badgeEn: 'Take 1 Junk from each',
     badgeKo: '상대 한 명당 피 1장씩',
     whenEn:
       'Two cards of the same month are on the floor. You play the third from your hand, then flip the fourth.',
     whenKo:
       '바닥에 같은 달 카드가 2장 있어요. 내 손에서 세 번째 카드를 내고, 더미에서 네 번째를 뒤집어요.',
-    whatEn: 'You take all four cards, and each player gives you 1 junk.',
+    whatEn: 'You take all four cards, and each player gives you 1 Junk.',
     whatKo: '네 장 모두 가져가고, 다른 플레이어들이 피를 한 장씩 줘요.',
     exampleEn:
       'Two March cards are on the floor. You play a March and flip the last March. All four are yours.',
@@ -372,12 +372,12 @@ const TAKE_JUNK_RULES: RuleCopy[] = [
     id: 'bomb',
     nameEn: 'Bomb',
     nameKo: '폭탄',
-    badgeEn: 'Take 1 junk from each',
+    badgeEn: 'Take 1 Junk from each',
     badgeKo: '상대 한 명당 피 1장씩',
     whenEn: 'You hold three cards of one month and the fourth is on the floor.',
     whenKo: '한 달의 카드 3장을 손에 들고 있고, 나머지 한 장이 바닥에 있어요.',
     whatEn:
-      'You play all three at once and take all four, and each player gives you 1 junk. Because you used three cards in one turn, on your next two turns you just flip from the deck.',
+      'You play all three at once and take all four, and each player gives you 1 Junk. Because you used three cards in one turn, on your next two turns you just flip from the deck.',
     whatKo:
       '세 장을 한꺼번에 내고 네 장을 모두 가져가요. 다른 플레이어들이 피를 한 장씩 주고요. 한 턴에 카드 세 장을 다 썼기 때문에, 다음 두 턴은 손패 없이 더미만 뒤집어요.',
     exampleEn:
@@ -390,11 +390,11 @@ const TAKE_JUNK_RULES: RuleCopy[] = [
     id: 'sweep',
     nameEn: 'Sweep',
     nameKo: '싹쓸이',
-    badgeEn: 'Take 1 junk from each',
+    badgeEn: 'Take 1 Junk from each',
     badgeKo: '상대 한 명당 피 1장씩',
     whenEn: 'Your turn takes the last card off the floor, leaving it empty.',
     whenKo: '내 차례에 바닥의 마지막 카드를 가져가서 바닥이 텅 비어요.',
-    whatEn: "Each player gives you 1 junk. It doesn't count on the last turn of the hand.",
+    whatEn: "Each player gives you 1 Junk. It doesn't count on the last turn of the hand.",
     whatKo: '다른 플레이어들이 피를 한 장씩 줘요. 단, 그 판의 마지막 턴에는 적용되지 않아요.',
     exampleEn:
       'Only a June card is left on the floor. You play a June and take it. The floor is empty.',
@@ -413,11 +413,11 @@ const STUCK_RULE: RuleCopy = {
   whenEn: 'You match a floor card with your hand card, then your flip is the same month.',
   whenKo: '손패로 바닥의 카드를 맞춰 가져가려는 순간, 뒤집은 카드도 같은 월이에요.',
   whatEn:
-    'You take nothing. All three cards stay stacked on the floor. Whoever plays the fourth card of that month takes the whole stack, plus 1 junk from each player. This is true even if they made the stack themselves.',
+    'You take nothing. All three cards stay stacked on the floor. Whoever plays the fourth card of that month takes the whole stack, plus 1 Junk from each player. This is true even if they made the stack themselves.',
   whatKo:
     '아무것도 가져가지 못해요. 세 장 모두 바닥에 그대로 쌓여요. 나중에 그 달의 네 번째 카드를 내는 사람이 쌓인 카드를 전부 가져가고, 다른 플레이어들에게 피도 한 장씩 받아요. 자기가 쌓았더라도 마찬가지예요.',
   exampleEn:
-    'Mina plays a January onto a January and flips a third January. The stack is stuck. Later, Joon plays the last January and takes all four, plus 1 junk from each player.',
+    'Mina plays a January onto a January and flips a third January. The stack is stuck. Later, Joon plays the last January and takes all four, plus 1 Junk from each player.',
   exampleKo:
     '미나가 1월 카드를 바닥의 1월에 내고, 뒤집은 카드도 1월이에요. 세 장이 그대로 묶여요. 나중에 준이 마지막 1월을 내서 네 장을 모두 가져가고, 다른 사람들에게 피도 한 장씩 받아요.',
   steps: PPEOK_STEPS,
@@ -522,11 +522,14 @@ function BakBlock() {
   const ko = locale === 'ko';
   const rules = bakRules();
   const threshold = (id: 'pi' | 'gwang' | 'meong') => rules.find((r) => r.id === id)?.threshold;
+  const winnerExample = 6;
 
   const items: {
     id: 'pi' | 'gwang' | 'meong';
     titleEn: string;
     titleKo: string;
+    subEn: string;
+    subKo: string;
     descEn: string;
     descKo: string;
   }[] = [
@@ -534,34 +537,42 @@ function BakBlock() {
       id: 'pi',
       titleEn: 'Pi-bak',
       titleKo: '피박',
-      descEn: `The winner scored with junk, and you have fewer than ${threshold('pi')} junk.`,
-      descKo: `승자가 피로 점수를 냈는데, 내 피가 ${threshold('pi')}장 미만이에요.`,
+      subEn: 'caught with almost no Junk.',
+      subKo: '피가 거의 없이 걸렸어요.',
+      descEn: `The winner's score includes points from Junk, and you finished with fewer than ${threshold('pi')} Junk cards. You pay double.`,
+      descKo: `승자의 점수에 피 점수가 들어있는데, 나는 피를 ${threshold('pi')}장 미만으로 끝냈어요. 두 배로 내요.`,
     },
     {
       id: 'gwang',
       titleEn: 'Gwang-bak',
       titleKo: '광박',
-      descEn: 'The winner scored with Brights, and you have no Brights.',
-      descKo: '승자가 광으로 점수를 냈는데, 나에게 광이 한 장도 없어요.',
+      subEn: 'caught with no Brights.',
+      subKo: '광이 하나도 없이 걸렸어요.',
+      descEn:
+        "The winner's score includes points from Brights, and you captured no Brights at all. You pay double.",
+      descKo:
+        '승자의 점수에 광 점수가 들어있는데, 나는 광을 한 장도 가져오지 못했어요. 두 배로 내요.',
     },
     {
       id: 'meong',
       titleEn: 'Meong-bak',
       titleKo: '멍박',
-      descEn: `The winner scored with ${SCORING.animalsStartAt}+ Animals, and you have no Animals.`,
-      descKo: `승자가 열 ${SCORING.animalsStartAt}장 이상으로 점수를 냈는데, 나에게 열이 한 장도 없어요.`,
+      subEn: 'caught with no Animals.',
+      subKo: '열이 하나도 없이 걸렸어요.',
+      descEn:
+        "The winner's score includes points from Animals, and you captured no Animals at all. You pay double.",
+      descKo:
+        '승자의 점수에 열 점수가 들어있는데, 나는 열을 한 장도 가져오지 못했어요. 두 배로 내요.',
     },
   ];
 
   return (
     <div>
-      {!RULES.bakPenalties.enabled && (
-        <p className="mb-5 max-w-[65ch] text-body leading-relaxed text-ink-soft">
-          {ko
-            ? '우리 테이블에서는 박을 쓰지 않아요. 쓰는 테이블도 있으니 방식을 알아두세요.'
-            : 'Bak is off at our table. Some tables play it, so here is how it works.'}
-        </p>
-      )}
+      <p className="mb-6 max-w-[65ch] text-body leading-relaxed text-ink-soft">
+        {ko
+          ? '패널티(박 · bak)는 패자 한 명에게만 두 배를 물려요. 다른 패자는 원래 금액을 내고요. 우리 테이블에서는 안 쓰지만, 다른 테이블에서 알아볼 수 있도록 여기 정리해뒀어요.'
+          : "A penalty (박 · bak) makes ONE loser pay double, while the other loser pays the normal amount. They're off at our table. Here's how they work, so you'll recognize them at other tables."}
+      </p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {items.map((item, i) => {
           const on = rules.find((r) => r.id === item.id)?.on ?? false;
@@ -585,12 +596,15 @@ function BakBlock() {
                       : 'Off at our table'}
                 </Badge>
               </div>
-              <h4 className="mb-2 font-display text-sub">
+              <h4 className="mb-1 font-display text-sub">
                 {ko ? item.titleKo : item.titleEn}
                 <span className="ml-2 text-label font-normal text-ink-soft">
                   {ko ? item.titleEn : item.titleKo}
                 </span>
               </h4>
+              <p className="mb-2 text-label font-semibold text-ink-soft">
+                {ko ? item.subKo : item.subEn}
+              </p>
               <p className="text-body leading-relaxed text-ink-soft">
                 {ko ? item.descKo : item.descEn}
               </p>
@@ -598,6 +612,23 @@ function BakBlock() {
           );
         })}
       </div>
+      <ul className="mt-5 space-y-2 text-label text-ink-soft">
+        <li>
+          {ko
+            ? `예시: 승자가 ${winnerExample}점으로 이겨요. 광이 없는 패자는 ${winnerExample}이 아니라 ${winnerExample * 2}를 내요. 다른 패자는 그대로 ${winnerExample}을 내고요.`
+            : `Example: the winner scores ${winnerExample}. A loser with no Brights pays ${winnerExample * 2} instead of ${winnerExample}. The other loser still pays ${winnerExample}.`}
+        </li>
+        <li>
+          {ko
+            ? `패널티 두 개가 한 사람에게 겹치면 곱해져요: ${winnerExample}이 ${winnerExample * 4}가 돼요.`
+            : `Two penalties can hit the same player, and they stack: ${winnerExample} becomes ${winnerExample * 4}.`}
+        </li>
+        <li>
+          {ko
+            ? '고박(Go-bak)은 다른 규칙이에요. 06 고? 스톱?에 있어요.'
+            : 'Go-bak (고박) is a different rule and lives in 06 Go or Stop?.'}
+        </li>
+      </ul>
     </div>
   );
 }
@@ -630,12 +661,12 @@ export function SectionSpecial() {
 
           <GroupLabel
             icon={<Plus className="size-4" />}
-            title="Take junk from other players · 피 뺏기"
+            title="Take Junk from other players · 피 뺏기"
           />
           <p className="mb-6 max-w-[65ch] text-body text-ink-soft leading-relaxed">
             {ko
               ? '이 움직임 중 하나를 성공시키면, 다른 모든 플레이어가 피 한 장씩을 나에게 줘요. 피가 많아질수록 10장을 더 빨리 채우고, 피 10장은 1점이에요.'
-              : 'When you pull off one of these moves, every other player hands you one junk card from their pile. More junk gets you to 10 junk faster, and 10 junk = 1 point.'}
+              : 'When you pull off one of these moves, every other player hands you one Junk card from their pile. More Junk gets you to 10 Junk faster, and 10 Junk = 1 point.'}
           </p>
           <div className="space-y-6">
             {TAKE_JUNK_RULES.map((rule) => (

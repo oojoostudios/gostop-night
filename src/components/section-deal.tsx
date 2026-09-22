@@ -172,6 +172,32 @@ export function SectionDeal() {
               {step + 1} / {STEP_META.length}
             </span>
           </div>
+
+          {/* CLAUDE.md Section 02, item 5: three checks before play begins. */}
+          <div className="club-card mt-8 p-5 sm:p-6">
+            <p className="font-display text-sub mb-3">
+              {locale === 'ko'
+                ? '플레이하기 전에 세 가지를 확인하세요.'
+                : 'Before you play, check three things.'}
+            </p>
+            <ul className="space-y-2.5 text-body text-ink-soft leading-relaxed list-disc pl-5">
+              <li>
+                {locale === 'ko'
+                  ? '한 플레이어가 한 달의 카드 4장을 모두 손에 들고 있으면, 그걸 보여주고 그 판을 즉시 이겨요 (총통). 각 상대는 콜 기준점만큼 치러요.'
+                  : 'If a player holds all 4 cards of one month, they show it and win the hand right away (총통). Each opponent pays the call threshold.'}
+              </li>
+              <li>
+                {locale === 'ko'
+                  ? '바닥에 한 달의 카드 4장이 모두 나오면, 다시 섞어서 새로 나눠요.'
+                  : 'If 4 cards of one month land on the floor, shuffle and deal again.'}
+              </li>
+              <li>
+                {locale === 'ko'
+                  ? '바닥에 한 달의 카드 3장이 나오면, 쌓아 두세요. 네 번째 카드를 내는 사람이 넷을 모두 가져가요.'
+                  : 'If 3 cards of one month land on the floor, stack them. Whoever plays the fourth takes all four.'}
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
@@ -192,9 +218,9 @@ function DealStage({ step }: { step: Step }) {
   const showHands = step >= 2;
   // Deck count drops as we deal
   let deckCount = 48;
-  if (step >= 1) deckCount -= STARTING_FLOOR.length; // -8
+  if (step >= 1) deckCount -= STARTING_FLOOR.length; // -6
   if (step >= 2) deckCount -= YOUR_HAND.length * 3; // -21
-  // Final: 48 - 8 - 21 = 19
+  // Final: 48 - 6 - 21 = 21
 
   return (
     <div className="club-card p-6 md:p-8 space-y-7">
@@ -221,8 +247,8 @@ function DealStage({ step }: { step: Step }) {
           {!showFloor && (
             <div className="text-label text-ink-soft self-center">
               {locale === 'ko'
-                ? '다음 단계: 8장이 여기에 펼쳐져요'
-                : 'Next: 8 cards land here face-up'}
+                ? '다음 단계: 6장이 여기에 펼쳐져요'
+                : 'Next: 6 cards land here face-up'}
             </div>
           )}
         </div>

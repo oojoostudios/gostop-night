@@ -27,8 +27,8 @@ export const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
     num: '02',
     label: 'Setup Hand',
     labelKo: '패 돌리기',
-    blurb: 'Shuffle, deal 8 to the floor, then 7 to each player. The remaining 19 form the deck.',
-    blurbKo: '셔플 → 바닥에 8장 → 각자 7장씩. 남은 19장이 더미.',
+    blurb: 'Shuffle, deal 6 to the floor, then 7 to each player. The remaining 21 form the deck.',
+    blurbKo: '셔플 → 바닥에 6장 → 각자 7장씩. 남은 21장이 더미.',
   },
   {
     id: 'section-flow',
@@ -44,7 +44,7 @@ export const GOSTOP_SECTIONS: ReadonlyArray<Section> = [
     label: 'Scoring',
     labelKo: '점수 계산',
     blurb:
-      'Brights (광), ribbons (띠), animals (열), and junk cards (피) — each scores differently.',
+      'Brights (광), Ribbons (띠), Animals (열), and Junk cards (피) — each scores differently.',
     blurbKo: '광·띠·열·피 — 카드 종류마다 점수 매기는 방식이 달라요.',
   },
   {

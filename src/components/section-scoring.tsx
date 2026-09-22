@@ -346,7 +346,7 @@ const RULE: Record<HwatuType, { en: string; ko: string }> = {
 
 const NOTE: Partial<Record<HwatuType, { en: string; ko: string }>> = {
   tti: {
-    en: 'The Dec ribbon counts toward your 5 Ribbons but belongs to no set.',
+    en: 'The Dec Ribbon counts toward your 5 Ribbons but belongs to no set.',
     ko: '12월 띠는 5장 카운트엔 포함되지만 어떤 세트에도 속하지 않아요.',
   },
   kkeut: {

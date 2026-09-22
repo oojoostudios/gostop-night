@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, RotateCcw, Trophy } from 'lucide-react';
+import { ArrowRight, ChevronUp, RotateCcw, Trophy } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { useLocale } from '@/contexts/locale-context';
 import { ScoreCardArt } from '@/components/score-card';
@@ -72,25 +72,25 @@ export function ScoreCalculator() {
       <PlayersSwitch />
 
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px] lg:items-start">
-        <div className="club-card space-y-5 p-5 sm:p-6">
+        <div className="club-card space-y-5 p-5 sm:p-6 pb-28 lg:pb-6">
           {TYPE_ORDER.map((type) => (
             <PickerGroup key={type} type={type} selected={selected} onToggle={toggle} />
           ))}
         </div>
 
-        <div className="lg:sticky lg:top-8">
-          <TotalPanel
-            score={score}
-            threshold={threshold}
-            canCall={canCall}
-            sakeSelected={selected.has(SAKE_CUP_ID)}
-            onReset={reset}
-          />
-        </div>
+        <TotalPanel
+          score={score}
+          threshold={threshold}
+          canCall={canCall}
+          sakeSelected={selected.has(SAKE_CUP_ID)}
+          onReset={reset}
+        />
       </div>
     </div>
   );
 }
+
+const CATEGORY_MAX: Record<HwatuType, number> = { gwang: 5, tti: 10, kkeut: 9, pi: 24 };
 
 function PickerGroup({
   type,
@@ -162,6 +162,7 @@ function TotalPanel({
   const { locale } = useLocale();
   const ko = locale === 'ko';
   const reduceMotion = useReducedMotion();
+  const [expanded, setExpanded] = useState(false);
 
   const useScore = () => {
     setPendingScore(score.total);
@@ -170,31 +171,32 @@ function TotalPanel({
       ?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
 
-  // The breakdown lines shown under the total: brights/ribbons/animals/junk that scored
-  // (their base count, not counting combo bonuses — those get their own line below),
-  // plus each active combo, plus a note on how the sake cup was counted.
+  // Every category row, always shown (even at 0), points net of combo bonuses (those get
+  // their own line below).
   const comboPoints = (type: HwatuType) =>
     score.combos
       .filter((c) => (c.id === 'godori') === (type === 'kkeut'))
       .reduce((sum, c) => sum + c.points, 0);
 
-  const lines: { label: string; value: string }[] = [];
-  (['gwang', 'tti', 'kkeut', 'pi'] as const).forEach((type) => {
-    const points = score.breakdown[type] - comboPoints(type);
-    const count = type === 'pi' ? score.piEffective : score.counts[type];
-    if (points <= 0 || count === 0) return;
+  const categoryRows = (['gwang', 'tti', 'kkeut', 'pi'] as const).map((type) => {
     const meta = HWATU_TYPES[type];
-    lines.push({ label: `${count} ${ko ? meta.labelKo : meta.label}`, value: String(points) });
-  });
-  score.combos.forEach((c) => {
-    lines.push({ label: ko ? c.labelKo : c.label, value: `+${c.points}` });
+    const points = score.breakdown[type] - comboPoints(type);
+    return {
+      type,
+      label: ko ? meta.labelKo : meta.label,
+      count: score.counts[type],
+      max: CATEGORY_MAX[type],
+      points,
+    };
   });
 
-  return (
-    <div className="club-card p-5 sm:p-6">
+  const progressPct = Math.min(100, (score.total / threshold) * 100);
+
+  const panelBody = (
+    <>
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-label text-ink-soft">{ko ? '총점' : 'Total'}</span>
-        <span className="relative h-[1em] overflow-hidden text-num">
+        <span className="relative h-[1.15em] overflow-visible text-num leading-none">
           <span aria-hidden className="invisible">
             {score.total}
           </span>
@@ -205,13 +207,21 @@ function TotalPanel({
               animate={{ y: '0%', opacity: 1 }}
               exit={{ y: '-60%', opacity: 0 }}
               transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-              className="absolute inset-0 flex items-baseline"
+              className="absolute inset-0 flex items-baseline justify-end"
               aria-live="polite"
             >
               {score.total}
             </motion.span>
           </AnimatePresence>
         </span>
+      </div>
+
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-hairline" aria-hidden>
+        <motion.div
+          className="h-full rounded-full bg-plum"
+          animate={{ width: `${progressPct}%` }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.3, ease: 'easeOut' }}
+        />
       </div>
 
       <AnimatePresence>
@@ -244,12 +254,26 @@ function TotalPanel({
         )}
       </AnimatePresence>
 
-      {lines.length > 0 && (
-        <ul className="mt-4 space-y-1.5 border-t border-hairline pt-4 text-label">
-          {lines.map((l) => (
-            <li key={l.label} className="flex items-center justify-between gap-3">
-              <span className="text-ink-soft">{l.label}</span>
-              <span className="font-bold tabular-nums">{l.value}</span>
+      <ul className="mt-4 space-y-1.5 border-t border-hairline pt-4 text-label">
+        {categoryRows.map((row) => (
+          <li key={row.type} className="flex items-center gap-2">
+            <span aria-hidden className={`size-2.5 shrink-0 rounded-full ${TYPE_DOT[row.type]}`} />
+            <span className="text-ink-soft">
+              {row.label} {row.count} / {row.max}
+            </span>
+            <span className="ml-auto font-bold tabular-nums">
+              {row.points} {ko ? '점' : row.points === 1 ? 'pt' : 'pts'}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      {(score.combos.length > 0 || sakeSelected) && (
+        <ul className="mt-3 space-y-1.5 border-t border-hairline pt-3 text-label">
+          {score.combos.map((c) => (
+            <li key={c.id} className="flex items-center justify-between gap-3">
+              <span className="text-ink-soft">{ko ? c.labelKo : c.label}</span>
+              <span className="font-bold tabular-nums">+{c.points}</span>
             </li>
           ))}
           {sakeSelected && (
@@ -284,6 +308,27 @@ function TotalPanel({
         <RotateCcw className="size-3.5" />
         {ko ? '카드 지우기' : 'Clear cards'}
       </Button>
+    </>
+  );
+
+  return (
+    <div
+      className={`club-card sticky bottom-0 z-30 rounded-b-none p-5 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] sm:p-6 lg:sticky lg:top-8 lg:bottom-auto lg:rounded-[10px] lg:shadow-none`}
+    >
+      <button
+        type="button"
+        onClick={() => setExpanded((e) => !e)}
+        className="flex w-full items-center justify-between gap-3 lg:hidden"
+      >
+        <span className="text-label font-semibold text-ink-soft">
+          {ko ? '총점' : 'Total'}{' '}
+          <span className="text-sub font-bold tabular-nums">{score.total}</span>
+        </span>
+        <ChevronUp
+          className={`size-4 text-ink-soft transition-transform ${expanded ? 'rotate-180' : ''}`}
+        />
+      </button>
+      <div className={`${expanded ? 'block' : 'hidden'} lg:block`}>{panelBody}</div>
     </div>
   );
 }

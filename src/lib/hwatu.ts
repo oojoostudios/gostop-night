@@ -90,7 +90,7 @@ export const HWATU_TYPES: Record<
     labelKo: '띠',
     hanja: '紅',
     roman: 'Tti',
-    blurb: 'Cards with red, blue, or grass-colored ribbons. Sets of three score extra.',
+    blurb: 'Cards with red, blue, or grass-colored Ribbons. Sets of three score extra.',
     blurbKo: '빨강·파랑·초록 띠가 있는 카드. 세 장 한 세트로 점수가 됩니다.',
   },
   kkeut: {
@@ -98,7 +98,7 @@ export const HWATU_TYPES: Record<
     labelKo: '열',
     hanja: '動',
     roman: 'Yeol',
-    blurb: `Cards depicting animals. ${cap(word(SCORING.animalsStartAt))} of these score one point.`,
+    blurb: `Cards depicting Animals. ${cap(word(SCORING.animalsStartAt))} of these score one point.`,
     blurbKo: `동물이 그려진 카드. ${SCORING.animalsStartAt}장부터 1점.`,
   },
   pi: {
@@ -534,7 +534,7 @@ export const HWATU_DECK: ReadonlyArray<HwatuCard> = [
     typeLabel: 'Animal or Double junk',
     typeLabelKo: '열 또는 쌍피',
     image: '/cards/m09-animal.webp',
-    lore: 'A sake cup beside chrysanthemums. It counts as an Animal or as two junk (쌍피) — the player picks when scoring.',
+    lore: 'A sake cup beside chrysanthemums. It counts as an Animal or as two Junk (쌍피) — the player picks when scoring.',
     loreKo: '국화 옆 술잔. 열로도, 쌍피(피 2장)로도 셀 수 있고, 점수 셈할 때 플레이어가 골라요.',
   },
   {

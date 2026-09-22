@@ -11,6 +11,7 @@ import { HwatuCardImage } from '@/components/hwatu-card-image';
 import { HwatuCardBack } from '@/components/hwatu-card-back';
 import { GOSTOP_SECTIONS } from '@/lib/sections';
 import { HWATU_DECK, type HwatuCard as HwatuCardData } from '@/lib/hwatu';
+import { MonthCaption } from '@/components/turn-stage';
 
 const SECTION = GOSTOP_SECTIONS.find((s) => s.id === 'section-deal')!;
 
@@ -18,16 +19,8 @@ const cardById = (id: string): HwatuCardData | undefined => HWATU_DECK.find((c) 
 
 // A representative starting deal — handpicked for visual variety
 // (the exact identity doesn't matter, since real deals are shuffled)
-const STARTING_FLOOR = [
-  '01-pi-1',
-  '04-pi-1',
-  '06-tti',
-  '08-gwang',
-  '09-kkeut',
-  '10-kkeut',
-  '11-pi-3',
-  '12-pi',
-] as const;
+// 3 players: 6 cards on the floor (see CLAUDE.md's resolved floor-count decision).
+const STARTING_FLOOR = ['01-pi-1', '04-pi-1', '06-tti', '08-gwang', '09-kkeut', '11-pi-3'] as const;
 
 const YOUR_HAND = [
   '02-tti',
@@ -39,7 +32,7 @@ const YOUR_HAND = [
   '01-gwang',
 ] as const;
 
-const REMAINING_COUNT = 48 - STARTING_FLOOR.length - YOUR_HAND.length * 3; // 19
+const REMAINING_COUNT = 48 - STARTING_FLOOR.length - YOUR_HAND.length * 3; // 21
 
 // Deal animation timing (CLAUDE.md, micro-interactions): ~0.3s per card, 60ms stagger,
 // then the face-up cards turn over (the same ~0.45s low-bounce spring as the card flip).
@@ -64,32 +57,29 @@ const STEP_META: ReadonlyArray<{
   {
     titleKo: '1. 카드를 섞어요',
     titleEn: '1. Shuffle the deck',
-    descKo: '48장 화투 카드를 모두 뒤집어 섞어요. 누가 어떤 카드를 받을지 운에 맡기는 단계.',
-    descEn:
-      "Shuffle all 48 face-down cards. Who gets what is up to chance — that's the whole point.",
+    descKo: '48장 카드를 모두 뒤집어서 섞어요.',
+    descEn: 'Shuffle all 48 cards face down.',
   },
   {
-    titleKo: '2. 바닥에 8장 펼쳐요',
-    titleEn: '2. Open the floor (8 cards)',
+    titleKo: '2. 바닥에 6장을 펼쳐요',
+    titleEn: '2. Open the floor (6 cards)',
     descKo:
-      '셔플한 더미에서 8장을 뽑아 바닥(공유 영역)에 펼쳐 놓아요. 모든 플레이어가 볼 수 있어요.',
+      '가운데에 6장을 펼쳐 놓아요. 이게 바닥이에요 — 모두가 보고, 이 카드들과 맞출 수 있어요.',
     descEn:
-      'Take 8 cards from the deck and lay them face-up on the floor — the shared area everyone can see.',
+      'Lay 6 cards face up in the middle. This is the floor: everyone can see it and match against it.',
   },
   {
-    titleKo: '3. 각자 7장씩 손패 분배',
+    titleKo: '3. 각자 7장씩 나눠줘요',
     titleEn: '3. Deal 7 cards to each player',
-    descKo:
-      '3인 게임 기준 — 각 플레이어에게 7장씩 손패. 다른 사람 손패는 안 보여요. (2인이면 10장씩, 4인이면 5장씩)',
-    descEn:
-      'In a 3-player game, each player gets 7 cards in hand. Hidden from others. (2-player: 10 each, 4-player: 5 each.)',
+    descKo: '각자의 손패는 비공개예요. 2인전이면 각자 10장씩 받고 바닥엔 8장을 펼쳐요.',
+    descEn: "Each player's hand is private. With 2 players, deal 10 each and open 8 on the floor.",
   },
   {
-    titleKo: '4. 더미에 19장 남음 — 시작!',
-    titleEn: '4. 19 cards left in the deck — ready!',
-    descKo: '남은 19장이 더미가 되어 라운드 동안 한 장씩 뒤집혀요. 첫 차례 플레이어부터 시작.',
+    titleKo: '4. 더미에 21장 남음 — 시작!',
+    titleEn: '4. 21 cards left in the deck — start!',
+    descKo: '나머지는 뒤집힌 채로 더미가 돼요. 매 턴마다 한 장씩 뒤집어요. 딜러부터 시작해요.',
     descEn:
-      'The remaining 19 form the deck — flipped one at a time during play. First player starts.',
+      'The rest stay face down as the deck. You flip one from it every turn. The dealer plays first.',
   },
 ];
 
@@ -215,7 +205,7 @@ function DealStage({ step }: { step: Step }) {
         helpKo="모두에게 공개된 매치 후보"
         helpEn="Face-up cards everyone can match against"
       >
-        <div className="flex flex-wrap gap-1.5 min-h-[6rem]">
+        <div className="flex flex-wrap gap-x-1.5 gap-y-7 min-h-[6rem]">
           <AnimatePresence>
             {showFloor &&
               STARTING_FLOOR.map((id, i) => (
@@ -419,6 +409,11 @@ function DealtCard({
       aria-hidden={!card}
     >
       {faces}
+      {card && (
+        <div className="absolute inset-x-0 -bottom-8">
+          <MonthCaption card={card} />
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -498,7 +493,7 @@ function PlayerHand({
         </div>
         <div className="text-label text-ink-soft">{help}</div>
       </div>
-      <div className="flex flex-wrap gap-1.5 min-h-[5rem]">
+      <div className="flex flex-wrap gap-x-1.5 gap-y-7 min-h-[5rem]">
         <AnimatePresence>
           {visibleHand?.map((id, i) => {
             const card = faceUp ? cardById(id) : undefined;

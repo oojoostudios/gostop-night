@@ -24,7 +24,7 @@ export type Rules = {
    *   enabled        = master switch. When false, none of the bak rules apply.
    *   piBak          = the loser has fewer than `piBakThreshold` junk (피) cards
    *   gwangBak       = the loser has no Brights (광) at all
-   *   meongBak       = the loser has fewer than 5 Animals (열)
+   *   meongBak       = the loser has no Animals (열) at all
    *   piBakThreshold = how few junk cards it takes to be pi-bak
    */
   bakPenalties: {
@@ -74,7 +74,7 @@ export const SCORING = {
   animalsStartAt: 5,
   /** Junk (피): this many score 1 point, +1 for each extra. Double junk (쌍피) counts as two. */
   junkStartAt: 10,
-  /** Combo bonuses. Hongdan, Cheongdan and Chodan are the red, blue and grass ribbon sets. */
+  /** Combo bonuses. 홍단/청단/초단 are the red, blue and grass Ribbon sets. */
   combos: { hongdan: 3, cheongdan: 3, chodan: 3, godori: 5 },
 } as const;
 

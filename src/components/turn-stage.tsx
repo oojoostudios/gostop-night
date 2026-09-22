@@ -7,12 +7,12 @@ import { Button } from '@heroui/react';
 import { useLocale } from '@/contexts/locale-context';
 import { HwatuCardImage } from '@/components/hwatu-card-image';
 import { HwatuCardBack } from '@/components/hwatu-card-back';
-import { HWATU_DECK, type HwatuCard as HwatuCardData } from '@/lib/hwatu';
+import { HWATU_DECK, MONTHS, type HwatuCard as HwatuCardData } from '@/lib/hwatu';
 
 /**
  * The animated turn-stage engine shared by Section 03 (Playing Game) and Section 05
  * (Special Rules). Both sections drive it with their own `Step[]` data; this file only
- * owns the shared visuals (floor/hand/taken zones, deck pile, bonus-pi badge) and the
+ * owns the shared visuals (floor/hand/taken zones, deck pile, bonus-Junk badge) and the
  * prev/next step-through controls. Moving a scenario between sections is just moving
  * its `Step[]` data — the animation itself doesn't change.
  */
@@ -22,6 +22,16 @@ export const cardById = (id: string): HwatuCardData => {
   if (!c) throw new Error(`Unknown card id: ${id}`);
   return c;
 };
+
+/** The two-line month caption ("1월" / "Jan") every demo card shows underneath it (CLAUDE.md). */
+export function MonthCaption({ card }: { card: HwatuCardData }) {
+  return (
+    <div className="mt-1 text-center leading-snug text-label text-ink-soft">
+      <div>{card.month}월</div>
+      <div>{MONTHS[card.month - 1].abbr}</div>
+    </div>
+  );
+}
 
 export type StageState = {
   hand: string[];
@@ -38,7 +48,7 @@ export type StageState = {
     /** Floor cards that are locked (뻑) — rendered dimmed with a lock badge. */
     locked?: string[];
   };
-  /** "+N pi from each opponent" badge (쪽/따닥/폭탄/싹쓸이). */
+  /** "+N Junk from each opponent" badge (쪽/따닥/폭탄/싹쓸이). */
   bonusPi?: number;
 };
 
@@ -226,7 +236,7 @@ function Zone({
           {empty}
         </div>
       ) : (
-        <div className="flex flex-wrap gap-x-1.5 gap-y-4">
+        <div className="flex flex-wrap gap-x-1.5 gap-y-7">
           <AnimatePresence mode="popLayout">
             {cardIds.map((id) => (
               <StageMiniCard
@@ -264,20 +274,23 @@ function StageMiniCard({
       animate={{ opacity: locked ? 0.6 : dimmed ? 0.5 : 1, y: 0 }}
       exit={{ opacity: 0, y: -6 }}
       transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-      className="relative aspect-[2/3] w-14 sm:w-16"
+      className="w-14 sm:w-16"
     >
-      <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
-      {locked && (
-        <div className="absolute top-0.5 right-0.5 bg-plum text-surface rounded-full p-0.5">
-          <Lock className="size-2.5" />
-        </div>
-      )}
-      {highlighted && (
-        <span
-          aria-hidden
-          className="absolute -bottom-3 left-1/2 size-2 -translate-x-1/2 rounded-full bg-plum"
-        />
-      )}
+      <div className="relative aspect-[2/3]">
+        <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
+        {locked && (
+          <div className="absolute top-0.5 right-0.5 bg-plum text-surface rounded-full p-0.5">
+            <Lock className="size-2.5" />
+          </div>
+        )}
+        {highlighted && (
+          <span
+            aria-hidden
+            className="absolute bottom-1 left-1/2 size-2 -translate-x-1/2 rounded-full bg-plum"
+          />
+        )}
+      </div>
+      <MonthCaption card={card} />
     </motion.div>
   );
 }
@@ -315,6 +328,9 @@ function DeckPile({ count, flipped }: { count: number; flipped?: string }) {
               className="absolute inset-0"
             >
               <HwatuCardImage card={flippedCard} className="absolute inset-0 w-full h-full" />
+              <div className="absolute inset-x-0 -bottom-9">
+                <MonthCaption card={flippedCard} />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -336,7 +352,7 @@ function BonusPiBadge({ count }: { count?: number }) {
           className="rounded-md bg-gold px-3 py-2 text-label text-on-fill self-center"
         >
           <div className="font-semibold tabular-nums">
-            +{count} {locale === 'ko' ? '피 (보너스)' : 'pi (bonus)'}
+            +{count} {locale === 'ko' ? '피 (보너스)' : 'Junk (bonus)'}
           </div>
           <div className="text-label mt-0.5">
             {locale === 'ko' ? '상대 한 명당 한 장씩' : 'from each opponent'}

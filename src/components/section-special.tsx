@@ -11,7 +11,7 @@ import { GOSTOP_SECTIONS } from '@/lib/sections';
 import { HWATU_DECK } from '@/lib/hwatu';
 import { RULES, SCORING, bakRules } from '@/config/rules';
 import { BAK_FACTOR } from '@/lib/tonight';
-import { StepThrough, type Step } from '@/components/turn-stage';
+import { MonthCaption, StepThrough, type Step } from '@/components/turn-stage';
 
 const SECTION = GOSTOP_SECTIONS.find((s) => s.id === 'section-special')!;
 
@@ -30,11 +30,10 @@ const JJOK_HAND_AFTER = ['03-tti', '07-pi-1', '09-kkeut'];
 const JJOK_STEPS: Step[] = [
   {
     id: 'setup',
-    title: 'January bright in hand, no January on floor',
-    titleKo: '내 손엔 1월 광, 바닥엔 1월 없음',
-    desc: "You hold the January bright. Looking at the floor, there's no January card to match against — so when you play it, it'll just join the floor.",
-    descKo:
-      '1월 광을 손에 들고 있어요. 바닥엔 1월이 하나도 없으니 그냥 광을 내면 바닥으로 가버리겠죠.',
+    title: 'Nothing to match.',
+    titleKo: '매치할 게 없어요.',
+    desc: "You hold the January Bright. There's no January card on the floor.",
+    descKo: '1월 광을 들고 있는데, 바닥엔 1월 카드가 없어요.',
     state: {
       hand: JJOK_HAND_INIT,
       floor: JJOK_FLOOR_INIT,
@@ -45,10 +44,10 @@ const JJOK_STEPS: Step[] = [
   },
   {
     id: 'no-match',
-    title: 'Played — joins the floor',
-    titleKo: '내고 보니 바닥행',
-    desc: 'You play the January bright. Without a partner on the floor, it sits face-up on the floor.',
-    descKo: '1월 광을 냈지만 짝이 없어서 그대로 바닥에 놓여요.',
+    title: 'Play it anyway.',
+    titleKo: '그래도 내요.',
+    desc: 'The January Bright goes face up on the floor.',
+    descKo: '1월 광이 바닥에 앞면으로 놓여요.',
     state: {
       hand: JJOK_HAND_AFTER,
       floor: [...JJOK_FLOOR_INIT, '01-gwang'],
@@ -59,10 +58,10 @@ const JJOK_STEPS: Step[] = [
   },
   {
     id: 'flip-match',
-    title: 'Flip — same month!',
-    titleKo: '더미를 뒤집었더니… 같은 월!',
-    desc: "Now you flip the top deck card. It's January — same month as the card you just placed. That's 쪽 (jjok).",
-    descKo: '더미를 뒤집었더니 1월! 방금 내가 낸 1월 광과 같은 월이에요. 이게 바로 쪽이에요.',
+    title: 'The flip is January.',
+    titleKo: '뒤집은 카드가 1월이에요.',
+    desc: "Your flip is a January Junk card, the same month as the card you just played. That's Jjok.",
+    descKo: '뒤집은 카드가 1월 피 카드로, 방금 낸 카드와 같은 달이에요. 이게 쪽이에요.',
     state: {
       hand: JJOK_HAND_AFTER,
       floor: [...JJOK_FLOOR_INIT, '01-gwang'],
@@ -74,11 +73,10 @@ const JJOK_STEPS: Step[] = [
   },
   {
     id: 'take-bonus',
-    title: 'Take both + bonus pi',
-    titleKo: '둘 다 가져가고 보너스 피',
-    desc: 'Both January cards go to your taken pile. Plus, every other player gives you one pi each — bonus reward for the lucky flip.',
-    descKo:
-      '두 카드 모두 내 먹은 패로. 추가로 상대방 한 명당 피 한 장씩 — 운 좋은 짝 만남에 대한 보너스예요.',
+    title: 'Take both, plus 1 junk from each player.',
+    titleKo: '둘 다 가져가고, 상대에게 피를 1장씩 받아요.',
+    desc: 'Both January cards go to your pile, and every other player gives you one Junk card.',
+    descKo: '1월 카드 두 장 모두 내 더미로 가고, 다른 모든 플레이어가 피 카드를 한 장씩 줘요.',
     state: {
       hand: JJOK_HAND_AFTER,
       floor: JJOK_FLOOR_INIT,
@@ -97,10 +95,10 @@ const TTADAK_HAND_AFTER = ['07-pi-1', '09-kkeut', '11-pi-3'];
 const TTADAK_STEPS: Step[] = [
   {
     id: 'setup',
-    title: 'Two March already on the floor',
-    titleKo: '바닥에 3월이 벌써 2장',
-    desc: 'The floor already shows two March pi cards (left over from earlier turns). You happen to be holding the March bright.',
-    descKo: '이전 차례들의 결과로 바닥엔 3월 피 2장이 있어요. 마침 내 손엔 3월 광이 들려있고요.',
+    title: 'Two Marches on the floor.',
+    titleKo: '바닥에 3월이 두 장.',
+    desc: 'Two March Junk cards are on the floor. You hold the March Bright.',
+    descKo: '바닥에 3월 피 카드가 두 장 있어요. 내 손엔 3월 광이 있고요.',
     state: {
       hand: TTADAK_HAND_INIT,
       floor: TTADAK_FLOOR_INIT,
@@ -110,32 +108,45 @@ const TTADAK_STEPS: Step[] = [
     },
   },
   {
-    id: 'match-three',
-    title: 'Match grabs all three',
-    titleKo: '한 번에 3장',
-    desc: 'When you play your March bright, it matches both floor cards. All three go into your taken pile.',
-    descKo: '3월 광을 내면 바닥의 3월 두 장과 한꺼번에 매치돼요. 세 장 모두 내 먹은 패로.',
+    id: 'play-one',
+    title: 'Play the March Bright.',
+    titleKo: '3월 광을 내요.',
+    desc: "It matches, but with two Marches there, you'd normally take just one. Wait for the flip.",
+    descKo: '맞긴 하지만, 3월이 두 장 있을 땐 원래 한 장만 가져가요. 뒤집을 때까지 기다려요.',
     state: {
       hand: TTADAK_HAND_AFTER,
-      floor: ['08-gwang'],
-      taken: ['03-gwang', '03-pi-1', '03-pi-2'],
+      floor: ['08-gwang', '03-pi-2'],
+      taken: ['03-gwang', '03-pi-1'],
       deckCount: 19,
-      highlight: { taken: ['03-gwang', '03-pi-1', '03-pi-2'] },
+      highlight: { taken: ['03-gwang', '03-pi-1'], floor: ['03-pi-2'] },
     },
   },
   {
     id: 'flip-ttadak',
-    title: 'Flip is March too — ttadak!',
-    titleKo: '더미도 3월 — 따닥!',
-    desc: "You flip the deck card and it's another March — the fourth of the month. Since nothing on the floor is left to match, it comes straight to your pile too. That's 따닥 (ttadak) — bonus pi from each opponent.",
+    title: 'The flip is the last March.',
+    titleKo: '뒤집은 카드가 마지막 3월이에요.',
+    desc: "Your flip is the March Ribbon, the fourth March. You take all four March cards. That's Ttadak.",
     descKo:
-      '더미를 뒤집었더니 또 3월. 바닥엔 이제 3월이 없으니 그냥 내 먹은 패로 들어와요. 이게 따닥 — 상대 한 명당 피 한 장씩 받아요.',
+      '뒤집은 카드가 3월 띠, 네 번째 3월이에요. 3월 카드 네 장을 모두 가져가요. 이게 따닥이에요.',
     state: {
       hand: TTADAK_HAND_AFTER,
       floor: ['08-gwang'],
       taken: ['03-gwang', '03-pi-1', '03-pi-2', '03-tti'],
       deckCount: 18,
-      highlight: { taken: ['03-tti'] },
+      highlight: { taken: ['03-pi-2', '03-tti'] },
+    },
+  },
+  {
+    id: 'bonus',
+    title: 'Plus 1 junk from each player.',
+    titleKo: '상대에게 피를 1장씩 받아요.',
+    desc: 'Every other player gives you one Junk card.',
+    descKo: '다른 모든 플레이어가 피 카드를 한 장씩 줘요.',
+    state: {
+      hand: TTADAK_HAND_AFTER,
+      floor: ['08-gwang'],
+      taken: ['03-gwang', '03-pi-1', '03-pi-2', '03-tti'],
+      deckCount: 18,
       bonusPi: 2,
     },
   },
@@ -148,10 +159,10 @@ const PPEOK_HAND_AFTER = ['03-tti', '07-pi-1', '09-kkeut'];
 const PPEOK_STEPS: Step[] = [
   {
     id: 'setup',
-    title: 'Hand match looks easy',
-    titleKo: '손패 매치는 평범해 보여요',
-    desc: 'You hold the January bright, and the floor has a January pi. A normal pair-take, right?',
-    descKo: '1월 광을 내려고 해요. 바닥에 1월 피가 한 장 있으니 평범한 쌍 매치 같죠?',
+    title: 'Looks like a normal match.',
+    titleKo: '평범한 매치처럼 보여요.',
+    desc: 'You hold the January Bright, and a January Junk card is on the floor.',
+    descKo: '1월 광을 들고 있고, 바닥에 1월 피 카드가 있어요.',
     state: {
       hand: PPEOK_HAND_INIT,
       floor: PPEOK_FLOOR_INIT,
@@ -162,33 +173,32 @@ const PPEOK_STEPS: Step[] = [
   },
   {
     id: 'flip-third',
-    title: 'But the flip is also January!',
-    titleKo: '근데 더미도 1월이네요?!',
-    desc: "You flip the deck card right after. It's another January. That makes three January cards on the floor at once — the situation locks.",
-    descKo:
-      '곧바로 더미를 뒤집었는데 그것도 1월. 바닥에 1월 카드가 한꺼번에 3장이 모이면 상황이 잠겨버려요.',
+    title: 'The flip is January too.',
+    titleKo: '뒤집은 카드도 1월이에요.',
+    desc: 'Your flip is the January Ribbon. Now three January cards are stacked on the floor.',
+    descKo: '뒤집은 카드가 1월 띠예요. 이제 바닥에 1월 카드가 세 장 쌓여요.',
     state: {
       hand: PPEOK_HAND_AFTER,
       floor: [...PPEOK_FLOOR_INIT, '01-gwang'],
       taken: [],
       deckCount: 18,
-      flipped: '01-pi-2',
+      flipped: '01-tti',
       highlight: { floor: ['01-pi-1', '01-gwang'] },
     },
   },
   {
     id: 'locked',
-    title: 'Three January stuck on the floor',
-    titleKo: '1월 3장이 바닥에 묶여요',
-    desc: 'All three January cards now stay on the floor — nobody takes them. The next player who plays a January card will sweep all four (the locked three plus their own), plus 1 junk from each player.',
+    title: 'Stuck.',
+    titleKo: '묶여요.',
+    desc: 'You take nothing. The three January cards stay stuck on the floor. Whoever plays the fourth January takes all four, plus 1 junk from each player, even if they made the stack.',
     descKo:
-      '1월 3장이 그대로 바닥에 묶여요. 누구도 못 가져가요. 다음에 1월을 내는 사람이 (자기 카드까지 더해서) 4장 모두 가져가고, 다른 플레이어들에게 피도 한 장씩 받아요.',
+      '아무것도 못 가져가요. 1월 카드 세 장이 바닥에 그대로 묶여요. 네 번째 1월을 내는 사람이 네 장을 모두 가져가고, 다른 플레이어들에게 피도 한 장씩 받아요 — 자기가 쌓았어도 마찬가지예요.',
     state: {
       hand: PPEOK_HAND_AFTER,
-      floor: ['04-pi-1', '08-gwang', '01-pi-1', '01-gwang', '01-pi-2'],
+      floor: ['04-pi-1', '08-gwang', '01-pi-1', '01-gwang', '01-tti'],
       taken: [],
       deckCount: 18,
-      highlight: { locked: ['01-pi-1', '01-gwang', '01-pi-2'] },
+      highlight: { locked: ['01-pi-1', '01-gwang', '01-tti'] },
     },
   },
 ];
@@ -200,47 +210,45 @@ const SWEEP_TAKEN_PRE = ['02-kkeut', '03-gwang', '04-pi-1'];
 const SWEEP_STEPS: Step[] = [
   {
     id: 'setup',
-    title: 'Late round, only one card on the floor',
-    titleKo: '라운드 막바지, 바닥엔 1장뿐',
-    desc: "Several turns in. Most floor cards have been taken throughout the round. Just a single June pi remains — and you're holding a June card.",
-    descKo:
-      '여러 턴이 지나 대부분의 카드가 정리됐어요. 바닥엔 6월 피 한 장만 남아있고, 마침 내 손엔 6월 카드가 있어요.',
+    title: 'Two cards left on the floor.',
+    titleKo: '바닥에 두 장만 남았어요.',
+    desc: 'Late in the hand, only a June Junk card and an October Junk card are left on the floor. You hold a June card.',
+    descKo: '판 막바지, 바닥엔 6월 피 카드와 10월 피 카드만 남았어요. 내 손엔 6월 카드가 있고요.',
     state: {
       hand: SWEEP_HAND_INIT,
-      floor: ['06-pi-1'],
+      floor: ['06-pi-1', '10-pi-1'],
       taken: SWEEP_TAKEN_PRE,
       deckCount: 6,
       highlight: { hand: '06-kkeut', floor: ['06-pi-1'] },
     },
   },
   {
-    id: 'sweep',
-    title: 'Match clears the floor — ssakssalri (sweep)!',
-    titleKo: '매치하면 바닥이 텅 비어요 — 싹쓸이!',
-    desc: "Your June card takes the lone June pi. The floor is now empty — that's 싹쓸이 (sweep). Every opponent gives you one pi.",
-    descKo:
-      '6월 카드가 마지막 6월 피와 매치되면서 바닥이 텅 비어요. 이게 싹쓸이! 상대 한 명당 피 1장씩 받아요.',
+    id: 'play-june',
+    title: 'Play June.',
+    titleKo: '6월을 내요.',
+    desc: 'Your June card takes the June Junk card. One card is left.',
+    descKo: '내 6월 카드가 6월 피 카드를 가져가요. 한 장 남았어요.',
     state: {
       hand: SWEEP_HAND_AFTER,
-      floor: [],
+      floor: ['10-pi-1'],
       taken: [...SWEEP_TAKEN_PRE, '06-kkeut', '06-pi-1'],
       deckCount: 6,
       highlight: { taken: ['06-kkeut', '06-pi-1'] },
-      bonusPi: 2,
     },
   },
   {
-    id: 'flip',
-    title: 'Flip lands on empty floor',
-    titleKo: '더미 뒤집기는 빈 바닥으로',
-    desc: 'After the sweep you still flip from the deck. It has nothing to match — it sits down on the (briefly empty) floor.',
+    id: 'sweep',
+    title: 'The flip is October.',
+    titleKo: '뒤집은 카드가 10월이에요.',
+    desc: "Your flip is an October card, and it takes the last floor card. The floor is empty. That's Sweep: each player gives you 1 junk.",
     descKo:
-      '싹쓸이 후에도 더미는 뒤집어요. 매치할 카드가 없어서 (잠깐 비었던) 바닥에 그대로 놓여요.',
+      '뒤집은 카드가 10월 카드인데, 이게 바닥의 마지막 카드를 가져가요. 바닥이 텅 비어요. 이게 싹쓸이 — 상대가 피를 1장씩 줘요.',
     state: {
       hand: SWEEP_HAND_AFTER,
-      floor: ['05-pi-1'],
-      taken: [...SWEEP_TAKEN_PRE, '06-kkeut', '06-pi-1'],
+      floor: [],
+      taken: [...SWEEP_TAKEN_PRE, '06-kkeut', '06-pi-1', '10-pi-1', '10-pi-2'],
       deckCount: 5,
+      highlight: { taken: ['10-pi-1', '10-pi-2'] },
       bonusPi: 2,
     },
   },
@@ -253,11 +261,11 @@ const POKDAN_HAND_AFTER = ['03-tti'];
 const POKDAN_STEPS: Step[] = [
   {
     id: 'setup',
-    title: 'Three Augusts in hand, one August on floor',
-    titleKo: '손엔 8월 3장, 바닥엔 8월 1장',
-    desc: "You're holding three August cards (bright + animal + pi). The fourth — an August pi — is sitting on the floor. Bomb condition.",
+    title: 'Three Augusts in hand.',
+    titleKo: '손에 8월 카드가 세 장.',
+    desc: 'You hold the August Bright, the August Animal (geese), and an August Junk card. The last August Junk card is on the floor.',
     descKo:
-      '내 손에 8월 카드가 3장 (광·열·피). 그 달의 마지막 한 장이 바닥에 있어요. 폭탄 조건이에요.',
+      '8월 광, 8월 열(기러기), 8월 피 카드를 들고 있어요. 마지막 8월 피 카드는 바닥에 있고요.',
     state: {
       hand: POKDAN_HAND_INIT,
       floor: POKDAN_FLOOR_INIT,
@@ -268,11 +276,11 @@ const POKDAN_STEPS: Step[] = [
   },
   {
     id: 'drop',
-    title: 'Drop all three at once',
-    titleKo: '3장을 한꺼번에 던져요',
-    desc: 'Instead of one card per turn, you slam all three same-month cards down at once and sweep the floor card too. All four August cards into your taken pile, plus 1 junk from each player.',
+    title: 'Play all three at once.',
+    titleKo: '세 장을 한꺼번에 내요.',
+    desc: 'Put all three down together and take all four August cards. Each player gives you 1 junk.',
     descKo:
-      '보통 한 턴에 한 장씩 내지만, 폭탄은 같은 달 3장을 한꺼번에 내려놓고 바닥의 1장까지 함께 쓸어가요. 8월 4장 모두 내 먹은 패로, 다른 플레이어들에게 피도 한 장씩 받아요.',
+      '세 장을 한 번에 내려놓고 8월 카드 네 장을 모두 가져가요. 다른 플레이어들이 피를 한 장씩 줘요.',
     state: {
       hand: POKDAN_HAND_AFTER,
       floor: ['01-pi-1', '04-pi-1'],
@@ -284,16 +292,17 @@ const POKDAN_STEPS: Step[] = [
   },
   {
     id: 'flip',
-    title: 'Flip the deck — bonus pi already earned',
-    titleKo: '더미 뒤집기 — 보너스 피는 이미 확보',
-    desc: "You still flip a card afterwards. It doesn't match — it joins the floor. The bomb already earned you one pi from each opponent.",
+    title: 'Flip as usual.',
+    titleKo: '평소처럼 뒤집어요.',
+    desc: 'You still flip from the deck. This one matches nothing and stays on the floor. On your next two turns, you only flip.',
     descKo:
-      '그래도 더미는 뒤집어요. 매치가 없어서 바닥행. 폭탄으로 이미 상대 한 명당 피 1장씩 챙긴 상태.',
+      '그래도 더미에서 한 장 뒤집어요. 이번엔 아무것도 안 맞아서 바닥에 남아요. 다음 두 턴은 뒤집기만 해요.',
     state: {
       hand: POKDAN_HAND_AFTER,
       floor: ['01-pi-1', '04-pi-1', '05-pi-1'],
       taken: ['08-gwang', '08-kkeut', '08-pi-1', '08-pi-2'],
       deckCount: 18,
+      flipped: '05-pi-1',
       bonusPi: 2,
     },
   },
@@ -459,6 +468,7 @@ function StaticCard({ id, role, roleKo }: { id: string; role: string; roleKo: st
         <HwatuCardImage card={card} className="absolute inset-0 w-full h-full" />
       </div>
       <span className="text-label text-ink-soft">{locale === 'ko' ? roleKo : role}</span>
+      <MonthCaption card={card} />
     </div>
   );
 }

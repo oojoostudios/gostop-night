@@ -241,7 +241,6 @@ export function HandForm({
   );
   const [gos, setGos] = useState(0);
   const [shakes, setShakes] = useState(0);
-  const [bombs, setBombs] = useState(0);
   const [flags, setFlags] = useState<Record<string, BakFlags>>({});
 
   const names = Object.fromEntries(ev.players.map((p) => [p.id, p.name]));
@@ -262,7 +261,9 @@ export function HandForm({
         points,
         gos,
         shakes,
-        bombs,
+        // Bombs have no control here: rules.ts's bombMultiplier is 1, so there's nothing to
+        // multiply. Re-add a Stepper for this if that value ever changes.
+        bombs: 0,
         afterDraw,
         losers: Object.fromEntries(losers.map((l) => [l.id, flagsOf(l.id)])),
       }
@@ -346,7 +347,6 @@ export function HandForm({
             />
             <Stepper label={t('Gos', '고')} value={gos} max={9} onChange={setGos} />
             <Stepper label={t('Shakes', '흔들기')} value={shakes} max={5} onChange={setShakes} />
-            <Stepper label={t('Bombs', '폭탄')} value={bombs} max={5} onChange={setBombs} />
           </div>
 
           {(bakOn.length > 0 || goBakOn) && (

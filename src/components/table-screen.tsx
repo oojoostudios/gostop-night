@@ -455,14 +455,23 @@ export function TableScreen({
         </p>
       )}
 
-      <HandForm
-        key={formKey}
-        ev={pseudoEvent}
-        onCancel={() => setFormKey((k) => k + 1)}
-        onSaveHand={handleSaveHand}
-        onSaveDraw={handleSaveDraw}
-        onDraftChange={handleDraftChange}
-      />
+      {players.length < 2 ? (
+        <p className="club-card p-5 text-body text-ink-soft sm:p-6">
+          {t(
+            'Add at least 2 players to this table before recording a hand.',
+            '판을 기록하려면 이 테이블에 최소 2명의 플레이어를 추가하세요.',
+          )}
+        </p>
+      ) : (
+        <HandForm
+          key={formKey}
+          ev={pseudoEvent}
+          onCancel={() => setFormKey((k) => k + 1)}
+          onSaveHand={handleSaveHand}
+          onSaveDraw={handleSaveDraw}
+          onDraftChange={handleDraftChange}
+        />
+      )}
 
       {saveError && (
         <p role="alert" className="text-body text-plum">

@@ -5,6 +5,7 @@ import { getEventByCode } from '@/lib/live/events';
 import { createHostSession, isHostSession } from '@/lib/live/host-session';
 import { verifyPin } from '@/lib/live/pin';
 import { addPlayer, createTable } from '@/lib/live/tables';
+import { cashOutPlayerLive, movePlayerLive, rebuyPlayerLive } from '@/lib/live/host-actions';
 
 export type PinGateState = { error: 'not-found' | 'wrong-pin' | null };
 
@@ -62,4 +63,34 @@ export async function addPlayerAction(
   await addPlayer({ eventId: event.id, tableId, name, startingChips: event.chips_per_buy_in });
   revalidatePath(`/host/${eventCode}`);
   return { error: null };
+}
+
+/**
+ * Rebuy, move, and cash-out are single-button actions (no form), so unlike the ones above
+ * they just throw on failure — the host dashboard's Realtime subscription reflects a success
+ * on its own, without a revalidate.
+ */
+async function requireHost(eventCode: string) {
+  const event = await getEventByCode(eventCode);
+  if (!event || !(await isHostSession(event.code, event.id))) throw new Error('unauthorized');
+  return event;
+}
+
+export async function rebuyAction(eventCode: string, playerId: string): Promise<void> {
+  const event = await requireHost(eventCode);
+  await rebuyPlayerLive(event.id, playerId, event.chips_per_buy_in);
+}
+
+export async function movePlayerAction(
+  eventCode: string,
+  playerId: string,
+  toTableId: string,
+): Promise<void> {
+  await requireHost(eventCode);
+  await movePlayerLive(playerId, toTableId);
+}
+
+export async function cashOutPlayerAction(eventCode: string, playerId: string): Promise<void> {
+  await requireHost(eventCode);
+  await cashOutPlayerLive(playerId);
 }

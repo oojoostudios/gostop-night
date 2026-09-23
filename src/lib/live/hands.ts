@@ -31,6 +31,18 @@ export async function listHandsForTable(tableId: string): Promise<HandRow[]> {
   return (data ?? []) as HandRow[];
 }
 
+/** Every hand across a set of tables — used by the host overview, which spans a whole event. */
+export async function listHandsForTables(tableIds: string[]): Promise<HandRow[]> {
+  if (tableIds.length === 0) return [];
+  const { data, error } = await supabaseAdmin()
+    .from('hands')
+    .select()
+    .in('table_id', tableIds)
+    .order('created_at', { ascending: true });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as HandRow[];
+}
+
 export type RecordHandArgs = {
   eventId: string;
   tableId: string;

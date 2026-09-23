@@ -3,8 +3,10 @@ import { notFound } from 'next/navigation';
 import { getEventByCode, toPublicEvent } from '@/lib/live/events';
 import { isHostSession } from '@/lib/live/host-session';
 import { listPlayersForEvent, listTablesForEvent } from '@/lib/live/tables';
+import { listHandsForTables } from '@/lib/live/hands';
 import { tableQrDataUrl } from '@/lib/live/qrcode';
 import { siteUrl } from '@/lib/live/site-url';
+import { signLiveToken } from '@/lib/live/token';
 import { HostPinGate } from '@/components/host-pin-gate';
 import { HostDashboard } from '@/components/host-dashboard';
 
@@ -30,6 +32,10 @@ export default async function HostEventPage({
     listTablesForEvent(event.id),
     listPlayersForEvent(event.id),
   ]);
+  const [hands, hostToken] = await Promise.all([
+    listHandsForTables(tables.map((table) => table.id)),
+    signLiveToken({ gostop_role: 'host', event_id: event.id }, '12h'),
+  ]);
   const tablesWithQr = await Promise.all(
     tables.map(async (table) => ({
       table,
@@ -37,5 +43,13 @@ export default async function HostEventPage({
     })),
   );
 
-  return <HostDashboard event={toPublicEvent(event)} tables={tablesWithQr} players={players} />;
+  return (
+    <HostDashboard
+      event={toPublicEvent(event)}
+      initialTables={tablesWithQr}
+      initialPlayers={players}
+      initialHands={hands}
+      accessToken={hostToken}
+    />
+  );
 }

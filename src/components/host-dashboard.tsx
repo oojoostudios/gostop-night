@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useReducedMotion } from 'motion/react';
 import { Check, Download } from 'lucide-react';
 import { useLocale } from '@/contexts/locale-context';
 import { chipValue, chipValueText, money, signed, signedMoney } from '@/lib/tonight';
@@ -16,10 +17,20 @@ import { AddPlayerForm } from '@/components/add-player-form';
 import { CountUp } from '@/components/count-up';
 import {
   cashOutPlayerAction,
+  deleteTableAction,
   movePlayerAction,
   rebuyAction,
+  removePlayerAction,
   resolvePendingHandAction,
 } from '@/app/host/[eventCode]/actions';
+
+/** The next free "Table N" name — reuses a freed number rather than only ever counting up. */
+function suggestedTableName(tables: TableRow[]): string {
+  const taken = new Set(tables.map((tb) => tb.name.trim().toLowerCase()));
+  let n = 1;
+  while (taken.has(`table ${n}`)) n++;
+  return `Table ${n}`;
+}
 
 export type TableWithQr = { table: TableRow; qrDataUrl: string };
 
@@ -64,7 +75,9 @@ export function HostDashboard({
   const [pendingHands, setPendingHands] = useState(initialPendingHands);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     const channel = supabase
@@ -134,9 +147,9 @@ export function HostDashboard({
     }))
     .sort((a, b) => b.netDollars - a.netDollars);
 
-  const runAction = (playerId: string, fn: () => Promise<void>) => {
+  const runAction = (rowId: string, fn: () => Promise<void>) => {
     setActionError(null);
-    setPendingId(playerId);
+    setPendingId(rowId);
     startTransition(async () => {
       try {
         await fn();
@@ -146,6 +159,40 @@ export function HostDashboard({
         setPendingId(null);
       }
     });
+  };
+
+  /** Like `runAction`, but for actions that return a reason instead of throwing on the
+   * outcomes a host can actually fix (see the note on `removePlayerLive`). */
+  const runGuardedAction = <R extends { ok: boolean; reason?: string }>(
+    rowId: string,
+    fn: () => Promise<R>,
+    messages: Record<string, string>,
+  ) => {
+    setActionError(null);
+    setPendingId(rowId);
+    startTransition(async () => {
+      try {
+        const result = await fn();
+        if (!result.ok && result.reason) {
+          setActionError(messages[result.reason] ?? messages.default);
+        }
+      } catch {
+        setActionError(t('That action failed. Try again.', '작업에 실패했어요. 다시 시도하세요.'));
+      } finally {
+        setPendingId(null);
+      }
+    });
+  };
+
+  const scrollAndHighlight = (domId: string, rowId: string) => {
+    setHighlightedId(rowId);
+    document
+      .getElementById(domId)
+      ?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    window.setTimeout(
+      () => setHighlightedId((current) => (current === rowId ? null : current)),
+      1600,
+    );
   };
 
   return (
@@ -245,8 +292,16 @@ export function HostDashboard({
               const handsPlayed = hands.filter((h) => h.table_id === table.id).length;
               const otherTables = tables.filter((tb) => tb.id !== table.id);
 
+              const canDeleteTable = rows.length === 0 && handsPlayed === 0;
+
               return (
-                <div key={table.id} className="rounded-input bg-paper p-4 sm:p-5">
+                <div
+                  key={table.id}
+                  id={`table-row-${table.id}`}
+                  className={`rounded-input bg-paper p-4 transition-shadow duration-700 sm:p-5 ${
+                    highlightedId === table.id ? 'shadow-[0_0_0_2px_var(--color-plum)]' : ''
+                  }`}
+                >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <div className="font-display text-sub">{table.name}</div>
@@ -275,6 +330,28 @@ export function HostDashboard({
                     )}
                   </div>
 
+                  {canDeleteTable && (
+                    <button
+                      type="button"
+                      className="club-btn mt-3 !px-3 !py-1.5 text-label disabled:cursor-not-allowed disabled:opacity-40"
+                      disabled={pendingId === table.id}
+                      onClick={() =>
+                        runGuardedAction(table.id, () => deleteTableAction(event.code, table.id), {
+                          'not-empty': t(
+                            'This table still has players or hands — remove or cash them out first.',
+                            '이 테이블에는 아직 플레이어나 판 기록이 있어요 — 먼저 제거하거나 정산하세요.',
+                          ),
+                          default: t(
+                            'That action failed. Try again.',
+                            '작업에 실패했어요. 다시 시도하세요.',
+                          ),
+                        })
+                      }
+                    >
+                      {t('Delete table', '테이블 삭제')}
+                    </button>
+                  )}
+
                   {rows.length === 0 ? (
                     <p className="mt-3 text-body text-ink-soft">
                       {t('No players yet.', '아직 플레이어가 없어요.')}
@@ -282,7 +359,15 @@ export function HostDashboard({
                   ) : (
                     <ul className="mt-3 space-y-3">
                       {rows.map((r) => (
-                        <li key={r.player.id} className="rounded-input bg-surface p-3">
+                        <li
+                          key={r.player.id}
+                          id={`player-row-${r.player.id}`}
+                          className={`rounded-input bg-surface p-3 transition-shadow duration-700 ${
+                            highlightedId === r.player.id
+                              ? 'shadow-[0_0_0_2px_var(--color-plum)]'
+                              : ''
+                          }`}
+                        >
                           <div className="flex items-center justify-between gap-3">
                             <span className="truncate font-medium">{r.player.name}</span>
                             <span className="flex items-baseline gap-2 tabular-nums">
@@ -343,6 +428,29 @@ export function HostDashboard({
                             >
                               {t('Cash out', '정산')}
                             </button>
+                            <button
+                              type="button"
+                              className="club-btn !px-3 !py-1.5 text-label disabled:cursor-not-allowed disabled:opacity-40"
+                              disabled={pendingId === r.player.id}
+                              onClick={() =>
+                                runGuardedAction(
+                                  r.player.id,
+                                  () => removePlayerAction(event.code, r.player.id),
+                                  {
+                                    'has-activity': t(
+                                      `${r.player.name} has already played or rebought — cash them out instead.`,
+                                      `${r.player.name} 님은 이미 게임에 참여했거나 리바이했어요 — 대신 정산을 사용하세요.`,
+                                    ),
+                                    default: t(
+                                      'That action failed. Try again.',
+                                      '작업에 실패했어요. 다시 시도하세요.',
+                                    ),
+                                  },
+                                )
+                              }
+                            >
+                              {t('Remove', '삭제')}
+                            </button>
                           </div>
                         </li>
                       ))}
@@ -361,13 +469,21 @@ export function HostDashboard({
         )}
 
         <div className="border-t border-hairline pt-5">
-          <CreateTableForm eventCode={event.code} />
+          <CreateTableForm
+            eventCode={event.code}
+            suggestedName={suggestedTableName(tables)}
+            onCreated={(id) => scrollAndHighlight(`table-row-${id}`, id)}
+          />
         </div>
       </div>
 
       <div className="club-card mt-6 space-y-5 p-5 sm:p-6">
         <h2 className="text-sub font-display">{t('Add a player', '플레이어 추가')}</h2>
-        <AddPlayerForm eventCode={event.code} tables={tables} />
+        <AddPlayerForm
+          eventCode={event.code}
+          tables={tables}
+          onCreated={(id) => scrollAndHighlight(`player-row-${id}`, id)}
+        />
       </div>
 
       <div className="club-card mt-6 space-y-5 p-5 sm:p-6">

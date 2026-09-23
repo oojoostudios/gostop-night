@@ -1,18 +1,36 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect, useRef } from 'react';
 import { useLocale } from '@/contexts/locale-context';
 import { addPlayerAction, type AddPlayerState } from '@/app/host/[eventCode]/actions';
 import type { TableRow } from '@/lib/live/types';
 
-const initialState: AddPlayerState = { error: null };
+const initialState: AddPlayerState = { error: null, createdId: null };
 
-export function AddPlayerForm({ eventCode, tables }: { eventCode: string; tables: TableRow[] }) {
+export function AddPlayerForm({
+  eventCode,
+  tables,
+  onCreated,
+}: {
+  eventCode: string;
+  tables: TableRow[];
+  onCreated?: (playerId: string) => void;
+}) {
   const { locale } = useLocale();
   const ko = locale === 'ko';
   const t = (en: string, kr: string) => (ko ? kr : en);
   const boundAction = addPlayerAction.bind(null, eventCode);
   const [state, action, pending] = useActionState(boundAction, initialState);
+  const formRef = useRef<HTMLFormElement>(null);
+  const lastHandledId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (state.createdId && state.createdId !== lastHandledId.current) {
+      lastHandledId.current = state.createdId;
+      formRef.current?.reset();
+      onCreated?.(state.createdId);
+    }
+  }, [state.createdId, onCreated]);
 
   if (tables.length === 0) {
     return (
@@ -26,7 +44,7 @@ export function AddPlayerForm({ eventCode, tables }: { eventCode: string; tables
   }
 
   return (
-    <form action={action} className="flex flex-wrap items-end gap-3">
+    <form ref={formRef} action={action} className="flex flex-wrap items-end gap-3">
       <label className="block">
         <span className="mb-1.5 block text-label font-medium">
           {t('Player name', '플레이어 이름')}

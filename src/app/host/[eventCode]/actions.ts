@@ -4,8 +4,16 @@ import { revalidatePath } from 'next/cache';
 import { getEventByCode } from '@/lib/live/events';
 import { createHostSession, isHostSession } from '@/lib/live/host-session';
 import { verifyPin } from '@/lib/live/pin';
-import { addPlayer, createTable } from '@/lib/live/tables';
-import { cashOutPlayerLive, movePlayerLive, rebuyPlayerLive } from '@/lib/live/host-actions';
+import { addPlayer, createTable, listTablesForEvent } from '@/lib/live/tables';
+import {
+  cashOutPlayerLive,
+  deleteTableLive,
+  movePlayerLive,
+  rebuyPlayerLive,
+  removePlayerLive,
+  type DeleteTableResult,
+  type RemovePlayerResult,
+} from '@/lib/live/host-actions';
 import { resolvePendingHandLive } from '@/lib/live/pending-hands';
 
 export type PinGateState = { error: 'not-found' | 'wrong-pin' | null };
@@ -26,7 +34,10 @@ export async function verifyHostPinAction(
   return { error: null };
 }
 
-export type CreateTableState = { error: 'unauthorized' | 'name-required' | null };
+export type CreateTableState = {
+  error: 'unauthorized' | 'name-required' | 'duplicate-name' | null;
+  createdId: string | null;
+};
 
 export async function createTableAction(
   eventCode: string,
@@ -34,18 +45,25 @@ export async function createTableAction(
   formData: FormData,
 ): Promise<CreateTableState> {
   const event = await getEventByCode(eventCode);
-  if (!event || !(await isHostSession(event.code, event.id))) return { error: 'unauthorized' };
+  if (!event || !(await isHostSession(event.code, event.id))) {
+    return { error: 'unauthorized', createdId: null };
+  }
 
   const name = String(formData.get('name') ?? '').trim();
-  if (!name) return { error: 'name-required' };
+  if (!name) return { error: 'name-required', createdId: null };
 
-  await createTable(event.id, name);
+  const existing = await listTablesForEvent(event.id);
+  const isDuplicate = existing.some((tb) => tb.name.trim().toLowerCase() === name.toLowerCase());
+  if (isDuplicate) return { error: 'duplicate-name', createdId: null };
+
+  const table = await createTable(event.id, name);
   revalidatePath(`/host/${eventCode}`);
-  return { error: null };
+  return { error: null, createdId: table.id };
 }
 
 export type AddPlayerState = {
   error: 'unauthorized' | 'name-required' | 'table-required' | null;
+  createdId: string | null;
 };
 
 export async function addPlayerAction(
@@ -54,16 +72,23 @@ export async function addPlayerAction(
   formData: FormData,
 ): Promise<AddPlayerState> {
   const event = await getEventByCode(eventCode);
-  if (!event || !(await isHostSession(event.code, event.id))) return { error: 'unauthorized' };
+  if (!event || !(await isHostSession(event.code, event.id))) {
+    return { error: 'unauthorized', createdId: null };
+  }
 
   const name = String(formData.get('name') ?? '').trim();
   const tableId = String(formData.get('tableId') ?? '').trim();
-  if (!name) return { error: 'name-required' };
-  if (!tableId) return { error: 'table-required' };
+  if (!name) return { error: 'name-required', createdId: null };
+  if (!tableId) return { error: 'table-required', createdId: null };
 
-  await addPlayer({ eventId: event.id, tableId, name, startingChips: event.chips_per_buy_in });
+  const player = await addPlayer({
+    eventId: event.id,
+    tableId,
+    name,
+    startingChips: event.chips_per_buy_in,
+  });
   revalidatePath(`/host/${eventCode}`);
-  return { error: null };
+  return { error: null, createdId: player.id };
 }
 
 /**
@@ -102,4 +127,20 @@ export async function resolvePendingHandAction(
 ): Promise<void> {
   await requireHost(eventCode);
   await resolvePendingHandLive(pendingId);
+}
+
+export async function removePlayerAction(
+  eventCode: string,
+  playerId: string,
+): Promise<RemovePlayerResult> {
+  await requireHost(eventCode);
+  return removePlayerLive(playerId);
+}
+
+export async function deleteTableAction(
+  eventCode: string,
+  tableId: string,
+): Promise<DeleteTableResult> {
+  await requireHost(eventCode);
+  return deleteTableLive(tableId);
 }

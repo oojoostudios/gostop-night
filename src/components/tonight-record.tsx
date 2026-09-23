@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { Modal } from '@heroui/react';
 import { RULES, bakRules, callThreshold, type Players } from '@/config/rules';
@@ -205,18 +205,25 @@ export function RecordHandDialog({
   );
 }
 
-function HandForm({
+/**
+ * The form itself, split out from the modal so it can also be embedded inline on a page
+ * (Section 07 Stage 2's live table screen shows it directly, not in a dialog).
+ */
+export function HandForm({
   ev,
   initialPoints,
   onCancel,
   onSaveHand,
   onSaveDraw,
+  onDraftChange,
 }: {
   ev: TonightEvent;
   initialPoints?: number;
   onCancel: () => void;
   onSaveHand: (input: HandInput) => void;
   onSaveDraw: () => void;
+  /** Fires when the form goes from "no winner picked yet" to "picking a winner or a draw", and back. */
+  onDraftChange?: (active: boolean) => void;
 }) {
   const { locale } = useLocale();
   const ko = locale === 'ko';
@@ -225,12 +232,15 @@ function HandForm({
   const afterDraw = nextHandDoubled(ev);
 
   const [winner, setWinner] = useState<string | 'draw' | null>(null);
+
+  useEffect(() => {
+    onDraftChange?.(winner !== null);
+  }, [winner, onDraftChange]);
   const [points, setPoints] = useState<number>(
     initialPoints ?? callThreshold(playerCount as Players),
   );
   const [gos, setGos] = useState(0);
   const [shakes, setShakes] = useState(0);
-  const [bombs, setBombs] = useState(0);
   const [flags, setFlags] = useState<Record<string, BakFlags>>({});
 
   const names = Object.fromEntries(ev.players.map((p) => [p.id, p.name]));
@@ -251,7 +261,9 @@ function HandForm({
         points,
         gos,
         shakes,
-        bombs,
+        // Bombs have no control here: rules.ts's bombMultiplier is 1, so there's nothing to
+        // multiply. Re-add a Stepper for this if that value ever changes.
+        bombs: 0,
         afterDraw,
         losers: Object.fromEntries(losers.map((l) => [l.id, flagsOf(l.id)])),
       }
@@ -335,7 +347,6 @@ function HandForm({
             />
             <Stepper label={t('Gos', '고')} value={gos} max={9} onChange={setGos} />
             <Stepper label={t('Shakes', '흔들기')} value={shakes} max={5} onChange={setShakes} />
-            <Stepper label={t('Bombs', '폭탄')} value={bombs} max={5} onChange={setBombs} />
           </div>
 
           {(bakOn.length > 0 || goBakOn) && (

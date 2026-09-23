@@ -2,13 +2,8 @@
 
 import type { HandInput } from '@/lib/tonight';
 import { verifyLiveToken } from '@/lib/live/token';
-import {
-  clearHandLock,
-  recordDrawLive,
-  recordHandLive,
-  setHandLock,
-  undoLastHandLive,
-} from '@/lib/live/hands';
+import { clearHandLock, recordDrawLive, setHandLock, undoLastHandLive } from '@/lib/live/hands';
+import { tryRecordHandLive, type RecordAttempt } from '@/lib/live/pending-hands';
 
 /**
  * Every action here is reachable by a direct POST, not just through this page's UI (see the
@@ -35,9 +30,9 @@ export async function recordHandAction(args: {
   playerCount: number;
   enteredBy: string;
   input: HandInput;
-}) {
+}): Promise<RecordAttempt> {
   await assertPlayerToken(args.accessToken, args.tableId, args.eventId);
-  return recordHandLive({
+  return tryRecordHandLive({
     eventId: args.eventId,
     tableId: args.tableId,
     chipsPerPoint: args.chipsPerPoint,

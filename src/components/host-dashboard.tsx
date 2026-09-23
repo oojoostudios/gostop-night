@@ -1,18 +1,25 @@
 'use client';
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Download } from 'lucide-react';
 import { useLocale } from '@/contexts/locale-context';
 import { chipValue, chipValueText, money, signed, signedMoney } from '@/lib/tonight';
 import { liveBalance, liveStandings } from '@/lib/live/standings';
 import { createLiveClient } from '@/lib/supabase/browser';
+import { downloadEventSummaryCsv } from '@/lib/live/csv';
 import type { PublicEvent } from '@/lib/live/events';
 import type { HandRow } from '@/lib/live/hands';
+import type { PendingHandRow } from '@/lib/live/pending-hands';
 import type { PlayerRow, TableRow } from '@/lib/live/types';
 import { CreateTableForm } from '@/components/create-table-form';
 import { AddPlayerForm } from '@/components/add-player-form';
 import { CountUp } from '@/components/count-up';
-import { cashOutPlayerAction, movePlayerAction, rebuyAction } from '@/app/host/[eventCode]/actions';
+import {
+  cashOutPlayerAction,
+  movePlayerAction,
+  rebuyAction,
+  resolvePendingHandAction,
+} from '@/app/host/[eventCode]/actions';
 
 export type TableWithQr = { table: TableRow; qrDataUrl: string };
 
@@ -32,12 +39,14 @@ export function HostDashboard({
   initialTables,
   initialPlayers,
   initialHands,
+  initialPendingHands,
   accessToken,
 }: {
   event: PublicEvent;
   initialTables: TableWithQr[];
   initialPlayers: PlayerRow[];
   initialHands: HandRow[];
+  initialPendingHands: PendingHandRow[];
   accessToken: string;
 }) {
   const { locale } = useLocale();
@@ -52,6 +61,7 @@ export function HostDashboard({
   );
   const [players, setPlayers] = useState(initialPlayers);
   const [hands, setHands] = useState(initialHands);
+  const [pendingHands, setPendingHands] = useState(initialPendingHands);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
@@ -89,6 +99,17 @@ export function HostDashboard({
           setHands((prev) => upsertById(prev, payload.new as HandRow));
         }
       })
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'pending_hands', filter: `event_id=eq.${event.id}` },
+        (payload) => {
+          if (payload.eventType === 'DELETE') {
+            setPendingHands((prev) => removeById(prev, (payload.old as PendingHandRow).id));
+          } else {
+            setPendingHands((prev) => upsertById(prev, payload.new as PendingHandRow));
+          }
+        },
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
@@ -98,6 +119,20 @@ export function HostDashboard({
   const chipVal = chipValue({ buyIn: event.buy_in_dollars, chipsPerBuyIn: event.chips_per_buy_in });
   const chipValueLabel = chipValueText(chipVal);
   const balance = liveBalance(players, event.chips_per_buy_in);
+  const nameOf = (id: string) => players.find((p) => p.id === id)?.name ?? '?';
+
+  const summaryRows = liveStandings(players, event.chips_per_buy_in, chipVal)
+    .map((r) => ({
+      name: r.player.name,
+      tableName:
+        tables.find((tb) => tb.id === r.player.table_id)?.name ?? t('Cashed out', '정산 완료'),
+      buyIns: r.player.buy_ins,
+      chips: r.player.chips,
+      net: r.net,
+      dollars: r.dollars,
+      netDollars: r.netDollars,
+    }))
+    .sort((a, b) => b.netDollars - a.netDollars);
 
   const runAction = (playerId: string, fn: () => Promise<void>) => {
     setActionError(null);
@@ -122,6 +157,40 @@ export function HostDashboard({
       <p className="mt-1 text-label uppercase tracking-[0.18em] text-ink-soft">
         {t('Host', '호스트')} · {event.code}
       </p>
+
+      {pendingHands.map((p) => {
+        const tableName = tables.find((tb) => tb.id === p.table_id)?.name ?? '';
+        return (
+          <div key={p.id} className="club-card mt-8 space-y-3 p-5 sm:p-6" aria-live="polite">
+            <h2 className="text-sub font-display">
+              {t('Rebuy needed', '리바이 필요')} · {tableName}
+            </h2>
+            <ul className="space-y-1 text-body">
+              {Object.entries(p.payload.shortfalls).map(([playerId, shortfall]) => {
+                const rebuysNeeded = Math.ceil(shortfall / event.chips_per_buy_in);
+                const dollars = event.buy_in_dollars * rebuysNeeded;
+                const chips = event.chips_per_buy_in * rebuysNeeded;
+                return (
+                  <li key={playerId}>
+                    {t(
+                      `${nameOf(playerId)}: collect ${money(dollars)} → +${chips} chips`,
+                      `${nameOf(playerId)}: ${money(dollars)} 수금 → +${chips}칩`,
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            <button
+              type="button"
+              className="club-btn club-btn--primary text-body disabled:cursor-not-allowed disabled:opacity-40"
+              disabled={pendingId === p.id}
+              onClick={() => runAction(p.id, () => resolvePendingHandAction(event.code, p.id))}
+            >
+              {t('Confirm rebuy & save hand', '리바이 확인 및 판 저장')}
+            </button>
+          </div>
+        );
+      })}
 
       <div className="club-card mt-8 space-y-3 p-5 sm:p-6">
         <h2 className="text-sub font-display">{t('Event settings', '이벤트 설정')}</h2>
@@ -299,6 +368,48 @@ export function HostDashboard({
       <div className="club-card mt-6 space-y-5 p-5 sm:p-6">
         <h2 className="text-sub font-display">{t('Add a player', '플레이어 추가')}</h2>
         <AddPlayerForm eventCode={event.code} tables={tables} />
+      </div>
+
+      <div className="club-card mt-6 space-y-5 p-5 sm:p-6">
+        <h2 className="text-sub font-display">{t('End of night', '정산 요약')}</h2>
+        {summaryRows.length === 0 ? (
+          <p className="text-body text-ink-soft">
+            {t('No players yet.', '아직 플레이어가 없어요.')}
+          </p>
+        ) : (
+          <ul className="divide-y divide-hairline">
+            {summaryRows.map((r) => (
+              <li
+                key={r.name + r.tableName}
+                className="flex flex-col gap-1 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-baseline sm:justify-between"
+              >
+                <div>
+                  <div className="font-medium">{r.name}</div>
+                  <div className="text-label tabular-nums text-ink-soft">
+                    {r.tableName} · {t(`${r.buyIns} buy-ins`, `바이인 ${r.buyIns}회`)}
+                  </div>
+                </div>
+                <div className="tabular-nums sm:text-right">
+                  <div className="font-bold">
+                    {r.chips}{' '}
+                    <span className="text-label font-normal text-ink-soft">{t('chips', '칩')}</span>
+                  </div>
+                  <div className="text-body text-ink-soft">
+                    {signed(r.net)} {t('chips', '칩')} · {signedMoney(r.netDollars)}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        <button
+          type="button"
+          className="club-btn text-body"
+          onClick={() => downloadEventSummaryCsv(event.name, event.date, summaryRows, ko)}
+        >
+          <Download className="size-4" />
+          {t('Export CSV', 'CSV 내보내기')}
+        </button>
       </div>
     </div>
   );

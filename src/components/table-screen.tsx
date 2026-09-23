@@ -4,9 +4,17 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import { useLocale } from '@/contexts/locale-context';
 import { createLiveClient } from '@/lib/supabase/browser';
 import { useLocalPlayer } from '@/lib/live/use-local-player';
+import { useOnlineStatus } from '@/lib/live/use-online-status';
 import { liveBalance, liveStandings } from '@/lib/live/standings';
+import {
+  pushToQueue,
+  readQueue,
+  removeFromQueue,
+  type QueuedEntry,
+} from '@/lib/live/offline-queue';
 import type { PlayerRow } from '@/lib/live/types';
 import type { HandRow } from '@/lib/live/hands';
+import type { PendingHandRow } from '@/lib/live/pending-hands';
 import {
   recordDrawAction,
   recordHandAction,
@@ -81,15 +89,22 @@ export function TableScreen({
   const { locale } = useLocale();
   const ko = locale === 'ko';
   const t = (en: string, kr: string) => (ko ? kr : en);
+  const online = useOnlineStatus();
 
   const supabase = useMemo(() => createLiveClient(accessToken), [accessToken]);
   const [players, setPlayers] = useState(initialPlayers);
   const [hands, setHands] = useState(initialHands);
   const [lock, setLock] = useState<HandLockRow | null>(null);
+  const [pendingHands, setPendingHands] = useState<PendingHandRow[]>([]);
   const { playerId, setPlayerId, mounted } = useLocalPlayer(table.code);
   const [formKey, setFormKey] = useState(0);
   const [pending, startTransition] = useTransition();
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [queue, setQueue] = useState<QueuedEntry[]>([]);
+
+  useEffect(() => {
+    setQueue(readQueue(table.code));
+  }, [table.code]);
 
   useEffect(() => {
     const channel = supabase
@@ -125,6 +140,17 @@ export function TableScreen({
           setLock(payload.eventType === 'DELETE' ? null : (payload.new as HandLockRow));
         },
       )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'pending_hands', filter: `table_id=eq.${table.id}` },
+        (payload) => {
+          if (payload.eventType === 'DELETE') {
+            setPendingHands((prev) => removeById(prev, (payload.old as PendingHandRow).id));
+          } else {
+            setPendingHands((prev) => upsertById(prev, payload.new as PendingHandRow));
+          }
+        },
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
@@ -155,27 +181,81 @@ export function TableScreen({
   const canUndo =
     !!lastHand && Date.now() - new Date(lastHand.created_at).getTime() <= UNDO_WINDOW_MS;
 
+  const nameOf = useCallback(
+    (id: string) => players.find((p) => p.id === id)?.name ?? '?',
+    [players],
+  );
+
   const handleDraftChange = useCallback(
     (active: boolean) => {
       if (!whoAmI) return;
       if (active) {
-        void setLockAction({
+        setLockAction({
           accessToken,
           eventId: event.id,
           tableId: table.id,
           enteredBy: whoAmI.name,
           handNumber: hands.length + 1,
+        }).catch(() => {
+          // Best-effort: the "X is entering..." banner is a nicety, not a guarantee.
         });
       } else {
-        void clearLockAction({ accessToken, eventId: event.id, tableId: table.id });
+        clearLockAction({ accessToken, eventId: event.id, tableId: table.id }).catch(() => {});
       }
     },
     [accessToken, event.id, table.id, whoAmI, hands.length],
   );
 
+  // Sends whatever's queued, in order, stopping at the first failure (still offline, most likely).
+  const flushQueue = useCallback(async () => {
+    for (const entry of readQueue(table.code)) {
+      try {
+        if (entry.kind === 'hand') {
+          await recordHandAction({
+            accessToken,
+            eventId: event.id,
+            tableId: table.id,
+            chipsPerPoint: event.chipsPerPoint,
+            playerCount: players.length,
+            enteredBy: entry.enteredBy,
+            input: entry.input,
+          });
+        } else {
+          await recordDrawAction({
+            accessToken,
+            eventId: event.id,
+            tableId: table.id,
+            enteredBy: entry.enteredBy,
+          });
+        }
+        setQueue(removeFromQueue(table.code, entry.id));
+      } catch {
+        break;
+      }
+    }
+  }, [accessToken, event.id, event.chipsPerPoint, table.id, table.code, players.length]);
+
+  useEffect(() => {
+    if (online) void flushQueue();
+  }, [online, flushQueue]);
+
   const handleSaveHand = (input: HandInput) => {
     if (!whoAmI) return;
     setSaveError(null);
+    const enteredBy = whoAmI.name;
+    if (!online) {
+      setQueue(
+        pushToQueue(table.code, {
+          kind: 'hand',
+          id: crypto.randomUUID(),
+          enteredBy,
+          input,
+          queuedAt: new Date().toISOString(),
+        }),
+      );
+      setFormKey((k) => k + 1);
+      return;
+    }
     startTransition(async () => {
       try {
         await recordHandAction({
@@ -184,12 +264,25 @@ export function TableScreen({
           tableId: table.id,
           chipsPerPoint: event.chipsPerPoint,
           playerCount: players.length,
-          enteredBy: whoAmI.name,
+          enteredBy,
           input,
         });
         setFormKey((k) => k + 1);
       } catch {
-        setSaveError(t('Could not save. Try again.', '저장하지 못했어요. 다시 시도하세요.'));
+        if (!navigator.onLine) {
+          setQueue(
+            pushToQueue(table.code, {
+              kind: 'hand',
+              id: crypto.randomUUID(),
+              enteredBy,
+              input,
+              queuedAt: new Date().toISOString(),
+            }),
+          );
+          setFormKey((k) => k + 1);
+        } else {
+          setSaveError(t('Could not save. Try again.', '저장하지 못했어요. 다시 시도하세요.'));
+        }
       }
     });
   };
@@ -197,17 +290,37 @@ export function TableScreen({
   const handleSaveDraw = () => {
     if (!whoAmI) return;
     setSaveError(null);
+    const enteredBy = whoAmI.name;
+    if (!online) {
+      setQueue(
+        pushToQueue(table.code, {
+          kind: 'draw',
+          id: crypto.randomUUID(),
+          enteredBy,
+          queuedAt: new Date().toISOString(),
+        }),
+      );
+      setFormKey((k) => k + 1);
+      return;
+    }
     startTransition(async () => {
       try {
-        await recordDrawAction({
-          accessToken,
-          eventId: event.id,
-          tableId: table.id,
-          enteredBy: whoAmI.name,
-        });
+        await recordDrawAction({ accessToken, eventId: event.id, tableId: table.id, enteredBy });
         setFormKey((k) => k + 1);
       } catch {
-        setSaveError(t('Could not save. Try again.', '저장하지 못했어요. 다시 시도하세요.'));
+        if (!navigator.onLine) {
+          setQueue(
+            pushToQueue(table.code, {
+              kind: 'draw',
+              id: crypto.randomUUID(),
+              enteredBy,
+              queuedAt: new Date().toISOString(),
+            }),
+          );
+          setFormKey((k) => k + 1);
+        } else {
+          setSaveError(t('Could not save. Try again.', '저장하지 못했어요. 다시 시도하세요.'));
+        }
       }
     });
   };
@@ -273,6 +386,26 @@ export function TableScreen({
         </p>
       </div>
 
+      {!online && (
+        <p
+          className="rounded-full bg-gold px-3 py-1 text-label font-medium text-on-fill"
+          aria-live="polite"
+        >
+          {t("Offline. Hands will save when you're back.", '오프라인이에요. 연결되면 저장돼요.')}
+        </p>
+      )}
+      {queue.length > 0 && (
+        <p
+          className="rounded-full bg-gold px-3 py-1 text-label font-medium text-on-fill"
+          aria-live="polite"
+        >
+          {t(
+            `${queue.length} hand${queue.length === 1 ? '' : 's'} waiting to save`,
+            `${queue.length}판 저장 대기 중`,
+          )}
+        </p>
+      )}
+
       <div className="club-card space-y-3 p-5 sm:p-6">
         <h2 className="text-sub font-display">{t('Players', '플레이어')}</h2>
         <ul className="space-y-3">
@@ -293,6 +426,22 @@ export function TableScreen({
           </p>
         )}
       </div>
+
+      {pendingHands.map((p) => {
+        const names = Object.keys(p.payload.shortfalls).map(nameOf).join(', ');
+        return (
+          <p
+            key={p.id}
+            className="rounded-full bg-gold px-3 py-1 text-label font-medium text-on-fill"
+            aria-live="polite"
+          >
+            {t(
+              `${names} needs to rebuy. Waiting for host.`,
+              `${names} 리바이 필요. 호스트 대기 중.`,
+            )}
+          </p>
+        );
+      })}
 
       {lockedByOther && lock && (
         <p

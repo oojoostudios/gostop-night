@@ -4,6 +4,7 @@ import { getEventByCode, toPublicEvent } from '@/lib/live/events';
 import { isHostSession } from '@/lib/live/host-session';
 import { listPlayersForEvent, listTablesForEvent } from '@/lib/live/tables';
 import { listHandsForTables } from '@/lib/live/hands';
+import { listPendingHandsForTables } from '@/lib/live/pending-hands';
 import { tableQrDataUrl } from '@/lib/live/qrcode';
 import { siteUrl } from '@/lib/live/site-url';
 import { signLiveToken } from '@/lib/live/token';
@@ -32,8 +33,10 @@ export default async function HostEventPage({
     listTablesForEvent(event.id),
     listPlayersForEvent(event.id),
   ]);
-  const [hands, hostToken] = await Promise.all([
-    listHandsForTables(tables.map((table) => table.id)),
+  const tableIds = tables.map((table) => table.id);
+  const [hands, pendingHands, hostToken] = await Promise.all([
+    listHandsForTables(tableIds),
+    listPendingHandsForTables(tableIds),
     signLiveToken({ gostop_role: 'host', event_id: event.id }, '12h'),
   ]);
   const tablesWithQr = await Promise.all(
@@ -49,6 +52,7 @@ export default async function HostEventPage({
       initialTables={tablesWithQr}
       initialPlayers={players}
       initialHands={hands}
+      initialPendingHands={pendingHands}
       accessToken={hostToken}
     />
   );

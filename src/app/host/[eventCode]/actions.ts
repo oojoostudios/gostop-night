@@ -6,6 +6,7 @@ import { createHostSession, isHostSession } from '@/lib/live/host-session';
 import { verifyPin } from '@/lib/live/pin';
 import { addPlayer, createTable } from '@/lib/live/tables';
 import { cashOutPlayerLive, movePlayerLive, rebuyPlayerLive } from '@/lib/live/host-actions';
+import { resolvePendingHandLive } from '@/lib/live/pending-hands';
 
 export type PinGateState = { error: 'not-found' | 'wrong-pin' | null };
 
@@ -93,4 +94,12 @@ export async function movePlayerAction(
 export async function cashOutPlayerAction(eventCode: string, playerId: string): Promise<void> {
   await requireHost(eventCode);
   await cashOutPlayerLive(playerId);
+}
+
+export async function resolvePendingHandAction(
+  eventCode: string,
+  pendingId: string,
+): Promise<void> {
+  await requireHost(eventCode);
+  await resolvePendingHandLive(pendingId);
 }

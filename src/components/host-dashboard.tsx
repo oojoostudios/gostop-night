@@ -22,6 +22,7 @@ import {
   rebuyAction,
   removePlayerAction,
   resolvePendingHandAction,
+  undoRebuyAction,
 } from '@/app/host/[eventCode]/actions';
 
 /** The next free "Table N" name — reuses a freed number rather than only ever counting up. */
@@ -391,6 +392,29 @@ export function HostDashboard({
                                 `Rebuy (+${event.chips_per_buy_in})`,
                                 `리바이 (+${event.chips_per_buy_in}칩)`,
                               )}
+                            </button>
+                            <button
+                              type="button"
+                              className="club-btn !px-3 !py-1.5 text-label disabled:cursor-not-allowed disabled:opacity-40"
+                              disabled={pendingId === r.player.id}
+                              onClick={() =>
+                                runGuardedAction(
+                                  r.player.id,
+                                  () => undoRebuyAction(event.code, r.player.id),
+                                  {
+                                    'not-last-rebuy': t(
+                                      `The last thing that happened to ${r.player.name} wasn't a rebuy — nothing to undo.`,
+                                      `${r.player.name} 님의 마지막 기록이 리바이가 아니에요 — 취소할 게 없어요.`,
+                                    ),
+                                    default: t(
+                                      'That action failed. Try again.',
+                                      '작업에 실패했어요. 다시 시도하세요.',
+                                    ),
+                                  },
+                                )
+                              }
+                            >
+                              {t('Undo last rebuy', '리바이 취소')}
                             </button>
                             {otherTables.length > 0 && (
                               <select

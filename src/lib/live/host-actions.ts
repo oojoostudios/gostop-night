@@ -110,3 +110,33 @@ export async function deleteTableLive(tableId: string): Promise<DeleteTableResul
   if (error) throw new Error(error.message);
   return { ok: true };
 }
+
+export type UndoRebuyResult = { ok: true } | { ok: false; reason: 'not-last-rebuy' };
+
+/**
+ * Reverses a player's most recent rebuy — chips and buy-in count both go back — but only
+ * while it's still their most recent ledger entry. If a hand (or another rebuy) has happened
+ * since, undoing it here would leave that later entry's numbers referring to a chip count
+ * that never really existed, so it's refused instead.
+ *
+ * See the note on `removePlayerLive` about returning rather than throwing expected outcomes.
+ */
+export async function undoRebuyLive(playerId: string): Promise<UndoRebuyResult> {
+  const db = supabaseAdmin();
+  const { data: lastEntry, error: ledgerError } = await db
+    .from('ledger')
+    .select()
+    .eq('player_id', playerId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (ledgerError) throw new Error(ledgerError.message);
+  if (!lastEntry || lastEntry.kind !== 'rebuy') return { ok: false, reason: 'not-last-rebuy' };
+
+  const { error } = await db.rpc('undo_rebuy', {
+    p_player_id: playerId,
+    p_ledger_id: lastEntry.id,
+  });
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}

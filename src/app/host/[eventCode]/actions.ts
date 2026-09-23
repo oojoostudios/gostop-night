@@ -11,8 +11,10 @@ import {
   movePlayerLive,
   rebuyPlayerLive,
   removePlayerLive,
+  undoRebuyLive,
   type DeleteTableResult,
   type RemovePlayerResult,
+  type UndoRebuyResult,
 } from '@/lib/live/host-actions';
 import { resolvePendingHandLive } from '@/lib/live/pending-hands';
 
@@ -143,4 +145,12 @@ export async function deleteTableAction(
 ): Promise<DeleteTableResult> {
   await requireHost(eventCode);
   return deleteTableLive(tableId);
+}
+
+export async function undoRebuyAction(
+  eventCode: string,
+  playerId: string,
+): Promise<UndoRebuyResult> {
+  await requireHost(eventCode);
+  return undoRebuyLive(playerId);
 }
